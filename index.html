@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Справочник автомобилей онлайн-игры Region: цены и характеристики по автосалонам.">
+  <meta name="theme-color" content="#0b0d0f">
+  <title>Region Auto — справочник автомобилей</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#catalog">К каталогу</a>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Region Auto — на главную">
+      <span class="brand__mark" aria-hidden="true">R</span>
+      <span>
+        <strong>REGION AUTO</strong>
+        <small>Справочник игроков</small>
+      </span>
+    </a>
+    <div class="header-meta">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span id="sourceLabel">Загрузка данных…</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="catalog-head" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">Автосалон 2/5</p>
+        <h1 id="pageTitle">Автомобили в продаже</h1>
+        <p class="intro">Цены и игровые характеристики в одном месте.</p>
+      </div>
+
+      <dl class="catalog-summary" aria-label="Сводка каталога">
+        <div>
+          <dt>Моделей</dt>
+          <dd id="totalCars">—</dd>
+        </div>
+        <div>
+          <dt>Цена от</dt>
+          <dd id="minPrice">—</dd>
+        </div>
+        <div>
+          <dt>До</dt>
+          <dd id="maxPrice">—</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="catalog-tools" aria-label="Поиск и сортировка">
+      <label class="search-field">
+        <span class="sr-only">Найти автомобиль</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+          <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="Марка или модель" autocomplete="off">
+        <kbd>/</kbd>
+      </label>
+
+      <label class="sort-field">
+        <span>Сортировка</span>
+        <select id="sortSelect">
+          <option value="price-asc">Сначала дешевле</option>
+          <option value="price-desc">Сначала дороже</option>
+          <option value="speed-desc">По максимальной скорости</option>
+          <option value="acceleration-asc">По разгону 0–100</option>
+          <option value="name-asc">По названию</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="catalog" class="catalog" aria-live="polite" aria-busy="true">
+      <div class="loading-state">
+        <span class="loader" aria-hidden="true"></span>
+        Загружаем автомобили
+      </div>
+    </section>
+
+    <p id="resultCount" class="result-count" hidden></p>
+  </main>
+
+  <footer class="site-footer">
+    <p>Region Auto</p>
+    <p>Данные могут меняться после обновлений игры.</p>
+  </footer>
+
+  <template id="carCardTemplate">
+    <article class="car-card">
+      <div class="car-card__topline">
+        <span class="car-card__number"></span>
+        <span class="dealer-pill"></span>
+      </div>
+      <div class="car-card__title">
+        <h2></h2>
+        <div class="price"></div>
+      </div>
+      <div class="car-card__facts"></div>
+      <dl class="spec-grid"></dl>
+    </article>
+  </template>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
