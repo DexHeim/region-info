@@ -27,6 +27,7 @@ html {
 body {
   min-width: 320px;
   margin: 0;
+  overflow-x: hidden;
   background:
     linear-gradient(115deg, transparent 0 61%, rgba(255, 255, 255, .014) 61% 61.25%, transparent 61.25%),
     radial-gradient(circle at 88% -8%, rgba(240, 55, 63, .2), transparent 32rem),
@@ -742,10 +743,96 @@ kbd {
   color: #fff;
 }
 
+.catalog-navigation {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) auto minmax(12rem, 1fr);
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  background: rgba(17, 18, 20, .88);
+}
+
 .result-count {
-  margin: 1rem 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: .88rem;
+}
+
+.pagination,
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.pagination button {
+  min-width: 2.55rem;
+  height: 2.55rem;
+  padding: 0 .72rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: #d8d8dc;
+  font-size: .78rem;
+  font-style: italic;
+  font-weight: 850;
+  cursor: pointer;
+  clip-path: polygon(.35rem 0, 100% 0, calc(100% - .35rem) 100%, 0 100%);
+}
+
+.pagination button:hover:not(:disabled),
+.pagination button:focus-visible {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.pagination button:focus-visible,
+.page-size-field select:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.pagination button:disabled {
+  opacity: .34;
+  cursor: not-allowed;
+}
+
+.pagination__page.is-active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+}
+
+.pagination__gap {
+  width: 1.7rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.page-size-field {
+  display: flex;
+  justify-self: end;
+  gap: .65rem;
+  align-items: center;
+  color: var(--muted);
+  font-size: .75rem;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.page-size-field select {
+  min-height: 2.55rem;
+  padding: 0 1.8rem 0 .75rem;
+  border: 1px solid var(--line);
+  outline: 0;
+  background: var(--surface-2);
+  color: #fff;
+  font-weight: 850;
+  cursor: pointer;
 }
 
 .site-footer {
@@ -901,13 +988,20 @@ kbd {
 
 .comparison-dialog {
   width: min(calc(100% - 2rem), 74rem);
-  max-height: min(90vh, 58rem);
+  height: min(90dvh, 58rem);
+  max-height: none;
   padding: 0;
   overflow: hidden;
   border: 1px solid #5a3333;
   background: #0d0d0f;
   color: var(--text);
   box-shadow: 0 2rem 7rem rgba(0, 0, 0, .72);
+}
+
+.comparison-dialog[open],
+.car-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .comparison-dialog::backdrop {
@@ -949,9 +1043,20 @@ kbd {
 }
 
 .comparison-content {
-  max-height: calc(90vh - 6.8rem);
+  min-height: 0;
+  max-height: none;
   padding: 1rem;
   overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.comparison-content:focus-visible,
+.car-dialog__content:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
 }
 
 .comparison-table-wrap {
@@ -1070,7 +1175,8 @@ kbd {
 
 .car-dialog {
   width: min(calc(100% - 2rem), 72rem);
-  max-height: min(92vh, 64rem);
+  height: min(92dvh, 64rem);
+  max-height: none;
   padding: 0;
   overflow: hidden;
   border: 1px solid #5a3333;
@@ -1120,9 +1226,14 @@ kbd {
 }
 
 .car-dialog__content {
-  max-height: calc(92vh - 6.6rem);
+  min-height: 0;
+  max-height: none;
   padding: 1rem;
   overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .car-detail__hero {
@@ -1439,6 +1550,16 @@ kbd {
     text-align: left;
   }
 
+  .catalog-navigation {
+    grid-template-columns: 1fr auto;
+  }
+
+  .pagination {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+  }
+
   .tuning-section__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1536,6 +1657,35 @@ kbd {
     grid-column: auto;
   }
 
+  .catalog-navigation {
+    grid-template-columns: 1fr;
+  }
+
+  .result-count,
+  .page-size-field,
+  .pagination {
+    justify-self: stretch;
+  }
+
+  .page-size-field {
+    justify-content: space-between;
+  }
+
+  .pagination {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: space-between;
+  }
+
+  .pagination__pages {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .pagination__step span {
+    display: none;
+  }
+
   body.has-comparison {
     padding-bottom: 9.5rem;
   }
@@ -1554,7 +1704,8 @@ kbd {
 
   .comparison-dialog {
     width: calc(100% - 1rem);
-    max-height: 94vh;
+    height: 94dvh;
+    max-height: none;
   }
 
   .comparison-dialog__header {
@@ -1562,13 +1713,14 @@ kbd {
   }
 
   .comparison-content {
-    max-height: calc(94vh - 6.2rem);
+    max-height: none;
     padding: .6rem;
   }
 
   .car-dialog {
     width: calc(100% - 1rem);
-    max-height: 94vh;
+    height: 94dvh;
+    max-height: none;
   }
 
   .car-dialog__header {
@@ -1576,7 +1728,7 @@ kbd {
   }
 
   .car-dialog__content {
-    max-height: calc(94vh - 6.2rem);
+    max-height: none;
     padding: .6rem;
   }
 

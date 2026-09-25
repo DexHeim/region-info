@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#09090a">
   <title>Region Info — справочник по игре Region</title>
   <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260925-8">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260925-10">
 </head>
 <body>
   <a class="skip-link" href="#catalog">К каталогу</a>
@@ -94,7 +94,22 @@
       </div>
     </section>
 
-    <p id="resultCount" class="result-count" hidden></p>
+    <div id="catalogNavigation" class="catalog-navigation" hidden>
+      <p id="resultCount" class="result-count"></p>
+      <nav id="pagination" class="pagination" aria-label="Страницы каталога">
+        <button id="previousPage" class="pagination__step" type="button" aria-label="Предыдущая страница">← <span>Назад</span></button>
+        <div id="paginationPages" class="pagination__pages"></div>
+        <button id="nextPage" class="pagination__step" type="button" aria-label="Следующая страница"><span>Вперёд</span> →</button>
+      </nav>
+      <label class="page-size-field">
+        <span>На странице</span>
+        <select id="pageSizeSelect">
+          <option value="12" selected>12</option>
+          <option value="24">24</option>
+          <option value="48">48</option>
+        </select>
+      </label>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -128,7 +143,7 @@
       </div>
       <button id="closeComparison" class="dialog-close" type="button" aria-label="Закрыть сравнение">×</button>
     </div>
-    <div id="comparisonContent" class="comparison-content"></div>
+    <div id="comparisonContent" class="comparison-content" tabindex="0"></div>
   </dialog>
 
   <dialog id="carDialog" class="car-dialog" aria-labelledby="carDialogTitle">
@@ -139,7 +154,7 @@
       </div>
       <button id="closeCarDialog" class="dialog-close" type="button" aria-label="Закрыть карточку">×</button>
     </div>
-    <div id="carDialogContent" class="car-dialog__content"></div>
+    <div id="carDialogContent" class="car-dialog__content" tabindex="0"></div>
   </dialog>
 
   <dialog id="tuningCalculatorDialog" class="car-dialog calculator-dialog" aria-labelledby="tuningCalculatorTitle">
@@ -150,7 +165,7 @@
       </div>
       <button id="closeTuningCalculator" class="dialog-close" type="button" aria-label="Закрыть калькулятор">×</button>
     </div>
-    <div class="car-dialog__content">
+    <div class="car-dialog__content" tabindex="0">
       <form class="tuning-calculator-form" onsubmit="return false">
         <label>
           <span>Исходная стоимость</span>
@@ -197,6 +212,6 @@
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/tuning.js?v=20260925-4"></script>
-  <script src="assets/js/app.js?v=20260925-8" defer></script>
+  <script src="assets/js/app.js?v=20260925-10" defer></script>
 </body>
 </html>

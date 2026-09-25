@@ -11,7 +11,13 @@
   const totalCars = document.querySelector("#totalCars");
   const minPrice = document.querySelector("#minPrice");
   const maxPrice = document.querySelector("#maxPrice");
+  const catalogNavigation = document.querySelector("#catalogNavigation");
   const resultCount = document.querySelector("#resultCount");
+  const pagination = document.querySelector("#pagination");
+  const paginationPages = document.querySelector("#paginationPages");
+  const previousPage = document.querySelector("#previousPage");
+  const nextPage = document.querySelector("#nextPage");
+  const pageSizeSelect = document.querySelector("#pageSizeSelect");
   const comparisonTray = document.querySelector("#comparisonTray");
   const comparisonCount = document.querySelector("#comparisonCount");
   const clearComparison = document.querySelector("#clearComparison");
@@ -46,6 +52,7 @@
 
   let cars = [];
   let selectedDealer = "all";
+  let currentPage = 1;
   const selectedIds = new Set();
   let limitNoticeTimer;
 
@@ -265,6 +272,7 @@
   function showCarDialog(car) {
     carDialogTitle.textContent = car.name;
     carDialogContent.replaceChildren();
+    carDialogContent.scrollTop = 0;
 
     const hero = document.createElement("section");
     hero.className = "car-detail__hero";
@@ -364,10 +372,85 @@
     });
   }
 
+  function carCountWord(count) {
+    const lastTwo = count % 100;
+    const last = count % 10;
+    return last === 1 && lastTwo !== 11 ? "автомобиля" : "автомобилей";
+  }
+
+  function getPaginationItems(totalPages) {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    const pages = new Set([1, totalPages]);
+    for (let page = currentPage - 1; page <= currentPage + 1; page += 1) {
+      if (page > 1 && page < totalPages) pages.add(page);
+    }
+    if (currentPage <= 3) [2, 3, 4].forEach((page) => pages.add(page));
+    if (currentPage >= totalPages - 2) {
+      [totalPages - 3, totalPages - 2, totalPages - 1].forEach((page) => pages.add(page));
+    }
+
+    const sorted = Array.from(pages).sort((a, b) => a - b);
+    const items = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) items.push(null);
+      items.push(page);
+    });
+    return items;
+  }
+
+  function goToPage(page) {
+    if (page === currentPage) return;
+    currentPage = page;
+    render();
+    catalog.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+    });
+  }
+
+  function renderPagination(totalPages) {
+    pagination.hidden = totalPages <= 1;
+    previousPage.disabled = currentPage === 1;
+    nextPage.disabled = currentPage === totalPages;
+    paginationPages.replaceChildren();
+
+    getPaginationItems(totalPages).forEach((page, index) => {
+      if (page === null) {
+        const gap = document.createElement("span");
+        gap.className = "pagination__gap";
+        gap.textContent = "…";
+        gap.setAttribute("aria-hidden", "true");
+        paginationPages.append(gap);
+        return;
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "pagination__page";
+      button.textContent = String(page);
+      button.setAttribute("aria-label", `Страница ${page}`);
+      if (page === currentPage) {
+        button.classList.add("is-active");
+        button.setAttribute("aria-current", "page");
+      }
+      button.addEventListener("click", () => goToPage(page));
+      paginationPages.append(button);
+    });
+  }
+
   function render() {
     const visibleCars = getVisibleCars();
     updateSummary(visibleCars);
     catalog.replaceChildren();
+
+    const pageSize = Number(pageSizeSelect.value);
+    const totalPages = Math.max(1, Math.ceil(visibleCars.length / pageSize));
+    currentPage = Math.min(currentPage, totalPages);
+    const startIndex = (currentPage - 1) * pageSize;
+    const pageCars = visibleCars.slice(startIndex, startIndex + pageSize);
 
     if (!visibleCars.length) {
       const empty = document.createElement("div");
@@ -376,13 +459,17 @@
       catalog.append(empty);
     } else {
       const fragment = document.createDocumentFragment();
-      visibleCars.forEach((car, index) => fragment.append(createCard(car, index)));
+      pageCars.forEach((car, index) => fragment.append(createCard(car, startIndex + index)));
       catalog.append(fragment);
     }
 
-    const word = visibleCars.length === 1 ? "автомобиль" : (visibleCars.length >= 2 && visibleCars.length <= 4 ? "автомобиля" : "автомобилей");
-    resultCount.textContent = `Показано: ${visibleCars.length} ${word}`;
-    resultCount.hidden = false;
+    const shownFrom = visibleCars.length ? startIndex + 1 : 0;
+    const shownTo = startIndex + pageCars.length;
+    resultCount.textContent = visibleCars.length
+      ? `Показано ${shownFrom}–${shownTo} из ${visibleCars.length} ${carCountWord(visibleCars.length)}`
+      : "Показано 0 автомобилей";
+    catalogNavigation.hidden = false;
+    renderPagination(totalPages);
   }
 
   function updateSummary(list) {
@@ -530,11 +617,27 @@
     catalog.innerHTML = '<div class="error-state"><strong>Не удалось загрузить каталог</strong><span>Проверьте источник данных и обновите страницу.</span></div>';
   }
 
-  searchInput.addEventListener("input", render);
-  sortSelect.addEventListener("change", render);
+  searchInput.addEventListener("input", () => {
+    currentPage = 1;
+    render();
+  });
+  sortSelect.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
+  pageSizeSelect.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
+  previousPage.addEventListener("click", () => goToPage(Math.max(1, currentPage - 1)));
+  nextPage.addEventListener("click", () => {
+    const totalPages = Math.max(1, Math.ceil(getVisibleCars().length / Number(pageSizeSelect.value)));
+    goToPage(Math.min(totalPages, currentPage + 1));
+  });
   dealerButtons.forEach((button) => {
     button.addEventListener("click", () => {
       selectedDealer = button.dataset.dealer;
+      currentPage = 1;
       dealerButtons.forEach((item) => {
         const active = item === button;
         item.classList.toggle("is-active", active);
@@ -564,6 +667,7 @@
   });
   openTuningCalculator.addEventListener("click", () => {
     renderTuningCalculator();
+    tuningCalculatorDialog.querySelector(".car-dialog__content").scrollTop = 0;
     tuningCalculatorDialog.showModal();
   });
   closeTuningCalculator.addEventListener("click", () => tuningCalculatorDialog.close());
