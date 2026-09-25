@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Region Info — справочник по онлайн-игре Region. Цены и характеристики автомобилей во всех автосалонах.">
+  <meta name="description" content="Region Info — справочник по онлайн-игре Region. Цены, характеристики и расчёт стоимости тюнинга автомобилей.">
   <meta name="theme-color" content="#09090a">
   <title>Region Info — справочник по игре Region</title>
   <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260925-5">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260925-7">
 </head>
 <body>
   <a class="skip-link" href="#catalog">К каталогу</a>
@@ -31,7 +31,7 @@
       <div>
         <p class="eyebrow">Автосалоны 1/5 — 5/5</p>
         <h1 id="pageTitle">Автомобили в продаже</h1>
-        <p class="intro">Цены и игровые характеристики автомобилей во всех салонах Region.</p>
+        <p class="intro">Цены, игровые характеристики и расчёт стоимости полного тюнинга автомобилей Region.</p>
       </div>
 
       <dl class="catalog-summary" aria-label="Сводка каталога">
@@ -68,6 +68,13 @@
         <kbd>/</kbd>
       </label>
 
+      <button id="openTuningCalculator" class="tuning-calculator-button" type="button">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19">
+          <path d="M4 3h16v18H4V3Zm4 4h8M8 12h1m3 0h1m3 0h1M8 16h1m3 0h1m3 0h1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Калькулятор тюнинга
+      </button>
+
       <label class="sort-field">
         <span>Сортировка</span>
         <select id="sortSelect">
@@ -91,8 +98,15 @@
   </main>
 
   <footer class="site-footer">
-    <p>Region Info</p>
-    <p>Данные могут меняться после обновлений игры.</p>
+    <div class="site-footer__brand">
+      <strong>REGION INFO</strong>
+      <span>Разработано для проекта <a href="https://region.game/" target="_blank" rel="noreferrer">Region</a></span>
+    </div>
+    <nav class="site-footer__links" aria-label="Контакты разработчика">
+      <a href="https://github.com/DexHeim" target="_blank" rel="noreferrer">GitHub · @DexHeim</a>
+      <a href="https://t.me/DexHeim" target="_blank" rel="noreferrer">Telegram · @DexHeim</a>
+    </nav>
+    <p class="site-footer__note">Неофициальный справочник. Данные могут меняться после обновлений игры.</p>
   </footer>
 
   <aside id="comparisonTray" class="comparison-tray" aria-label="Выбранные автомобили" hidden>
@@ -117,6 +131,44 @@
     <div id="comparisonContent" class="comparison-content"></div>
   </dialog>
 
+  <dialog id="carDialog" class="car-dialog" aria-labelledby="carDialogTitle">
+    <div class="car-dialog__header">
+      <div>
+        <p class="eyebrow">Карточка автомобиля</p>
+        <h2 id="carDialogTitle"></h2>
+      </div>
+      <button id="closeCarDialog" class="dialog-close" type="button" aria-label="Закрыть карточку">×</button>
+    </div>
+    <div id="carDialogContent" class="car-dialog__content"></div>
+  </dialog>
+
+  <dialog id="tuningCalculatorDialog" class="car-dialog calculator-dialog" aria-labelledby="tuningCalculatorTitle">
+    <div class="car-dialog__header">
+      <div>
+        <p class="eyebrow">Свободный расчёт</p>
+        <h2 id="tuningCalculatorTitle">Калькулятор тюнинга</h2>
+      </div>
+      <button id="closeTuningCalculator" class="dialog-close" type="button" aria-label="Закрыть калькулятор">×</button>
+    </div>
+    <div class="car-dialog__content">
+      <form class="tuning-calculator-form" onsubmit="return false">
+        <label>
+          <span>Исходная стоимость</span>
+          <select id="tuningPriceType">
+            <option value="sale">Цена в салоне</option>
+            <option value="state">Гос. стоимость (70%)</option>
+          </select>
+        </label>
+        <label>
+          <span>Сумма, ₽</span>
+          <input id="tuningPriceInput" type="number" min="1000" step="100" value="1700000" inputmode="numeric">
+        </label>
+      </form>
+      <div id="tuningCalculatorSummary" class="calculator-summary" aria-live="polite"></div>
+      <div id="tuningCalculatorResults" class="tuning-sections"></div>
+    </div>
+  </dialog>
+
   <template id="carCardTemplate">
     <article class="car-card">
       <div class="car-card__topline">
@@ -136,11 +188,15 @@
       </div>
       <div class="car-card__facts"></div>
       <dl class="spec-grid"></dl>
-      <button class="compare-toggle" type="button" aria-pressed="false"></button>
+      <div class="car-card__actions">
+        <button class="car-details-button" type="button">Карточка и тюнинг</button>
+        <button class="compare-toggle" type="button" aria-pressed="false"></button>
+      </div>
     </article>
   </template>
 
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/app.js?v=20260925-4" defer></script>
+  <script src="assets/js/tuning.js?v=20260925-3"></script>
+  <script src="assets/js/app.js?v=20260925-7" defer></script>
 </body>
 </html>

@@ -19,6 +19,18 @@
   const comparisonDialog = document.querySelector("#comparisonDialog");
   const comparisonContent = document.querySelector("#comparisonContent");
   const closeComparison = document.querySelector("#closeComparison");
+  const carDialog = document.querySelector("#carDialog");
+  const carDialogTitle = document.querySelector("#carDialogTitle");
+  const carDialogContent = document.querySelector("#carDialogContent");
+  const closeCarDialog = document.querySelector("#closeCarDialog");
+  const openTuningCalculator = document.querySelector("#openTuningCalculator");
+  const tuningCalculatorDialog = document.querySelector("#tuningCalculatorDialog");
+  const closeTuningCalculator = document.querySelector("#closeTuningCalculator");
+  const tuningPriceType = document.querySelector("#tuningPriceType");
+  const tuningPriceInput = document.querySelector("#tuningPriceInput");
+  const tuningCalculatorSummary = document.querySelector("#tuningCalculatorSummary");
+  const tuningCalculatorResults = document.querySelector("#tuningCalculatorResults");
+  const tuning = window.REGION_TUNING;
 
   const priceFormatter = new Intl.NumberFormat("ru-RU", {
     style: "currency",
@@ -164,6 +176,7 @@
   function createCard(car, index) {
     const fragment = template.content.cloneNode(true);
     const card = fragment.querySelector(".car-card");
+    const detailsButton = fragment.querySelector(".car-details-button");
     const compareButton = fragment.querySelector(".compare-toggle");
     const isSelected = selectedIds.has(car.id);
 
@@ -185,11 +198,140 @@
     addSpec(specs, "Разгон 0–100", `${formatDecimal(car.acceleration_0_100_s)} сек.`);
     addSpec(specs, "Торможение 100–0", `${formatDecimal(car.braking_100_0_s)} сек.`);
 
+    detailsButton.addEventListener("click", () => showCarDialog(car));
     compareButton.textContent = isSelected ? "В сравнении" : "Добавить к сравнению";
     compareButton.classList.toggle("is-selected", isSelected);
     compareButton.setAttribute("aria-pressed", String(isSelected));
     compareButton.addEventListener("click", () => toggleComparison(car.id));
     return fragment;
+  }
+
+  function createDetailPrice(label, value) {
+    const wrapper = document.createElement("div");
+    const term = document.createElement("span");
+    const price = document.createElement("strong");
+    term.textContent = label;
+    price.textContent = priceFormatter.format(value);
+    wrapper.append(term, price);
+    return wrapper;
+  }
+
+  function createTuningGroup(group, carPrice, kind, wide) {
+    const article = document.createElement("article");
+    article.className = "tuning-group";
+    if (wide) article.classList.add("tuning-group--wide");
+
+    const title = document.createElement("h4");
+    title.textContent = group.title;
+    const list = document.createElement("ul");
+    list.className = "tuning-list";
+
+    group.options.forEach(([label, referencePrice]) => {
+      const item = document.createElement("li");
+      const name = document.createElement("span");
+      const price = document.createElement("strong");
+      name.textContent = label;
+      price.textContent = priceFormatter.format(
+        tuning.calculatePrice(referencePrice, carPrice, kind)
+      );
+      item.append(name, price);
+      list.append(item);
+    });
+
+    article.append(title, list);
+    return article;
+  }
+
+  function createTuningSection(title, groups, carPrice, kind, open, wide) {
+    const section = document.createElement("details");
+    section.className = "tuning-section";
+    section.open = open;
+
+    const optionCount = groups.reduce((total, group) => total + group.options.length, 0);
+    const summary = document.createElement("summary");
+    const summaryTitle = document.createElement("strong");
+    const summaryCount = document.createElement("span");
+    summaryTitle.textContent = title;
+    summaryCount.textContent = `${optionCount} вариантов`;
+    summary.append(summaryTitle, summaryCount);
+
+    const grid = document.createElement("div");
+    grid.className = "tuning-section__grid";
+    groups.forEach((group) => grid.append(createTuningGroup(group, carPrice, kind, wide)));
+    section.append(summary, grid);
+    return section;
+  }
+
+  function showCarDialog(car) {
+    carDialogTitle.textContent = car.name;
+    carDialogContent.replaceChildren();
+
+    const hero = document.createElement("section");
+    hero.className = "car-detail__hero";
+    const visual = document.createElement("div");
+    visual.className = "car-detail__visual vehicle-sprite";
+    visual.setAttribute("aria-hidden", "true");
+    applySprite(visual, car);
+
+    const overview = document.createElement("div");
+    overview.className = "car-detail__overview";
+    const dealer = document.createElement("span");
+    dealer.className = "dealer-pill";
+    dealer.textContent = car.dealer;
+    const prices = document.createElement("div");
+    prices.className = "car-detail__prices";
+    prices.append(
+      createDetailPrice("Стоимость автомобиля", car.price_rub),
+      createDetailPrice("Гос. стоимость (70%)", car.state_price_rub),
+      createDetailPrice("Макс. улучшения", tuning.calculatePerformanceTotal(car.price_rub))
+    );
+    overview.append(dealer, prices);
+    hero.append(visual, overview);
+
+    const note = document.createElement("p");
+    note.className = "tuning-note";
+    note.textContent = "Цены рассчитаны пропорционально стоимости автомобиля по данным BMW M5 (E39) за 1 700 000 ₽ и округлены до 100 ₽. Минимальная цена улучшения — 10 000 ₽.";
+
+    const sections = document.createElement("div");
+    sections.className = "tuning-sections";
+    sections.append(
+      createTuningSection("Улучшения", tuning.performance, car.price_rub, "mechanical", true, false),
+      createTuningSection("Покраска и внешний вид", tuning.appearance, car.price_rub, "visual", false, false),
+      createTuningSection("Клаксон", [tuning.horns], car.price_rub, "visual", false, true)
+    );
+
+    carDialogContent.append(hero, note, sections);
+    carDialog.showModal();
+  }
+
+  function renderTuningCalculator() {
+    const enteredPrice = toNumber(tuningPriceInput.value);
+    tuningCalculatorSummary.replaceChildren();
+    tuningCalculatorResults.replaceChildren();
+
+    if (!Number.isFinite(enteredPrice) || enteredPrice <= 0) {
+      const error = document.createElement("p");
+      error.className = "calculator-error";
+      error.textContent = "Укажите стоимость автомобиля больше нуля.";
+      tuningCalculatorSummary.append(error);
+      return;
+    }
+
+    const carPrice = tuningPriceType.value === "state"
+      ? enteredPrice / STATE_BUYBACK_RATE
+      : enteredPrice;
+    const statePrice = carPrice * STATE_BUYBACK_RATE;
+
+    tuningCalculatorSummary.append(
+      createDetailPrice("Цена в салоне", Math.round(carPrice)),
+      createDetailPrice("Гос. стоимость (70%)", Math.round(statePrice)),
+      createDetailPrice("Макс. улучшения", tuning.calculatePerformanceTotal(carPrice))
+    );
+    tuningCalculatorResults.append(
+      createTuningSection("Улучшения", tuning.performance, carPrice, "mechanical", true, false),
+      createTuningSection("Покраска и внешний вид", tuning.appearance, carPrice, "visual", false, false),
+      createTuningSection("Клаксон", [tuning.horns], carPrice, "visual", false, true)
+    );
   }
 
   function getVisibleCars() {
@@ -407,8 +549,22 @@
   comparisonDialog.addEventListener("click", (event) => {
     if (event.target === comparisonDialog) comparisonDialog.close();
   });
+  closeCarDialog.addEventListener("click", () => carDialog.close());
+  carDialog.addEventListener("click", (event) => {
+    if (event.target === carDialog) carDialog.close();
+  });
+  openTuningCalculator.addEventListener("click", () => {
+    renderTuningCalculator();
+    tuningCalculatorDialog.showModal();
+  });
+  closeTuningCalculator.addEventListener("click", () => tuningCalculatorDialog.close());
+  tuningCalculatorDialog.addEventListener("click", (event) => {
+    if (event.target === tuningCalculatorDialog) tuningCalculatorDialog.close();
+  });
+  tuningPriceType.addEventListener("change", renderTuningCalculator);
+  tuningPriceInput.addEventListener("input", renderTuningCalculator);
   document.addEventListener("keydown", (event) => {
-    if (event.key === "/" && document.activeElement !== searchInput) {
+    if (event.key === "/" && !comparisonDialog.open && !carDialog.open && !tuningCalculatorDialog.open && document.activeElement !== searchInput) {
       event.preventDefault();
       searchInput.focus();
     }
