@@ -420,30 +420,31 @@ kbd {
   overflow: hidden;
   border-top: 1px solid rgba(255,255,255,.025);
   border-bottom: 1px solid var(--line);
-  background: #0d1012;
+  background: transparent;
 }
 
 .car-card__visual::before {
   content: "";
   position: absolute;
   top: 50%;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  width: auto;
+  height: 125%;
   aspect-ratio: 1;
-  background-image: url("../img/car-sprite.png");
+  background-image: url("../img/car-sprite-v2.png");
   background-repeat: no-repeat;
   background-position: var(--sprite-x) var(--sprite-y);
   background-size: 400% 400%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
 }
 
 .car-card__visual--dealer-1::before {
-  background-image: url("../img/car-sprite-dealer-1.png");
+  background-image: url("../img/car-sprite-dealer-1-v2.png");
   background-size: 300% 300%;
 }
 
 .car-card__visual--dealer-4::before {
-  background-image: url("../img/car-sprite-dealer-4.png");
+  background-image: url("../img/car-sprite-dealer-4-v2.png");
   background-size: 500% 500%;
 }
 
