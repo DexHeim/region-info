@@ -1,10 +1,9 @@
 """Normalize vehicle placement inside the catalog sprite sheets.
 
-The catalog enlarges a sprite tile inside its viewport. Every opaque vehicle
-therefore needs a consistent transparent safety margin so roofs, wheels and
-bumpers are never clipped. This script trims each tile to its visible pixels,
-scales it without changing its aspect ratio, and places it back in the centre
-of the original grid cell.
+Some source vehicles extend beyond their nominal grid cells, so slicing the
+sheet into cells first can cut a vehicle in half. Detect complete connected
+vehicle shapes across the whole sheet, then scale and centre each shape in its
+destination cell with a consistent transparent safety margin.
 """
 
 from __future__ import annotations
@@ -28,6 +27,22 @@ class SpriteSheet:
     grid_size: int
 
 
+@dataclass(frozen=True)
+class Component:
+    pixel_count: int
+    bounds: tuple[int, int, int, int]
+
+    @property
+    def centre_x(self) -> float:
+        left, _, right, _ = self.bounds
+        return (left + right) / 2
+
+    @property
+    def centre_y(self) -> float:
+        _, top, _, bottom = self.bounds
+        return (top + bottom) / 2
+
+
 SHEETS = (
     SpriteSheet("dealer-2", "car-sprite-v2.png", "car-sprite-v3.png", 4),
     SpriteSheet("dealer-1", "car-sprite-dealer-1-v2.png", "car-sprite-dealer-1-v3.png", 3),
@@ -40,7 +55,8 @@ SHEETS = (
     SpriteSheet("dealer-5d", "car-sprite-dealer-5d.png", "car-sprite-dealer-5d-v3.png", 4),
 )
 
-ALPHA_THRESHOLD = 8
+ALPHA_THRESHOLDS = (16, 24, 32, 48, 64, 96, 128)
+MIN_COMPONENT_PIXELS = 500
 MAX_CONTENT_WIDTH = 0.90
 MAX_CONTENT_HEIGHT = 0.76
 SOURCE_PADDING = 3
@@ -64,20 +80,14 @@ def cell_edges(length: int, grid_size: int) -> list[int]:
     return [round(index * length / grid_size) for index in range(grid_size + 1)]
 
 
-def visible_bounds(image: Image.Image) -> tuple[int, int, int, int] | None:
-    """Return the bounds of the main connected opaque shape in a grid cell.
-
-    A few source vehicles extend a pixel or two into a neighbouring cell. The
-    largest connected component is the actual vehicle; using it prevents those
-    foreign edge fragments from influencing the crop and appearing in cards.
-    """
+def visible_components(image: Image.Image, threshold: int) -> list[Component]:
+    """Return substantial connected opaque shapes across an entire sheet."""
 
     width, height = image.size
     alpha = image.getchannel("A").tobytes()
-    visible = bytearray(value > ALPHA_THRESHOLD for value in alpha)
+    visible = bytearray(value > threshold for value in alpha)
     visited = bytearray(width * height)
-    largest_size = 0
-    largest_bounds: tuple[int, int, int, int] | None = None
+    components: list[Component] = []
 
     for start, is_visible in enumerate(visible):
         if not is_visible or visited[start]:
@@ -106,11 +116,50 @@ def visible_bounds(image: Image.Image) -> tuple[int, int, int, int] | None:
                         visited[neighbour] = 1
                         stack.append(neighbour)
 
-        if size > largest_size:
-            largest_size = size
-            largest_bounds = (min_x, min_y, max_x + 1, max_y + 1)
+        if size > MIN_COMPONENT_PIXELS:
+            components.append(
+                Component(size, (min_x, min_y, max_x + 1, max_y + 1))
+            )
 
-    return largest_bounds
+    return components
+
+
+def extract_vehicles(
+    source: Image.Image, expected_count: int
+) -> tuple[list[Component], int]:
+    """Find a threshold that separates every complete vehicle in the sheet."""
+
+    counts: list[str] = []
+    for threshold in ALPHA_THRESHOLDS:
+        components = visible_components(source, threshold)
+        counts.append(f"{threshold}: {len(components)}")
+        if len(components) == expected_count:
+            return components, threshold
+
+    raise ValueError(
+        f"Expected {expected_count} vehicles, found {', '.join(counts)}"
+    )
+
+
+def assign_components(
+    components: list[Component], used_indexes: set[int], grid_size: int
+) -> dict[int, Component]:
+    """Assign visually ordered components to their destination sprite indexes."""
+
+    indexes_by_row: dict[int, list[int]] = {}
+    for index in sorted(used_indexes):
+        indexes_by_row.setdefault(index // grid_size, []).append(index)
+
+    by_vertical_position = sorted(components, key=lambda item: item.centre_y)
+    assignments: dict[int, Component] = {}
+    offset = 0
+    for indexes in indexes_by_row.values():
+        row_components = by_vertical_position[offset : offset + len(indexes)]
+        row_components.sort(key=lambda item: item.centre_x)
+        assignments.update(zip(indexes, row_components))
+        offset += len(indexes)
+
+    return assignments
 
 
 def padded_crop(image: Image.Image, bounds: tuple[int, int, int, int]) -> Image.Image:
@@ -132,6 +181,8 @@ def normalize_sheet(spec: SpriteSheet) -> None:
     x_edges = cell_edges(source.width, spec.grid_size)
     y_edges = cell_edges(source.height, spec.grid_size)
     used_indexes = used_tile_indexes().get(spec.key, set())
+    components, threshold = extract_vehicles(source, len(used_indexes))
+    assignments = assign_components(components, used_indexes, spec.grid_size)
 
     for row in range(spec.grid_size):
         for column in range(spec.grid_size):
@@ -141,12 +192,7 @@ def normalize_sheet(spec: SpriteSheet) -> None:
 
             left, right = x_edges[column], x_edges[column + 1]
             top, bottom = y_edges[row], y_edges[row + 1]
-            cell = source.crop((left, top, right, bottom))
-            bounds = visible_bounds(cell)
-            if bounds is None:
-                continue
-
-            vehicle = padded_crop(cell, bounds)
+            vehicle = padded_crop(source, assignments[sprite_index].bounds)
             max_width = round((right - left) * MAX_CONTENT_WIDTH)
             max_height = round((bottom - top) * MAX_CONTENT_HEIGHT)
             scale = min(max_width / vehicle.width, max_height / vehicle.height)
@@ -161,7 +207,10 @@ def normalize_sheet(spec: SpriteSheet) -> None:
             normalized.alpha_composite(vehicle, (x, y))
 
     normalized.save(target_path, optimize=True)
-    print(f"Created {target_path.relative_to(ROOT)}")
+    print(
+        f"Created {target_path.relative_to(ROOT)} "
+        f"({len(components)} vehicles, alpha > {threshold})"
+    )
 
 
 def main() -> None:
