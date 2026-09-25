@@ -10,6 +10,7 @@ of the original grid cell.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 
 from PIL import Image
@@ -21,27 +22,40 @@ IMAGE_DIR = ROOT / "assets" / "img"
 
 @dataclass(frozen=True)
 class SpriteSheet:
+    key: str
     source: str
     target: str
     grid_size: int
 
 
 SHEETS = (
-    SpriteSheet("car-sprite-v2.png", "car-sprite-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-1-v2.png", "car-sprite-dealer-1-v3.png", 3),
-    SpriteSheet("car-sprite-dealer-3a.png", "car-sprite-dealer-3a-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-3b.png", "car-sprite-dealer-3b-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-4-v2.png", "car-sprite-dealer-4-v3.png", 5),
-    SpriteSheet("car-sprite-dealer-5a.png", "car-sprite-dealer-5a-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-5b.png", "car-sprite-dealer-5b-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-5c.png", "car-sprite-dealer-5c-v3.png", 4),
-    SpriteSheet("car-sprite-dealer-5d.png", "car-sprite-dealer-5d-v3.png", 4),
+    SpriteSheet("dealer-2", "car-sprite-v2.png", "car-sprite-v3.png", 4),
+    SpriteSheet("dealer-1", "car-sprite-dealer-1-v2.png", "car-sprite-dealer-1-v3.png", 3),
+    SpriteSheet("dealer-3a", "car-sprite-dealer-3a.png", "car-sprite-dealer-3a-v3.png", 4),
+    SpriteSheet("dealer-3b", "car-sprite-dealer-3b.png", "car-sprite-dealer-3b-v3.png", 4),
+    SpriteSheet("dealer-4", "car-sprite-dealer-4-v2.png", "car-sprite-dealer-4-v3.png", 5),
+    SpriteSheet("dealer-5a", "car-sprite-dealer-5a.png", "car-sprite-dealer-5a-v3.png", 4),
+    SpriteSheet("dealer-5b", "car-sprite-dealer-5b.png", "car-sprite-dealer-5b-v3.png", 4),
+    SpriteSheet("dealer-5c", "car-sprite-dealer-5c.png", "car-sprite-dealer-5c-v3.png", 4),
+    SpriteSheet("dealer-5d", "car-sprite-dealer-5d.png", "car-sprite-dealer-5d-v3.png", 4),
 )
 
 ALPHA_THRESHOLD = 8
 MAX_CONTENT_WIDTH = 0.90
 MAX_CONTENT_HEIGHT = 0.76
 SOURCE_PADDING = 3
+
+
+def used_tile_indexes() -> dict[str, set[int]]:
+    with (ROOT / "data" / "cars.json").open(encoding="utf-8") as source:
+        cars = json.load(source)
+
+    indexes: dict[str, set[int]] = {}
+    for car in cars:
+        key = car.get("sprite_sheet", "dealer-2")
+        index = int(car.get("sprite_index", int(car["id"]) - 1))
+        indexes.setdefault(key, set()).add(index)
+    return indexes
 
 
 def cell_edges(length: int, grid_size: int) -> list[int]:
@@ -117,9 +131,14 @@ def normalize_sheet(spec: SpriteSheet) -> None:
     normalized = Image.new("RGBA", source.size, (0, 0, 0, 0))
     x_edges = cell_edges(source.width, spec.grid_size)
     y_edges = cell_edges(source.height, spec.grid_size)
+    used_indexes = used_tile_indexes().get(spec.key, set())
 
     for row in range(spec.grid_size):
         for column in range(spec.grid_size):
+            sprite_index = row * spec.grid_size + column
+            if sprite_index not in used_indexes:
+                continue
+
             left, right = x_edges[column], x_edges[column + 1]
             top, bottom = y_edges[row], y_edges[row + 1]
             cell = source.crop((left, top, right, bottom))
