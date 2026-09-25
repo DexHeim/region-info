@@ -283,14 +283,23 @@
     prices.append(
       createDetailPrice("Стоимость автомобиля", car.price_rub),
       createDetailPrice("Гос. стоимость (70%)", car.state_price_rub),
-      createDetailPrice("Макс. улучшения", tuning.calculatePerformanceTotal(car.price_rub))
+      createDetailPrice("Все улучшения", tuning.calculatePerformanceTotal(car.price_rub))
     );
     overview.append(dealer, prices);
     hero.append(visual, overview);
 
     const note = document.createElement("p");
     note.className = "tuning-note";
-    note.textContent = "Цены рассчитаны пропорционально стоимости автомобиля по данным BMW M5 (E39) за 1 700 000 ₽ и округлены до 100 ₽. Минимальная цена улучшения — 10 000 ₽.";
+    const reportLink = document.createElement("a");
+    reportLink.href = "https://t.me/DexHeim";
+    reportLink.target = "_blank";
+    reportLink.rel = "noreferrer";
+    reportLink.textContent = "сообщите разработчику";
+    note.append(
+      "Цены рассчитаны приблизительно и могут отличаться от фактических. Нашли ошибку — ",
+      reportLink,
+      "."
+    );
 
     const sections = document.createElement("div");
     sections.className = "tuning-sections";
@@ -325,7 +334,7 @@
     tuningCalculatorSummary.append(
       createDetailPrice("Цена в салоне", Math.round(carPrice)),
       createDetailPrice("Гос. стоимость (70%)", Math.round(statePrice)),
-      createDetailPrice("Макс. улучшения", tuning.calculatePerformanceTotal(carPrice))
+      createDetailPrice("Все улучшения", tuning.calculatePerformanceTotal(carPrice))
     );
     tuningCalculatorResults.append(
       createTuningSection("Улучшения", tuning.performance, carPrice, "mechanical", true, false),

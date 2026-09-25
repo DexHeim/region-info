@@ -166,8 +166,10 @@
 
   function calculatePerformanceTotal(carPrice) {
     return performance.reduce((total, group) => {
-      const maximumOption = group.options[group.options.length - 1];
-      return total + calculatePrice(maximumOption[1], carPrice, "mechanical");
+      const groupTotal = group.options.reduce((subtotal, option) => (
+        subtotal + calculatePrice(option[1], carPrice, "mechanical")
+      ), 0);
+      return total + groupTotal;
     }, 0);
   }
 
