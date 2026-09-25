@@ -436,7 +436,7 @@ kbd {
 }
 
 .vehicle-sprite {
-  --sprite-image: url("../img/car-sprite-v2.png");
+  --sprite-image: url("../img/car-sprite-v3.png");
   --sprite-size: 400% 400%;
   position: relative;
   overflow: hidden;
@@ -467,37 +467,37 @@ kbd {
 }
 
 .car-card__visual--dealer-1 {
-  --sprite-image: url("../img/car-sprite-dealer-1-v2.png");
+  --sprite-image: url("../img/car-sprite-dealer-1-v3.png");
   --sprite-size: 300% 300%;
 }
 
 .car-card__visual--dealer-3a {
-  --sprite-image: url("../img/car-sprite-dealer-3a.png");
+  --sprite-image: url("../img/car-sprite-dealer-3a-v3.png");
 }
 
 .car-card__visual--dealer-3b {
-  --sprite-image: url("../img/car-sprite-dealer-3b.png");
+  --sprite-image: url("../img/car-sprite-dealer-3b-v3.png");
 }
 
 .car-card__visual--dealer-4 {
-  --sprite-image: url("../img/car-sprite-dealer-4-v2.png");
+  --sprite-image: url("../img/car-sprite-dealer-4-v3.png");
   --sprite-size: 500% 500%;
 }
 
 .car-card__visual--dealer-5a {
-  --sprite-image: url("../img/car-sprite-dealer-5a.png");
+  --sprite-image: url("../img/car-sprite-dealer-5a-v3.png");
 }
 
 .car-card__visual--dealer-5b {
-  --sprite-image: url("../img/car-sprite-dealer-5b.png");
+  --sprite-image: url("../img/car-sprite-dealer-5b-v3.png");
 }
 
 .car-card__visual--dealer-5c {
-  --sprite-image: url("../img/car-sprite-dealer-5c.png");
+  --sprite-image: url("../img/car-sprite-dealer-5c-v3.png");
 }
 
 .car-card__visual--dealer-5d {
-  --sprite-image: url("../img/car-sprite-dealer-5d.png");
+  --sprite-image: url("../img/car-sprite-dealer-5d-v3.png");
 }
 
 .car-card__number {
@@ -517,7 +517,7 @@ kbd {
 }
 
 .car-card__title {
-  min-height: 7rem;
+  min-height: 9.25rem;
   flex-direction: column;
   justify-content: flex-start;
 }
@@ -537,6 +537,28 @@ kbd {
   font-size: 1.38rem;
   font-weight: 900;
   letter-spacing: -.025em;
+}
+
+.car-card__prices {
+  display: grid;
+  gap: .45rem;
+}
+
+.state-price {
+  display: flex;
+  gap: .65rem;
+  align-items: baseline;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: .76rem;
+  letter-spacing: .025em;
+}
+
+.state-price strong {
+  color: #d6d6da;
+  font-size: .98rem;
+  letter-spacing: -.01em;
+  white-space: nowrap;
 }
 
 .car-card__facts {
@@ -963,7 +985,7 @@ kbd {
   }
 
   .car-card__title {
-    min-height: 6.4rem;
+    min-height: 8.75rem;
   }
 
   .site-footer {

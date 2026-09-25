@@ -25,6 +25,7 @@
     currency: "RUB",
     maximumFractionDigits: 0
   });
+  const STATE_BUYBACK_RATE = 0.7;
 
   const icons = {
     fuel: '<svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15"><path d="M6 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M5 21h13M8 7h7v5H8V7Zm9 1h2l2 2v7a2 2 0 0 1-4 0v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -89,6 +90,9 @@
       ? Math.max(0, numericId - 14)
       : (dealer.includes("4/5") ? Math.max(0, numericId - 22) : Math.max(0, numericId - 1));
     const fuelType = String(car.fuel_type || "Бензин").trim();
+    const priceRub = toNumber(car.price_rub);
+    const hasStatePrice = car.state_price_rub !== undefined && String(car.state_price_rub).trim() !== "";
+    const suppliedStatePrice = hasStatePrice ? toNumber(car.state_price_rub) : NaN;
 
     return {
       id: String(car.id || index + 1),
@@ -102,7 +106,10 @@
       handling: toNumber(car.handling),
       acceleration_0_100_s: toNumber(car.acceleration_0_100_s),
       braking_100_0_s: toNumber(car.braking_100_0_s),
-      price_rub: toNumber(car.price_rub),
+      price_rub: priceRub,
+      state_price_rub: Number.isFinite(suppliedStatePrice)
+        ? suppliedStatePrice
+        : Math.round(priceRub * STATE_BUYBACK_RATE),
       sprite_sheet: String(car.sprite_sheet || (dealer.includes("1/5") ? "dealer-1" : (dealer.includes("4/5") ? "dealer-4" : "dealer-2"))),
       sprite_index: hasSpriteIndex ? Math.max(0, toNumber(car.sprite_index)) : defaultSpriteIndex,
       active: !["0", "false", "нет", "no"].includes(String(car.active ?? "true").trim().toLowerCase())
@@ -166,6 +173,7 @@
     applySprite(fragment.querySelector(".car-card__visual"), car);
     fragment.querySelector("h2").textContent = car.name;
     fragment.querySelector(".price").textContent = priceFormatter.format(car.price_rub);
+    fragment.querySelector(".state-price strong").textContent = priceFormatter.format(car.state_price_rub);
     fragment.querySelector(".car-card__facts").innerHTML = [
       `<span class="fact">${icons.fuel}${formatDecimal(car.fuel_l)} ${car.fuel_unit} · ${car.fuel_type}</span>`,
       `<span class="fact">${icons.trunk}${formatDecimal(car.trunk_kg)} кг</span>`
@@ -337,6 +345,7 @@
     const body = document.createElement("tbody");
     const metrics = [
       { label: "Цена", field: "price_rub", direction: "min", format: (car) => priceFormatter.format(car.price_rub) },
+      { label: "Гос. стоимость", format: (car) => priceFormatter.format(car.state_price_rub) },
       { label: "Топливо", format: (car) => `${formatDecimal(car.fuel_l)} ${car.fuel_unit} · ${car.fuel_type}` },
       { label: "Багажник", field: "trunk_kg", direction: "max", format: (car) => `${formatDecimal(car.trunk_kg)} кг` },
       { label: "Макс. скорость", field: "max_speed_kmh", direction: "max", format: (car) => `${formatDecimal(car.max_speed_kmh)} км/ч` },
