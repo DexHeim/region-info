@@ -3,20 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Справочник автомобилей онлайн-игры Region: цены и характеристики по автосалонам.">
-  <meta name="theme-color" content="#0b0d0f">
-  <title>Region Auto — справочник автомобилей</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20260925-2">
+  <meta name="description" content="Region Info — справочник по онлайн-игре Region. Цены и характеристики автомобилей во всех автосалонах.">
+  <meta name="theme-color" content="#09090a">
+  <title>Region Info — справочник по игре Region</title>
+  <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260925-3">
 </head>
 <body>
   <a class="skip-link" href="#catalog">К каталогу</a>
 
   <header class="site-header">
-    <a class="brand" href="./" aria-label="Region Auto — на главную">
-      <span class="brand__mark" aria-hidden="true">R</span>
+    <a class="brand" href="./" aria-label="Region Info — на главную">
+      <img class="brand__mark" src="assets/img/region-info-icon.svg" alt="" width="46" height="46">
       <span>
-        <strong>REGION AUTO</strong>
-        <small>Справочник игроков</small>
+        <strong>REGION INFO</strong>
+        <small>Справочник по игре</small>
       </span>
     </a>
     <div class="header-meta">
@@ -28,9 +29,9 @@
   <main>
     <section class="catalog-head" aria-labelledby="pageTitle">
       <div>
-        <p class="eyebrow">Автосалоны 1/5, 2/5 и 4/5</p>
+        <p class="eyebrow">Автосалоны 1/5 — 5/5</p>
         <h1 id="pageTitle">Автомобили в продаже</h1>
-        <p class="intro">Цены и игровые характеристики в одном месте.</p>
+        <p class="intro">Цены и игровые характеристики автомобилей во всех салонах Region.</p>
       </div>
 
       <dl class="catalog-summary" aria-label="Сводка каталога">
@@ -54,7 +55,9 @@
         <button class="dealer-switch__button is-active" type="button" data-dealer="all" aria-pressed="true">Все салоны</button>
         <button class="dealer-switch__button" type="button" data-dealer="Автосалон 1/5" aria-pressed="false">Автосалон 1/5</button>
         <button class="dealer-switch__button" type="button" data-dealer="Автосалон 2/5" aria-pressed="false">Автосалон 2/5</button>
+        <button class="dealer-switch__button" type="button" data-dealer="Автосалон 3/5" aria-pressed="false">Автосалон 3/5</button>
         <button class="dealer-switch__button" type="button" data-dealer="Автосалон 4/5" aria-pressed="false">Автосалон 4/5</button>
+        <button class="dealer-switch__button" type="button" data-dealer="Автосалон 5/5" aria-pressed="false">Автосалон 5/5</button>
       </div>
       <label class="search-field">
         <span class="sr-only">Найти автомобиль</span>
@@ -88,9 +91,31 @@
   </main>
 
   <footer class="site-footer">
-    <p>Region Auto</p>
+    <p>Region Info</p>
     <p>Данные могут меняться после обновлений игры.</p>
   </footer>
+
+  <aside id="comparisonTray" class="comparison-tray" aria-label="Выбранные автомобили" hidden>
+    <div>
+      <span class="comparison-tray__eyebrow">Сравнение</span>
+      <strong id="comparisonCount">Выбрано: 0 из 3</strong>
+    </div>
+    <div class="comparison-tray__actions">
+      <button id="clearComparison" class="button button--quiet" type="button">Очистить</button>
+      <button id="openComparison" class="button button--primary" type="button">Сравнить</button>
+    </div>
+  </aside>
+
+  <dialog id="comparisonDialog" class="comparison-dialog" aria-labelledby="comparisonTitle">
+    <div class="comparison-dialog__header">
+      <div>
+        <p class="eyebrow">До трёх моделей</p>
+        <h2 id="comparisonTitle">Сравнение автомобилей</h2>
+      </div>
+      <button id="closeComparison" class="dialog-close" type="button" aria-label="Закрыть сравнение">×</button>
+    </div>
+    <div id="comparisonContent" class="comparison-content"></div>
+  </dialog>
 
   <template id="carCardTemplate">
     <article class="car-card">
@@ -98,17 +123,18 @@
         <span class="car-card__number"></span>
         <span class="dealer-pill"></span>
       </div>
-      <div class="car-card__visual" aria-hidden="true"></div>
+      <div class="car-card__visual vehicle-sprite" aria-hidden="true"></div>
       <div class="car-card__title">
         <h2></h2>
         <div class="price"></div>
       </div>
       <div class="car-card__facts"></div>
       <dl class="spec-grid"></dl>
+      <button class="compare-toggle" type="button" aria-pressed="false"></button>
     </article>
   </template>
 
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/app.js?v=20260925-3" defer></script>
 </body>
 </html>
