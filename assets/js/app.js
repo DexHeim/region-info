@@ -6,6 +6,7 @@
   const template = document.querySelector("#carCardTemplate");
   const searchInput = document.querySelector("#searchInput");
   const sortSelect = document.querySelector("#sortSelect");
+  const dealerButtons = Array.from(document.querySelectorAll("[data-dealer]"));
   const sourceLabel = document.querySelector("#sourceLabel");
   const totalCars = document.querySelector("#totalCars");
   const minPrice = document.querySelector("#minPrice");
@@ -19,6 +20,7 @@
   });
 
   let cars = [];
+  let selectedDealer = "all";
 
   const icons = {
     fuel: '<svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15"><path d="M6 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M5 21h13M8 7h7v5H8V7Zm9 1h2l2 2v7a2 2 0 0 1-4 0v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -71,11 +73,18 @@
   }
 
   function normalizeCar(car, index) {
+    const dealer = String(car.dealer || "Автосалон 2/5").trim();
+    const numericId = toNumber(car.id || index + 1);
+    const hasSpriteIndex = car.sprite_index !== undefined && String(car.sprite_index).trim() !== "";
+    const defaultSpriteIndex = dealer.includes("1/5")
+      ? Math.max(0, numericId - 14)
+      : (dealer.includes("4/5") ? Math.max(0, numericId - 22) : Math.max(0, numericId - 1));
     return {
       id: String(car.id || index + 1),
       name: String(car.name || "Без названия").trim(),
-      dealer: String(car.dealer || "Автосалон 2/5").trim(),
+      dealer,
       fuel_l: toNumber(car.fuel_l),
+      fuel_unit: String(car.fuel_unit || (String(car.fuel_type).toLocaleLowerCase("ru").includes("электро") ? "кВт." : "л")).trim(),
       fuel_type: String(car.fuel_type || "Бензин").trim(),
       trunk_kg: toNumber(car.trunk_kg),
       max_speed_kmh: toNumber(car.max_speed_kmh),
@@ -83,6 +92,8 @@
       acceleration_0_100_s: toNumber(car.acceleration_0_100_s),
       braking_100_0_s: toNumber(car.braking_100_0_s),
       price_rub: toNumber(car.price_rub),
+      sprite_sheet: String(car.sprite_sheet || (dealer.includes("1/5") ? "dealer-1" : (dealer.includes("4/5") ? "dealer-4" : "dealer-2"))),
+      sprite_index: hasSpriteIndex ? Math.max(0, toNumber(car.sprite_index)) : defaultSpriteIndex,
       active: !["0", "false", "нет", "no"].includes(String(car.active ?? "true").trim().toLowerCase())
     };
   }
@@ -125,10 +136,19 @@
     card.dataset.name = car.name;
     fragment.querySelector(".car-card__number").textContent = `#${String(index + 1).padStart(2, "0")}`;
     fragment.querySelector(".dealer-pill").textContent = car.dealer;
+    const visual = fragment.querySelector(".car-card__visual");
+    const spriteGridSize = car.sprite_sheet === "dealer-1" ? 3 : (car.sprite_sheet === "dealer-4" ? 5 : 4);
+    const spriteStep = 100 / (spriteGridSize - 1);
+    const spriteColumn = car.sprite_index % spriteGridSize;
+    const spriteRow = Math.floor(car.sprite_index / spriteGridSize);
+    if (car.sprite_sheet === "dealer-1") visual.classList.add("car-card__visual--dealer-1");
+    if (car.sprite_sheet === "dealer-4") visual.classList.add("car-card__visual--dealer-4");
+    visual.style.setProperty("--sprite-x", `${spriteColumn * spriteStep}%`);
+    visual.style.setProperty("--sprite-y", `${spriteRow * spriteStep}%`);
     fragment.querySelector("h2").textContent = car.name;
     fragment.querySelector(".price").textContent = priceFormatter.format(car.price_rub);
     fragment.querySelector(".car-card__facts").innerHTML = [
-      `<span class="fact">${icons.fuel}${formatDecimal(car.fuel_l)} л · ${car.fuel_type}</span>`,
+      `<span class="fact">${icons.fuel}${formatDecimal(car.fuel_l)} ${car.fuel_unit} · ${car.fuel_type}</span>`,
       `<span class="fact">${icons.trunk}${formatDecimal(car.trunk_kg)} кг</span>`
     ].join("");
 
@@ -143,7 +163,8 @@
   function getVisibleCars() {
     const query = searchInput.value.trim().toLocaleLowerCase("ru");
     const filtered = cars.filter((car) => (
-      !query || `${car.name} ${car.dealer}`.toLocaleLowerCase("ru").includes(query)
+      (selectedDealer === "all" || car.dealer === selectedDealer)
+      && (!query || `${car.name} ${car.dealer}`.toLocaleLowerCase("ru").includes(query))
     ));
 
     const [field, direction] = sortSelect.value.split("-");
@@ -162,6 +183,7 @@
 
   function render() {
     const visibleCars = getVisibleCars();
+    updateSummary(visibleCars);
     catalog.replaceChildren();
 
     if (!visibleCars.length) {
@@ -180,11 +202,11 @@
     resultCount.hidden = false;
   }
 
-  function updateSummary() {
-    const prices = cars.map((car) => car.price_rub).filter(Number.isFinite);
-    totalCars.textContent = String(cars.length);
-    minPrice.textContent = priceFormatter.format(Math.min(...prices));
-    maxPrice.textContent = priceFormatter.format(Math.max(...prices));
+  function updateSummary(list) {
+    const prices = list.map((car) => car.price_rub).filter(Number.isFinite);
+    totalCars.textContent = String(list.length);
+    minPrice.textContent = prices.length ? priceFormatter.format(Math.min(...prices)) : "—";
+    maxPrice.textContent = prices.length ? priceFormatter.format(Math.max(...prices)) : "—";
   }
 
   function showError(error) {
@@ -196,6 +218,17 @@
 
   searchInput.addEventListener("input", render);
   sortSelect.addEventListener("change", render);
+  dealerButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedDealer = button.dataset.dealer;
+      dealerButtons.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      render();
+    });
+  });
   document.addEventListener("keydown", (event) => {
     if (event.key === "/" && document.activeElement !== searchInput) {
       event.preventDefault();
@@ -207,7 +240,6 @@
     .then(({ data, source }) => {
       cars = data.map(normalizeCar).filter((car) => car.active && car.name && Number.isFinite(car.price_rub));
       sourceLabel.textContent = `данные: ${source}`;
-      updateSummary();
       render();
       catalog.setAttribute("aria-busy", "false");
     })
