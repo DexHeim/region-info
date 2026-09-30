@@ -157,6 +157,10 @@
   }
 
   function calculatePrice(referencePrice, carPrice, kind) {
+    if (kind === "fixed") {
+      return referencePrice;
+    }
+
     const scaledPrice = referencePrice * carPrice / REFERENCE_CAR_PRICE;
     if (kind === "mechanical") {
       return Math.max(MECHANICAL_MINIMUM, roundPrice(scaledPrice, 100));

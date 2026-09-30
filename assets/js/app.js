@@ -314,7 +314,7 @@
     sections.append(
       createTuningSection("Улучшения", tuning.performance, car.price_rub, "mechanical", true, false),
       createTuningSection("Покраска и внешний вид", tuning.appearance, car.price_rub, "visual", false, false),
-      createTuningSection("Клаксон", [tuning.horns], car.price_rub, "visual", false, true)
+      createTuningSection("Клаксон", [tuning.horns], car.price_rub, "fixed", false, true)
     );
 
     carDialogContent.append(hero, note, sections);
@@ -347,7 +347,7 @@
     tuningCalculatorResults.append(
       createTuningSection("Улучшения", tuning.performance, carPrice, "mechanical", true, false),
       createTuningSection("Покраска и внешний вид", tuning.appearance, carPrice, "visual", false, false),
-      createTuningSection("Клаксон", [tuning.horns], carPrice, "visual", false, true)
+      createTuningSection("Клаксон", [tuning.horns], carPrice, "fixed", false, true)
     );
   }
 
