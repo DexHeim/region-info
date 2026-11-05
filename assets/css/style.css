@@ -550,6 +550,18 @@ kbd {
   --sprite-size: 300% 300%;
 }
 
+.car-card__visual--dealer-2b {
+  --sprite-image: url("../img/car-sprite-dealer-2b-v3.png");
+}
+
+.car-card__visual--dealer-1b {
+  --sprite-image: url("../img/car-sprite-dealer-1b-v3.png");
+}
+
+.car-card__visual--dealer-4b {
+  --sprite-image: url("../img/car-sprite-dealer-4b-v3.png");
+}
+
 .car-card__visual--dealer-3a {
   --sprite-image: url("../img/car-sprite-dealer-3a-v3.png");
 }
@@ -577,6 +589,10 @@ kbd {
 
 .car-card__visual--dealer-5d {
   --sprite-image: url("../img/car-sprite-dealer-5d-v3.png");
+}
+
+.car-card__visual--dealer-5e {
+  --sprite-image: url("../img/car-sprite-dealer-5e-v3.png");
 }
 
 .car-card__number {

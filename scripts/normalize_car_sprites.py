@@ -45,14 +45,18 @@ class Component:
 
 SHEETS = (
     SpriteSheet("dealer-2", "car-sprite-v2.png", "car-sprite-v3.png", 4),
+    SpriteSheet("dealer-2b", "car-sprite-dealer-2b.png", "car-sprite-dealer-2b-v3.png", 4),
     SpriteSheet("dealer-1", "car-sprite-dealer-1-v2.png", "car-sprite-dealer-1-v3.png", 3),
+    SpriteSheet("dealer-1b", "car-sprite-dealer-1b.png", "car-sprite-dealer-1b-v3.png", 4),
     SpriteSheet("dealer-3a", "car-sprite-dealer-3a.png", "car-sprite-dealer-3a-v3.png", 4),
     SpriteSheet("dealer-3b", "car-sprite-dealer-3b.png", "car-sprite-dealer-3b-v3.png", 4),
     SpriteSheet("dealer-4", "car-sprite-dealer-4-v2.png", "car-sprite-dealer-4-v3.png", 5),
+    SpriteSheet("dealer-4b", "car-sprite-dealer-4b.png", "car-sprite-dealer-4b-v3.png", 4),
     SpriteSheet("dealer-5a", "car-sprite-dealer-5a.png", "car-sprite-dealer-5a-v3.png", 4),
     SpriteSheet("dealer-5b", "car-sprite-dealer-5b.png", "car-sprite-dealer-5b-v3.png", 4),
     SpriteSheet("dealer-5c", "car-sprite-dealer-5c.png", "car-sprite-dealer-5c-v3.png", 4),
     SpriteSheet("dealer-5d", "car-sprite-dealer-5d.png", "car-sprite-dealer-5d-v3.png", 4),
+    SpriteSheet("dealer-5e", "car-sprite-dealer-5e.png", "car-sprite-dealer-5e-v3.png", 4),
 )
 
 ALPHA_THRESHOLDS = (16, 24, 32, 48, 64, 96, 128)
