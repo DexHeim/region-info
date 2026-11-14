@@ -8,9 +8,9 @@
   <title>Region Info — справочник по игре Region</title>
   <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-7">
-  <link rel="stylesheet" href="assets/css/catalog.css?v=20261114-7">
-  <link rel="stylesheet" href="assets/css/details.css?v=20261114-7">
+  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-9">
+  <link rel="stylesheet" href="assets/css/catalog.css?v=20261114-9">
+  <link rel="stylesheet" href="assets/css/details.css?v=20261114-9">
 </head>
 <body>
   <a class="skip" href="#main">К содержанию</a>
@@ -19,12 +19,14 @@
       <img src="assets/img/region-info-icon.svg" width="42" height="42" alt="">
       <span><strong>REGION INFO</strong><small>Справочник игрока</small></span>
     </a>
+    <button class="icon-button sidebar-close" id="menuClose" type="button" aria-label="Закрыть разделы"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#x"></use></svg></button>
     <nav id="navigation" aria-label="Разделы справочника"></nav>
     <div class="sidebar-footer">
       <a href="https://wiki.region.game/" target="_blank" rel="noreferrer">Источник · Region Wiki ↗</a>
       <span id="importDate">Загрузка базы…</span>
     </div>
   </aside>
+  <button class="menu-backdrop" id="menuBackdrop" type="button" aria-label="Закрыть разделы" tabindex="-1"></button>
   <div class="workspace">
     <header class="topbar">
       <button class="icon-button menu-button" id="menuButton" aria-label="Открыть разделы" aria-expanded="false" aria-controls="sidebar"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#menu"></use></svg></button>
@@ -60,6 +62,6 @@
   <div id="toast" class="toast" role="status" hidden></div>
   <noscript><p>Для поиска, каталогов и карты включите JavaScript. <a href="https://wiki.region.game/">Открыть Region Wiki</a></p></noscript>
   <script src="assets/js/tuning.js?v=20260925-4"></script>
-  <script src="assets/js/wiki.js?v=20261114-7" defer></script>
+  <script src="assets/js/wiki.js?v=20261114-9" defer></script>
 </body>
 </html>

@@ -146,9 +146,10 @@
   function renderNavigation(section) {
     const groups = [
       ["", ["home", "articles", "updates"]],
-      ["Каталоги", ["vehicles", "items", "clothes", "appearance", "estate", "business", "map"]],
-      ["Прогресс и занятия", ["cases", "animations", "season", "achievements", "levels", "factions", "rentals"]],
-      ["Наши дополнения", ["tuning"]]
+      ["Транспорт", ["vehicles", "rentals", "tuning"]],
+      ["Мир и имущество", ["estate", "business", "map", "factions"]],
+      ["Персонаж", ["items", "clothes", "appearance", "animations"]],
+      ["Прогресс и награды", ["season", "cases", "achievements", "levels"]]
     ];
     document.querySelector("#navigation").innerHTML = groups.map(([title, items]) => (
       `${title ? `<p class="nav-label">${title}</p>` : ""}${items.map((id) => {
@@ -319,8 +320,19 @@
     return `<div class="catalog-table-wrap"><table class="catalog-table"><thead><tr><th scope="col">Название</th>${hasPrice ? '<th scope="col">Цена</th>' : ""}${(settings.columns || []).map((title) => `<th scope="col">${escapeHtml(title)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr><th scope="row"><a class="table-title" href="${localHref(row.href)}">${row.image ? `<img class="${cover ? "cover" : ""}" src="${escapeHtml(imageUrl(row.image))}" alt="" loading="lazy">` : ""}<span>${escapeHtml(row.title)}${row.kindLabel ? `<small>${escapeHtml(row.kindLabel)}</small>` : ""}</span></a></th>${hasPrice ? `<td class="table-price">${money(row.price, row.currency)}${section === "estate" && row.kind === "Hotel" ? " / сутки" : ""}</td>` : ""}${(settings.columns || []).map((title, index) => `<td>${escapeHtml(catalogStat(row.stats?.[index], section))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
+  function vehicleCosts(vehicle) {
+    const price = vehicle.price_dealer ?? vehicle.price_donate;
+    const basePrice = Number.isFinite(price) && price > 0 ? price : null;
+    return {
+      basePrice,
+      statePrice: basePrice == null ? null : Math.round(basePrice * .7),
+      tuningPrice: basePrice == null ? null : tuning.calculatePerformanceTotal(basePrice)
+    };
+  }
+
   function vehicleCardHtml(row, presentation) {
     const vehicle = row.vehicle;
+    const costs = vehicleCosts(vehicle);
     const rarity = ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][vehicle.rarity];
     const stats = [
       ["gauge", "Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`],
@@ -335,7 +347,8 @@
         <div class="vehicle-badges"><span>${escapeHtml(row.kindLabel)}</span>${vehicle.rarity > 1 ? `<span class="rarity-badge">${rarity}</span>` : ""}</div>
       </a>
       <label class="vehicle-compare" title="Добавить к сравнению"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}><span>${icon("scale")}<span class="sr-only">Сравнить ${escapeHtml(row.title)}</span></span></label>
-      <div class="vehicle-body"><div class="vehicle-heading"><div><p class="vehicle-brand">${escapeHtml(vehicle.brand)}${presentation?.flag ? `<img class="country-flag" src="${escapeHtml(presentation.flag)}" alt="${escapeHtml(presentation.country)}" width="16" height="12" loading="lazy">` : ""}</p><h2><a href="${localHref(row.href)}">${escapeHtml(vehicle.name)}</a></h2></div><div class="vehicle-price">${row.price != null ? `${vehicle.price_dealer == null ? "<small>Оценка</small>" : ""}<strong>${money(row.price)}</strong>` : '<span>Служебный</span>'}</div></div>
+      <div class="vehicle-body"><div class="vehicle-heading"><div><p class="vehicle-brand">${escapeHtml(vehicle.brand)}${presentation?.flag ? `<img class="country-flag" src="${escapeHtml(presentation.flag)}" alt="${escapeHtml(presentation.country)}" width="16" height="12" loading="lazy">` : ""}</p><h2><a href="${localHref(row.href)}">${escapeHtml(vehicle.name)}</a></h2></div><div class="vehicle-price">${row.price != null ? `${vehicle.price_dealer == null ? "<small>Оценочная стоимость</small>" : "<small>Цена в салоне</small>"}<strong>${money(row.price)}</strong>` : '<span>Служебный</span>'}</div></div>
+      <dl class="vehicle-costs"><div title="70% ${vehicle.price_dealer == null ? "оценочной стоимости" : "базовой цены для машины, купленной в салоне"}"><dt>Госстоимость</dt><dd>${money(costs.statePrice)}</dd></div><div title="Приблизительная сумма покупки всех уровней двигателя, трансмиссии, тормозов, подвески и турбо по порядку"><dt>Полный тюнинг</dt><dd>${costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`}</dd></div></dl>
       <dl class="vehicle-stats">${stats.map(([name, title, value]) => `<div title="${title}"><dt class="sr-only">${title}</dt>${icon(name)}<dd>${escapeHtml(value)}</dd></div>`).join("")}</dl></div>
     </article>`;
   }
@@ -510,6 +523,16 @@
       const summary = main.querySelector(".catalog-season-summary");
       const title = document.createElement("h2"); title.className = "catalog-season-title"; title.textContent = payload.seasonTitle || "";
       summary.querySelector(".detail-metrics")?.before(title);
+      const metrics = summary.querySelector('.detail-metrics');
+      if (metrics) {
+        const overview = document.createElement('details');
+        overview.className = 'season-overview';
+        overview.open = !matchMedia('(max-width: 760px)').matches;
+        overview.innerHTML = '<summary>Сроки, опыт и премиум</summary>';
+        metrics.before(overview);
+        overview.append(metrics);
+      }
+      summary.querySelector('.detail-category')?.remove();
       localizeDocument(summary, "/season/");
     }
     const results = main.querySelector("#catalogResults");
@@ -626,14 +649,17 @@
       Object.entries(manifest.categories).filter(([id]) => !category || category === id).map(([id, title]) => `<section class="article-group"><h2>${escapeHtml(title)}</h2><div class="article-links">${pages.filter((page) => page.path.split("/")[2] === id).map((page) => `<a class="article-link" href="${localHref(page.path)}"><h3>${escapeHtml(page.title)} ↗</h3><p>${escapeHtml(page.summary)}</p></a>`).join("")}</div></section>`).join("");
   }
 
-  function fact(labelText, value) {
-    return `<div class="detail-fact"><span>${escapeHtml(labelText)}</span><strong>${escapeHtml(value)}</strong></div>`;
+  function fact(labelText, value, description = "") {
+    return `<div class="detail-fact"${description ? ` title="${escapeHtml(description)}"` : ""}><span>${escapeHtml(labelText)}</span><strong>${escapeHtml(value)}</strong></div>`;
   }
 
-  function tuningHtml(price) {
+  function tuningHtml(price, vehicle = null) {
+    const statePrice = vehicle ? vehicleCosts(vehicle).statePrice : Math.round(price * .7);
+    const priceLabel = vehicle && vehicle.price_dealer == null ? "Оценочная стоимость для расчёта" : "Цена автомобиля для расчёта";
+    const stateLabel = vehicle ? "Госстоимость" : "Выкуп 70% для салонной машины";
     const groups = (title, collection, kind, open) => `<details ${open ? "open" : ""}><summary>${title}</summary><div class="tuning-groups">${collection.map((group) => `<section class="tuning-group"><h3>${escapeHtml(group.title)}</h3><ul>${group.options.map(([name, referencePrice]) => `<li><span>${escapeHtml(name)}</span><strong>${money(tuning.calculatePrice(referencePrice, price, kind))}</strong></li>`).join("")}</ul></section>`).join("")}</div></details>`;
     const fixed = [{ title: "Фиксированные цены ателье из Wiki", options: [["Бронированный кузов", 30000], ["Смена типа краски", 15000]] }];
-    return `<div class="tuning-summary"><div><span>Цена автомобиля для расчёта</span><strong>${money(price)}</strong></div><div><span>Выкуп 70% для салонной машины</span><strong>${money(Math.round(price * .7))}</strong></div><div><span>Все уровни улучшений по порядку</span><strong>${money(tuning.calculatePerformanceTotal(price))}</strong></div></div>${groups("Улучшения", tuning.performance, "mechanical", true)}${groups("Покраска, тонировка, колёса и фары", tuning.appearance, "visual", false)}${groups("Клаксон", [tuning.horns], "fixed", false)}${groups("Другие услуги ателье", fixed, "fixed", false)}<p class="tuning-note"><a href="#/articles/vehicles/fuel-repair-tuning/">Механики нитро, GPS-маячка, ливрей, дыма шин, шлема и ремонта ↗</a></p>`;
+    return `<div class="tuning-summary"><div><span>${priceLabel}</span><strong>${money(price)}</strong></div><div><span>${stateLabel}</span><strong>${money(statePrice)}</strong></div><div><span>Все уровни улучшений по порядку</span><strong>${money(tuning.calculatePerformanceTotal(price))}</strong></div></div>${groups("Улучшения", tuning.performance, "mechanical", true)}${groups("Покраска, тонировка, колёса и фары", tuning.appearance, "visual", false)}${groups("Клаксон", [tuning.horns], "fixed", false)}${groups("Другие услуги ателье", fixed, "fixed", false)}<p class="tuning-note"><a href="#/articles/vehicles/fuel-repair-tuning/">Механики нитро, GPS-маячка, ливрей, дыма шин, шлема и ремонта ↗</a></p>`;
   }
 
   function tuningNote() {
@@ -663,6 +689,7 @@
     });
     container.querySelectorAll("a[href]").forEach((link) => {
       const raw = link.getAttribute("href");
+      if (raw.startsWith('#/')) return;
       if (raw.startsWith("#")) {
         link.href = `${localHref(path)}?anchor=${encodeURIComponent(raw.slice(1))}`;
         return;
@@ -729,24 +756,92 @@
     });
   }
 
-  function enhanceDocument(section, documentData, params) {
+  function enhanceVehicle(overview, vehicle) {
+    const info = overview.querySelector('.imported-info');
+    const costs = vehicleCosts(vehicle);
+    const brand = info.firstElementChild;
+    info.querySelector('h1').textContent = vehicle.name;
+    brand.classList.add('vehicle-brand-line');
+    info.querySelector(':scope > ul').classList.add('vehicle-tags');
+    const originalPrices = info.querySelector(':scope > div:has(> div > span)');
+    if (vehicle.access === 'service') {
+      const availability = document.createElement('p');
+      availability.className = 'detail-note';
+      availability.textContent = originalPrices.textContent.trim();
+      originalPrices.before(availability);
+    }
+    const similarLink = info.querySelector('a[href*="/vehicles/compare/"]');
+    const similarModels = similarLink ? new URL(similarLink.href, sourceOrigin).searchParams.get('ids') : '';
+    const originalActions = info.lastElementChild;
+    const rows = [
+      ['store', 'Цена в салоне', money(vehicle.price_dealer), vehicle.price_dealer == null ? 'В салонах нет' : 'Базовая цена. Владелец салона может изменить её в пределах игры.'],
+      ['gift', 'Оценочная стоимость', money(vehicle.price_donate ?? vehicle.price_dealer), 'Кейсы, пропуски и магазин'],
+      ['building-2', 'Госстоимость · 70%', money(costs.statePrice), vehicle.price_dealer == null ? 'От оценочной стоимости' : 'От базовой цены в салоне'],
+      ['wrench', 'Полный тюнинг', costs.tuningPrice == null ? '—' : `≈ ${money(costs.tuningPrice)}`, 'Все уровни улучшений по порядку']
+    ];
+    originalPrices.className = 'vehicle-finances';
+    originalPrices.innerHTML = rows.map(([name, title, value, note], index) => {
+      if (vehicle.access === 'service' && index < 2) return '';
+      return `<div class="vehicle-finance ${index > 1 ? 'vehicle-finance--accent' : ''}">${icon(name)}<div><span>${title}</span><strong>${index === 3 && costs.basePrice != null ? `<a href="${localHref(`/vehicles/${vehicle.model}/`)}?anchor=region-tuning">${value} ${icon('arrow-up-right')}</a>` : value}</strong></div>${vehicle.access === 'service' ? '' : `<p>${note}</p>`}</div>`;
+    }).join('');
+    if (vehicle.dealership_business_id != null) {
+      const salonLink = document.createElement('a');
+      salonLink.className = 'vehicle-dealership';
+      salonLink.href = localHref(`/business/${vehicle.dealership_business_id}/`);
+      salonLink.textContent = `Салон «${vehicle.dealership}» ↗`;
+      originalPrices.firstElementChild.querySelector('p').append(document.createElement('br'), salonLink);
+    }
+    originalActions.className = 'detail-actions';
+    originalActions.innerHTML = `${similarModels ? `<button type="button" class="primary-button" id="similarCompare" data-models="${escapeHtml(similarModels)}">${icon('scale')}Сравнить с похожей</button>` : ''}<button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? 'Убрать из сравнения' : 'Добавить к сравнению'}</button><a class="quiet-button" href="#/vehicles?kind=${encodeURIComponent(vehicle.class)}">Весь класс ${icon('arrow-up-right')}</a>`;
+    overview.querySelector('.imported-stage > span:nth-child(2)')?.classList.add('vehicle-rarity');
+    const highlights = main.querySelector('.imported-kpis');
+    if (highlights) {
+      highlights.querySelectorAll('.imported-kpi').forEach((metric) => {
+        const ranking = metric.lastElementChild.textContent.match(/(\d+) место из (\d+)/);
+        if (!ranking) return;
+        const meter = document.createElement('span');
+        meter.className = 'kpi-meter';
+        meter.setAttribute('aria-hidden', 'true');
+        meter.innerHTML = `<span style="width:${(Number(ranking[2]) - Number(ranking[1]) + 1) / Number(ranking[2]) * 100}%"></span>`;
+        metric.lastElementChild.before(meter);
+      });
+      const strip = document.createElement('section');
+      strip.className = 'prose vehicle-highlights';
+      strip.append(highlights);
+      overview.after(strip);
+    }
+  }
+
+  function enhanceDocument(section, documentData, params, vehicle) {
     const layout = main.querySelector(".article-layout");
     const prose = layout.querySelector(".prose");
     prose.classList.add(`prose--${section}`);
     const structured = !["articles", "updates"].includes(section);
     if (structured) {
+      layout.classList.add('article-layout--structured');
       const hero = prose.querySelector(".imported-hero, .detail-heading");
-      if (hero && section !== "vehicles") {
+      if (hero) {
         const info = hero.querySelector(".imported-info") || hero;
         const heading = main.querySelector(".page-head");
         heading.querySelector(".intro")?.remove();
-        const category = info.querySelector(":scope > a, :scope > .detail-category");
+        const estateSeparator = documentData.title.includes(' · ') ? ' · ' : ', ';
+        if (section === 'estate' && documentData.title.includes(estateSeparator)) {
+          const [title, ...address] = documentData.title.split(estateSeparator);
+          heading.querySelector('h1').textContent = title;
+          const context = document.createElement('p');
+          context.className = 'detail-address';
+          context.textContent = address.join(estateSeparator);
+          heading.append(context);
+        }
+        const category = vehicle ? info.firstElementChild : info.querySelector(":scope > a, :scope > .detail-category");
         if (category) category.after(heading);
         else info.prepend(heading);
         const overview = document.createElement("section");
         overview.className = `prose detail-overview detail-overview--${section}`;
         overview.append(hero);
+        overview.querySelectorAll('img').forEach((image) => { image.loading = 'eager'; });
         layout.before(overview);
+        if (vehicle) enhanceVehicle(overview, vehicle);
         if (hero.classList.contains("imported-hero")) {
           [...hero.children].slice(2).forEach((extra) => { extra.classList.add("detail-extra"); info.append(extra); });
         }
@@ -755,6 +850,11 @@
         if (group.querySelector(":scope > div > b")) group.classList.add("detail-metrics");
       });
       prose.querySelectorAll(".related-card--vehicle, .related-card--clothes, .related-card--property").forEach((card) => card.classList.add("related-card"));
+      prose.querySelectorAll('dl').forEach((list) => list.classList.add('detail-rows'));
+      prose.querySelectorAll('h2').forEach((heading) => {
+        const parent = heading.parentElement;
+        if (parent.tagName === 'DIV' && parent.firstElementChild === heading) parent.classList.add('detail-section-header');
+      });
       prose.querySelectorAll(".related-grid + .related-grid").forEach((grid) => {
         grid.previousElementSibling.append(...grid.children);
         grid.remove();
@@ -771,6 +871,14 @@
 
     const floorBar = prose.querySelector(".floor-tabs");
     const floors = [...prose.querySelectorAll(".flat-list")];
+    floors.forEach((floor) => floor.querySelectorAll('li').forEach((row) => {
+      row.querySelectorAll('.flat-meta').forEach((meta, index) => {
+        const label = document.createElement('span');
+        label.className = 'flat-meta-label';
+        label.textContent = index === 0 ? 'Жильцов' : 'Мест в гараже';
+        meta.prepend(label);
+      });
+    }));
     if (floorBar && floors.length) {
       floorBar.setAttribute("role", "tablist");
       floorBar.setAttribute("aria-label", "Этаж");
@@ -832,10 +940,11 @@
     if (version !== routeVersion) return;
     if (!documentData) throw new Error("Эта страница отсутствует в локальной базе.");
     const vehicle = section === "vehicles" ? payload.data[0].data.vehicles.find((item) => item.model === path.split("/")[2]) : null;
+    const costs = vehicle ? vehicleCosts(vehicle) : null;
     const toc = documentData.headings.filter((heading) => heading.id).map((heading) => `<a href="${localHref(path)}?anchor=${encodeURIComponent(heading.id)}">${escapeHtml(heading.title)}</a>`).join("") + (vehicle ? `<a href="${localHref(path)}?anchor=region-tuning">Расчёт тюнинга</a>` : "");
     document.title = `${documentData.title} — Region Info`;
     main.innerHTML = pageHeading(documentData.title, documentData.summary, section) +
-      (vehicle ? `<div class="detail-hero"><img class="detail-image" src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="${escapeHtml(documentData.title)}"><div class="detail-facts">${fact(vehicle.price_dealer == null ? "Оценочная стоимость" : "Базовая цена в салоне", money(vehicle.price_dealer ?? vehicle.price_donate))}${fact("Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`)}${fact("Разгон 0–100", vehicle.t100_s == null ? "—" : `${numbers.format(vehicle.t100_s)} с`)}${fact("Багажник", `${vehicle.trunk_kg} кг`)}</div></div><button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению"}</button><section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer > 0 ? tuningHtml(vehicle.price_dealer) : '<p class="tuning-note">Для этой модели отсутствует салонная цена. Укажите стоимость в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
+      (vehicle ? `<section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer == null && costs.basePrice != null ? '<p class="tuning-note">Для этой модели расчёт выполнен по оценочной стоимости из Wiki.</p>' : ""}${costs.basePrice != null ? tuningHtml(costs.basePrice, vehicle) : '<p class="tuning-note">Для этой модели в Wiki отсутствует стоимость. Укажите цену в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
       `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentMarkup(documentData.html)}</article><aside class="article-toc" aria-label="На этой странице"><details id="pageToc"><summary>На этой странице</summary>${toc}</details></aside></div>${sourceNote(path)}`;
     const tocDetails = main.querySelector("#pageToc");
     if (tocDetails) tocDetails.open = !matchMedia("(max-width: 1200px)").matches;
@@ -849,7 +958,14 @@
       }
     }
     localizeDocument(main.querySelector(".prose"), path);
-    enhanceDocument(section, documentData, params);
+    enhanceDocument(section, documentData, params, vehicle);
+    main.querySelector('#similarCompare')?.addEventListener('click', (event) => {
+      const models = event.currentTarget.dataset.models.split(',');
+      comparison.clear();
+      models.map((model) => payload.data[0].data.vehicles.find((item) => item.model === model)).filter(Boolean).slice(0, 4).forEach(toggleComparison);
+      main.querySelector('#detailCompare').textContent = comparison.has(vehicle.model) ? 'Убрать из сравнения' : 'Добавить к сравнению';
+      renderComparison();
+    });
     main.querySelector("#detailCompare")?.addEventListener("click", (event) => {
       toggleComparison(vehicle);
       event.target.textContent = comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению";
@@ -877,22 +993,24 @@
   }
 
   function renderComparison() {
-    const list = [...comparison.values()].map((vehicle) => ({ ...vehicle, assessment: vehicle.price_donate ?? vehicle.price_dealer }));
+    const list = [...comparison.values()].map((vehicle) => ({ ...vehicle, assessment: vehicle.price_donate ?? vehicle.price_dealer, ...vehicleCosts(vehicle) }));
     const metrics = [
       ["Цена в салоне", "price_dealer", "min", (value) => money(value)],
       ["Оценочная стоимость", "assessment", "min", (value) => money(value)],
+      ["Госстоимость", "statePrice", "max", (value) => money(value)],
+      ["Полный тюнинг · расчёт", "tuningPrice", "min", (value) => value == null ? "—" : `≈ ${money(value)}`],
       ["Максимальная скорость", "max_speed_kmh", "max", (value) => `${numbers.format(value)} км/ч`],
       ["Разгон 0–100", "t100_s", "min", (value) => value == null ? "—" : `${numbers.format(value)} с`],
       ["Багажник", "trunk_kg", "max", (value) => `${numbers.format(value)} кг`],
       ["Мест", "seats", "max", String], ["Масса", "mass_kg", "", (value) => value == null ? "—" : `${numbers.format(value)} кг`],
-      ["Топливо", "fuel_type", "", label], ["Бак", "fuel_capacity_l", "max", (value) => value == null ? "—" : numbers.format(value)],
-      ["Расход под нагрузкой", "fuel_load_l100", "min", (value) => numbers.format(value)],
+      ["Топливо", "fuel_type", "", label], ["Бак / батарея", "fuel_capacity_l", "max", (value, vehicle) => `${numbers.format(value)} ${vehicle.fuel_type === 'Electric' ? 'ед.' : 'л'}`],
+      ["Расход под нагрузкой", "fuel_load_l100", "min", (value, vehicle) => `${numbers.format(value)} ${vehicle.fuel_type === 'Electric' ? 'ед.' : 'л'}/100 км`],
       ["Привод", "drivetrain", "", label]
     ];
-    document.querySelector("#compareContent").innerHTML = `<table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col"><img src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
+    document.querySelector("#compareContent").innerHTML = `<p class="compare-help">Таблицу можно прокручивать по горизонтали.</p><table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col"><img src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
       const values = list.map((vehicle) => vehicle[field]).filter((value) => typeof value === "number");
       const best = direction === "min" ? Math.min(...values) : Math.max(...values);
-      return `<tr><th scope="row">${title}</th>${list.map((vehicle) => `<td ${direction && vehicle[field] != null && vehicle[field] === best ? 'class="best"' : ""}>${escapeHtml(format(vehicle[field]))}</td>`).join("")}</tr>`;
+      return `<tr><th scope="row">${title}</th>${list.map((vehicle) => `<td ${direction && vehicle[field] != null && vehicle[field] === best ? 'class="best"' : ""}>${escapeHtml(vehicle[field] == null ? '—' : format(vehicle[field], vehicle))}</td>`).join("")}</tr>`;
     }).join("")}</tbody></table>`;
     document.querySelector("#compareDialog").showModal();
   }
@@ -1034,6 +1152,7 @@
 
   async function route() {
     document.querySelector("#imageDialog").close();
+    document.querySelector("#compareDialog").close();
     if (!manifest) return;
     const version = ++routeVersion;
     cleanupView();
@@ -1045,6 +1164,7 @@
     const parts = url.pathname.split("/").filter(Boolean);
     const section = parts[0] || "home";
     const path = `/${parts.join("/")}/`;
+    main.dataset.section = section;
     renderNavigation(section);
     main.innerHTML = '<div class="loading" role="status">Загружаем раздел…</div>';
     document.title = `${section === "home" ? "Справочник игрока" : section === "tuning" ? "Калькулятор тюнинга" : section === "search" ? "Поиск" : sectionTitle(section)} — Region Info`;
@@ -1086,6 +1206,13 @@
     const expanded = document.body.classList.toggle("menu-open");
     event.currentTarget.setAttribute("aria-expanded", String(expanded));
   });
+  for (const id of ['menuClose', 'menuBackdrop']) {
+    document.querySelector(`#${id}`).addEventListener('click', () => {
+      document.body.classList.remove('menu-open');
+      document.querySelector('#menuButton').setAttribute('aria-expanded', 'false');
+      document.querySelector('#menuButton').focus();
+    });
+  }
   main.addEventListener("click", () => {
     document.body.classList.remove("menu-open");
     document.querySelector("#menuButton").setAttribute("aria-expanded", "false");
