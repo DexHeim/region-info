@@ -6,6 +6,7 @@
   const sourceOrigin = "https://wiki.region.game";
   const collator = new Intl.Collator("ru", { numeric: true, sensitivity: "base" });
   const numbers = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
+  const dates = new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow" });
   const rubles = new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 });
   const sectionCache = new Map();
   const documentCache = new Map();
@@ -37,6 +38,7 @@
     yours: "Своё", lamoba: "ЛаМоба", selection: "Эгоист", tsum: "ПУМ"
   };
   let manifest;
+  let imageOverrides = {};
   let routeVersion = 0;
   let cleanupView = () => {};
   let toastTimer;
@@ -58,6 +60,19 @@
   function money(value, currency = "rub") {
     if (value === null || value === undefined || !Number.isFinite(Number(value))) return "—";
     return currency === "rc" ? `${numbers.format(value)} RC` : rubles.format(value);
+  }
+
+  function imageUrl(url) {
+    return imageOverrides[url]?.src || url;
+  }
+
+  function documentMarkup(markup) {
+    for (const [original, replacement] of Object.entries(imageOverrides)) {
+      markup = markup.replaceAll(original, escapeHtml(replacement.src));
+    }
+    const unavailableVideos = Object.values(imageOverrides).map((replacement) => replacement.unavailableVideo).filter(Boolean);
+    return markup.replace(/<video\b[\s\S]*?<\/video>/g, (video) => unavailableVideos.some((url) => video.includes(url))
+      ? '<p class="media-note">Видеопревью этой анимации пока недоступно.</p>' : video);
   }
 
   async function getJson(url) {
@@ -162,11 +177,12 @@
     if (section === "vehicles") {
       return data.vehicles.map((vehicle) => ({
         id: vehicle.model, href: `/vehicles/${vehicle.model}/`, title: `${vehicle.brand} ${vehicle.name}`,
-        image: `${mediaBase}/vehicles/${vehicle.model}.png`, price: vehicle.price_dealer,
+        image: `${mediaBase}/vehicles/${vehicle.model}.png`, price: vehicle.price_dealer ?? vehicle.price_donate,
+        priceLabel: vehicle.price_dealer == null ? "Оценочная стоимость" : "Цена в салоне",
         sub: `${label(vehicle.class)} · ${label(vehicle.access)}`, kind: vehicle.class, kindLabel: label(vehicle.class),
         level: vehicle.access, levelLabel: label(vehicle.access), city: vehicle.brand,
         stats: [`${numbers.format(vehicle.max_speed_kmh)} км/ч`, vehicle.t100_s == null ? "" : `${numbers.format(vehicle.t100_s)} с до 100`, `${vehicle.seats} мест`, `${vehicle.trunk_kg} кг`],
-        sortBy: { price: vehicle.price_dealer, speed: vehicle.max_speed_kmh, acceleration: vehicle.t100_s, trunk: vehicle.trunk_kg }, vehicle
+        sortBy: { price: vehicle.price_dealer ?? vehicle.price_donate, speed: vehicle.max_speed_kmh, acceleration: vehicle.t100_s, trunk: vehicle.trunk_kg }, vehicle
       }));
     }
     if (section === "items") {
@@ -174,7 +190,7 @@
         id: item.id, href: `/items/${item.id}/`, title: item.name, sub: item.description,
         image: `${mediaBase}/inventory/items/${item.id}.avif`, kind: item.category, kindLabel: label(item.category),
         level: String(item.rarity), levelLabel: ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][item.rarity] || String(item.rarity),
-        stats: [`${numbers.format(item.weight_kg)} кг`, `${item.size_w}×${item.size_h}`, `Стопка до ${item.max_stack}`],
+        stats: [`${numbers.format(item.weight_kg)} кг`, `${item.size_w}×${item.size_h}`, `${item.max_stack} шт.`],
         sortBy: { weight: item.weight_kg, stack: item.max_stack, rarity: item.rarity }
       }));
     }
@@ -192,7 +208,9 @@
     if (data.rows) return data.rows;
     return manifest.pages.filter((document) => document.section === section).map((document) => ({
       id: document.path, href: document.path, title: document.title, sub: document.summary,
-      image: document.image, stats: [], sortBy: { date: Date.parse(document.path.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "1970-01-01") }
+      image: document.image, stats: [],
+      kindLabel: section === "updates" ? dates.format(new Date(document.path.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "1970-01-01")) : "",
+      sortBy: { date: Date.parse(document.path.match(/\d{4}-\d{2}-\d{2}/)?.[0] || "1970-01-01") }
     }));
   }
 
@@ -227,10 +245,31 @@
     return `<label class="filter-label">${escapeHtml(title)}<select data-filter="${field}"><option value="">Все</option>${combined}${[...values].sort((a, b) => collator.compare(a[1], b[1])).map(([value, text]) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(text)}</option>`).join("")}</select></label>`;
   }
 
-  function cardHtml(row, section) {
-    const image = row.image ? `<img src="${escapeHtml(row.image)}" alt="" loading="lazy" ${["estate", "business", "factions"].includes(section) ? 'class="cover"' : ""}>` : `<span class="media-placeholder" aria-hidden="true">${icons[section] || "◇"}</span>`;
-    const description = row.vehicle ? "" : row.sub || row.cat || "";
-    return `<article class="catalog-card"><a class="card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}">${image}</a><div class="card-body"><p class="card-category">${escapeHtml([row.kindLabel, row.levelLabel, section === "vehicles" ? "" : row.city].filter(Boolean).join(" · "))}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${row.price != null ? `<p class="card-price">${money(row.price, row.currency)}</p>` : ""}${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}<div class="card-stats">${(row.stats || []).filter(Boolean).map((value) => `<span>${escapeHtml(value)}</span>`).join("")}${row.foot ? `<span>${escapeHtml(row.foot)}</span>` : ""}</div></div>${row.vehicle ? `<label class="compare-select"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}>Добавить к сравнению</label>` : ""}</article>`;
+  function cardHtml(row, section, settings) {
+    const currencyReward = row.level === "money" || row.level === "rc";
+    const symbol = row.level === "money" ? "₽" : row.level === "rc" ? "RC" : section === "levels" ? String(row.id) : icons[section] || "◇";
+    const iconUrl = row.blip ? new URL(row.blip, sourceOrigin).href : "";
+    let media = `<span class="media-placeholder ${currencyReward ? "media-placeholder--currency" : ""}" aria-hidden="true">${escapeHtml(symbol)}</span>`;
+    if (row.image) {
+      const presentation = imageOverrides[row.image];
+      const cover = !presentation && row.fit !== "contain" && ["estate", "business", "factions", "updates"].includes(section);
+      const className = presentation?.fit === "icon" ? "media-icon" : cover ? "cover" : "";
+      media = `<img src="${escapeHtml(imageUrl(row.image))}" alt="" loading="lazy" decoding="async" class="${className}">`;
+    } else if (iconUrl && !currencyReward && section !== "levels") {
+      media = `<img class="media-icon" src="${escapeHtml(iconUrl)}" alt="" loading="lazy">`;
+    }
+    const category = [row.kindLabel, row.levelLabel, ["vehicles", "clothes"].includes(section) ? "" : Array.isArray(row.city) ? row.city.join(", ") : row.city].filter(Boolean).join(" · ");
+    const description = row.vehicle ? "" : row.sub || (row.cat && !category.includes(row.cat) ? row.cat : "");
+    const statLabels = row.vehicle ? ["Скорость", "0–100 км/ч", "Места", "Багажник"]
+      : section === "items" ? ["Вес", "Размер", "В стопке"]
+      : section === "clothes" ? ["Магазины", "Источник", "Источник"] : settings.columns || [];
+    const stats = (row.stats || []).map((value, index) => {
+      if (value === null || value === undefined || value === "" || value === "—") return "";
+      if (section === "season" && index === 0 && row.badge) return "";
+      return `<div>${statLabels[index] ? `<dt>${escapeHtml(statLabels[index])}</dt>` : ""}<dd>${escapeHtml(value)}</dd></div>`;
+    }).join("");
+    const foot = row.foot && !["season", "levels"].includes(section) ? `<p class="card-foot">${escapeHtml(row.foot)}</p>` : "";
+    return `<article class="catalog-card"><a class="card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-icon="${escapeHtml(iconUrl)}" data-symbol="${escapeHtml(symbol)}">${section === "season" && row.badge ? `<span class="card-badge">${escapeHtml(row.badge)}</span>` : ""}${media}</a><div class="card-body"><p class="card-category">${escapeHtml(category)}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${row.price != null ? `<p class="card-price">${row.priceLabel ? `<small>${escapeHtml(row.priceLabel)}</small>` : ""}${money(row.price, row.currency)}</p>` : ""}${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}${stats ? `<dl class="card-stats">${stats}</dl>` : ""}${foot}</div>${row.vehicle ? `<label class="compare-select"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}>Добавить к сравнению</label>` : ""}</article>`;
   }
 
   function paginationHtml(page, pages) {
@@ -267,9 +306,25 @@
       min: incoming.get("min") || "", max: incoming.get("max") || "", page: Math.max(1, Number(incoming.get("page")) || 1), size: 24,
       view: incoming.get("view") || settings.defaultView || "cards"
     };
-    main.innerHTML = pageHeading(payload.title, section === "vehicles" ? "Полный каталог транспорта. В карточках автомобилей — наши расчёты стоимости улучшений и внешнего тюнинга." : "", section) +
+    const introductions = {
+      vehicles: "Полный каталог транспорта. В карточках автомобилей — наши расчёты стоимости улучшений и внешнего тюнинга.",
+      estate: "Квартиры открываются внутри карточек жилых комплексов. Дома и отели представлены отдельными карточками.",
+      season: payload.description || ""
+    };
+    const guide = section === "season" ? '<p class="catalog-guide"><a href="#/articles/systems/season-pass/">Задания, опыт и покупка премиума ↗</a></p>' : "";
+    main.innerHTML = pageHeading(payload.title, introductions[section] || "", section) + guide +
       `<div class="toolbar"><input type="search" id="catalogQuery" aria-label="Поиск в разделе" placeholder="${escapeHtml(settings.search || "Найти в разделе")}" value="${escapeHtml(state.query)}">${filterSelect(rows, "kind", settings.kindTitle || "Тип", state.kind)}${filterSelect(rows, "level", settings.levelTitle || "Категория", state.level)}${filterSelect(rows, "city", settings.cityTitle || "Город", state.city)}<label class="filter-label">Сортировка<select id="catalogSort">${sorts.map((sort) => `<option value="${sort.key}:${sort.dir}" ${state.sort === `${sort.key}:${sort.dir}` ? "selected" : ""}>${escapeHtml(sort.label)}</option>`).join("")}</select></label>${rows.some((row) => row.price != null) ? `<label class="filter-label">Цена от<input id="minPrice" type="number" min="0" aria-label="Минимальная цена" value="${escapeHtml(state.min)}"></label><label class="filter-label">Цена до<input id="maxPrice" type="number" min="0" aria-label="Максимальная цена" value="${escapeHtml(state.max)}"></label>` : ""}<button class="quiet-button" id="resetFilters" type="button">Сбросить</button></div><div id="catalogResults" aria-live="polite"></div>${section === "vehicles" ? '<p class="source-note"><a href="cars.html">Наш каталог с замерами управляемости и торможения ↗</a></p>' : ""}${sourceNote(`/${section}/`)}`;
     const results = main.querySelector("#catalogResults");
+    const filterToggle = document.createElement("button");
+    filterToggle.className = "quiet-button filter-toggle";
+    filterToggle.type = "button";
+    filterToggle.setAttribute("aria-expanded", "false");
+    filterToggle.textContent = "Фильтры";
+    const toolbar = main.querySelector(".toolbar");
+    main.querySelector("#catalogQuery").after(filterToggle);
+    filterToggle.addEventListener("click", () => {
+      filterToggle.setAttribute("aria-expanded", String(toolbar.classList.toggle("filters-open")));
+    });
 
     function matchesFacet(value, selected) {
       if (!selected) return true;
@@ -278,6 +333,8 @@
     }
 
     function draw() {
+      const filterCount = [state.kind, state.level, state.city, state.min, state.max].filter((value) => value !== "").length;
+      filterToggle.textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
       const terms = normalize(state.query).split(/\s+/).filter(Boolean);
       const filtered = rows.filter((row) => {
         const haystack = normalize([row.title, row.sub, row.kindLabel, row.levelLabel, row.city, row.id, ...(row.stats || [])].join(" "));
@@ -302,7 +359,7 @@
       state.page = Math.min(state.page, pages);
       const pageRows = filtered.slice((state.page - 1) * state.size, state.page * state.size);
       const tableAvailable = settings.columns?.length > 0;
-      const content = state.view === "table" && tableAvailable ? tableHtml(pageRows, settings) : `<div class="catalog-grid">${pageRows.map((row) => cardHtml(row, section)).join("")}</div>`;
+      const content = state.view === "table" && tableAvailable ? tableHtml(pageRows, settings) : `<div class="catalog-grid">${pageRows.map((row) => cardHtml(row, section, settings)).join("")}</div>`;
       results.innerHTML = `<div class="result-line"><span>Найдено ${numbers.format(filtered.length)} из ${numbers.format(rows.length)}</span>${tableAvailable ? `<label>Вид <select id="catalogView" aria-label="Вид каталога"><option value="cards" ${state.view === "cards" ? "selected" : ""}>Карточки</option><option value="table" ${state.view === "table" ? "selected" : ""}>Таблица</option></select></label>` : ""}<label>На странице <select id="pageSize" aria-label="Количество на странице">${[24, 48, 96].map((size) => `<option ${state.size === size ? "selected" : ""}>${size}</option>`).join("")}</select></label></div>${pageRows.length ? content : '<div class="empty">По выбранным условиям ничего не найдено.</div>'}${paginationHtml(state.page, pages)}`;
       results.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
         state.page = Number(button.dataset.page);
@@ -331,7 +388,7 @@
     for (const [id, field] of [["minPrice", "min"], ["maxPrice", "max"]]) {
       main.querySelector(`#${id}`)?.addEventListener("input", (event) => { state[field] = event.target.value; state.page = 1; draw(); });
     }
-    main.querySelector("#resetFilters").addEventListener("click", () => { location.hash = `/${section}`; route(); });
+    main.querySelector("#resetFilters").addEventListener("click", () => { history.replaceState(null, "", `#/${section}`); route(); });
     draw();
   }
 
@@ -374,6 +431,10 @@
   }
 
   function localizeDocument(container, path) {
+    const iconSources = new Set(Object.values(imageOverrides).filter((replacement) => replacement.fit === "icon").map((replacement) => replacement.src));
+    container.querySelectorAll("img").forEach((image) => {
+      if (iconSources.has(image.src)) image.dataset.mediaKind = "icon";
+    });
     container.querySelectorAll("a[href]").forEach((link) => {
       const raw = link.getAttribute("href");
       if (raw.startsWith("#")) {
@@ -411,10 +472,22 @@
     if (version !== routeVersion) return;
     if (!documentData) throw new Error("Эта страница отсутствует в локальной базе.");
     const vehicle = section === "vehicles" ? payload.data[0].data.vehicles.find((item) => item.model === path.split("/")[2]) : null;
-    const toc = documentData.headings.filter((heading) => heading.id).map((heading) => `<a href="${localHref(path)}?anchor=${encodeURIComponent(heading.id)}">${escapeHtml(heading.title)}</a>`).join("");
+    const toc = documentData.headings.filter((heading) => heading.id).map((heading) => `<a href="${localHref(path)}?anchor=${encodeURIComponent(heading.id)}">${escapeHtml(heading.title)}</a>`).join("") + (vehicle ? `<a href="${localHref(path)}?anchor=region-tuning">Расчёт тюнинга</a>` : "");
+    document.title = `${documentData.title} — Region Info`;
     main.innerHTML = pageHeading(documentData.title, documentData.summary, section) +
-      (vehicle ? `<div class="detail-hero"><img class="detail-image" src="${mediaBase}/vehicles/${escapeHtml(vehicle.model)}.png" alt="${escapeHtml(documentData.title)}"><div class="detail-facts">${fact("Базовая цена в салоне", money(vehicle.price_dealer))}${fact("Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`)}${fact("Разгон 0–100", vehicle.t100_s == null ? "—" : `${numbers.format(vehicle.t100_s)} с`)}${fact("Багажник", `${vehicle.trunk_kg} кг`)}</div></div><button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению"}</button><section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer > 0 ? tuningHtml(vehicle.price_dealer) : '<p class="tuning-note">Для этой модели отсутствует салонная цена. Укажите стоимость в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
-      `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentData.html}</article>${toc ? `<aside class="article-toc" aria-label="На этой странице"><strong>На этой странице</strong>${toc}</aside>` : ""}</div>${documentData.widgets.filter((widget) => widget.component.includes("MiniMap")).map((widget) => `<p><a class="quiet-button" href="#/map?x=${widget.data.x}&y=${widget.data.y}">На карте · ${escapeHtml(widget.data.label || "Расположение")} ↗</a></p>`).join("")}${sourceNote(path)}`;
+      (vehicle ? `<div class="detail-hero"><img class="detail-image" src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="${escapeHtml(documentData.title)}"><div class="detail-facts">${fact(vehicle.price_dealer == null ? "Оценочная стоимость" : "Базовая цена в салоне", money(vehicle.price_dealer ?? vehicle.price_donate))}${fact("Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`)}${fact("Разгон 0–100", vehicle.t100_s == null ? "—" : `${numbers.format(vehicle.t100_s)} с`)}${fact("Багажник", `${vehicle.trunk_kg} кг`)}</div></div><button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению"}</button><section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer > 0 ? tuningHtml(vehicle.price_dealer) : '<p class="tuning-note">Для этой модели отсутствует салонная цена. Укажите стоимость в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
+      `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentMarkup(documentData.html)}</article>${toc ? `<aside class="article-toc" aria-label="На этой странице"><details id="pageToc"><summary>На этой странице</summary>${toc}</details></aside>` : ""}</div>${documentData.widgets.filter((widget) => widget.component.includes("MiniMap")).map((widget) => `<p><a class="quiet-button" href="#/map?x=${widget.data.x}&y=${widget.data.y}">На карте · ${escapeHtml(widget.data.label || "Расположение")} ↗</a></p>`).join("")}${sourceNote(path)}`;
+    const tocDetails = main.querySelector("#pageToc");
+    if (tocDetails) tocDetails.open = !matchMedia("(max-width: 1200px)").matches;
+    if (vehicle) {
+      const tuningPanel = main.querySelector("#vehicleTuning");
+      tuningPanel.dataset.anchor = "region-tuning";
+      const specs = main.querySelector('.prose [data-anchor="specs"]')?.closest("section");
+      if (specs) {
+        specs.after(tuningPanel);
+        tuningPanel.after(main.querySelector("#legacySpecs"));
+      }
+    }
     localizeDocument(main.querySelector(".prose"), path);
     main.querySelector("#detailCompare")?.addEventListener("click", (event) => {
       toggleComparison(vehicle);
@@ -424,7 +497,7 @@
       const legacy = await getJson("data/cars.json").catch(() => []);
       if (version !== routeVersion) return;
       const modelName = normalize(`${vehicle.brand} ${vehicle.name}`).replace(/[^\p{L}\p{N}]/gu, "");
-      const oldCar = legacy.find((car) => normalize(car.name).replace(/[^\p{L}\p{N}]/gu, "") === modelName);
+      const oldCar = legacy.find((car) => car.wiki_model ? car.wiki_model === vehicle.model : normalize(car.name).replace(/[^\p{L}\p{N}]/gu, "") === modelName);
       if (oldCar) {
         main.querySelector("#legacySpecs").innerHTML = `<section class="tuning-panel"><h2>Дополнительные замеры Region Info</h2><p class="tuning-note">Замеры из нашего прежнего каталога.</p><div class="detail-facts">${fact("Управляемость", `${oldCar.handling} / 5`)}${fact("Торможение 100–0", `${numbers.format(oldCar.braking_100_0_s)} с`)}</div></section>`;
       }
@@ -443,9 +516,10 @@
   }
 
   function renderComparison() {
-    const list = [...comparison.values()];
+    const list = [...comparison.values()].map((vehicle) => ({ ...vehicle, assessment: vehicle.price_donate ?? vehicle.price_dealer }));
     const metrics = [
       ["Цена в салоне", "price_dealer", "min", (value) => money(value)],
+      ["Оценочная стоимость", "assessment", "min", (value) => money(value)],
       ["Максимальная скорость", "max_speed_kmh", "max", (value) => `${numbers.format(value)} км/ч`],
       ["Разгон 0–100", "t100_s", "min", (value) => value == null ? "—" : `${numbers.format(value)} с`],
       ["Багажник", "trunk_kg", "max", (value) => `${numbers.format(value)} кг`],
@@ -454,7 +528,7 @@
       ["Расход под нагрузкой", "fuel_load_l100", "min", (value) => numbers.format(value)],
       ["Привод", "drivetrain", "", label]
     ];
-    document.querySelector("#compareContent").innerHTML = `<table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col"><img src="${mediaBase}/vehicles/${escapeHtml(vehicle.model)}.png" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
+    document.querySelector("#compareContent").innerHTML = `<table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col"><img src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
       const values = list.map((vehicle) => vehicle[field]).filter((value) => typeof value === "number");
       const best = direction === "min" ? Math.min(...values) : Math.max(...values);
       return `<tr><th scope="row">${title}</th>${list.map((vehicle) => `<td ${direction && vehicle[field] != null && vehicle[field] === best ? 'class="best"' : ""}>${escapeHtml(format(vehicle[field]))}</td>`).join("")}</tr>`;
@@ -669,17 +743,45 @@
     if (event.key === "Escape") { document.body.classList.remove("menu-open"); document.querySelector("#menuButton").setAttribute("aria-expanded", "false"); }
   });
   document.addEventListener("error", (event) => {
-    if (event.target.tagName !== "IMG" || event.target.dataset.failed) return;
+    if (event.target.tagName === "VIDEO") {
+      const message = document.createElement("p");
+      message.className = "media-note";
+      message.textContent = "Видеопревью пока недоступно.";
+      event.target.replaceWith(message);
+      return;
+    }
+    if (event.target.tagName !== "IMG") return;
     const image = event.target;
-    image.dataset.failed = "true";
-    if (image.src.endsWith("_small.avif")) image.src = image.src.replace("_small.avif", ".avif");
-    else image.style.visibility = "hidden";
+    if (!image.dataset.fullTried && image.src.endsWith("_small.avif")) {
+      image.dataset.fullTried = "true";
+      image.src = image.src.replace("_small.avif", ".avif");
+    } else if (!image.dataset.formatTried && /\.(avif|png)$/.test(image.src)) {
+      image.dataset.formatTried = "true";
+      image.src = image.src.endsWith(".avif") ? image.src.replace(/\.avif$/, ".png") : image.src.replace(/\.png$/, ".avif");
+    } else {
+      const media = image.closest(".card-media");
+      if (media?.dataset.icon && !image.dataset.iconTried) {
+        image.dataset.iconTried = "true";
+        image.src = media.dataset.icon;
+        image.className = "media-icon";
+      } else if (media) {
+        const placeholder = document.createElement("span");
+        placeholder.className = "media-placeholder";
+        placeholder.setAttribute("aria-hidden", "true");
+        placeholder.textContent = media.dataset.symbol;
+        image.replaceWith(placeholder);
+      } else {
+        image.alt = image.alt || "Изображение недоступно";
+        image.classList.add("media-unavailable");
+      }
+    }
   }, true);
   window.addEventListener("hashchange", route);
 
-  getJson("data/wiki/index.json").then((index) => {
+  Promise.all([getJson("data/wiki/index.json"), getJson("data/wiki/image-overrides.json").catch(() => ({}))]).then(([index, overrides]) => {
     manifest = index;
-    document.querySelector("#importDate").textContent = `База от ${new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Moscow" }).format(new Date(index.importedAt))}`;
+    imageOverrides = overrides;
+    document.querySelector("#importDate").textContent = `База от ${dates.format(new Date(index.importedAt))}`;
     route();
   }).catch((error) => {
     console.error(error);

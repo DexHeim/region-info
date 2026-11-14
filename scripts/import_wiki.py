@@ -10,6 +10,7 @@ import os
 import re
 import time
 import threading
+import unicodedata
 import urllib.parse
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -47,6 +48,7 @@ VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "met
 CONNECTIONS = threading.local()
 WORKERS = 8
 USE_CACHE = True
+FUEL_GRADES = {60: 92, 80: 95, 100: 100}
 
 
 class Node:
@@ -291,6 +293,52 @@ def dump(path, data):
     os.replace(temporary, path)
 
 
+def synchronize_legacy_cars(vehicles):
+    path = ROOT / "data" / "cars.json"
+    cars = json.loads(path.read_text(encoding="utf-8"))
+
+    def name_key(value):
+        return re.sub(r"[\W_]", "", unicodedata.normalize("NFKD", value).casefold())
+
+    names = {}
+    models = {vehicle["model"]: vehicle for vehicle in vehicles}
+    for vehicle in vehicles:
+        key = name_key(vehicle["brand"] + " " + vehicle["name"])
+        names.setdefault(key, []).append(vehicle)
+    fields = {
+        "fuel_l": "fuel_capacity_l", "trunk_kg": "trunk_kg",
+        "max_speed_kmh": "max_speed_kmh", "acceleration_0_100_s": "t100_s",
+        "price_rub": "price_dealer",
+    }
+    for car in cars:
+        known_model = models.get(car.get("wiki_model"))
+        variants = [known_model] if known_model else names.get(name_key(car["name"]), [])
+        dealer_models = [vehicle for vehicle in variants if vehicle["price_dealer"] is not None]
+        candidates = dealer_models or variants
+        if len(candidates) != 1:
+            raise ValueError(f"Cannot uniquely match legacy vehicle {car['name']!r}")
+        vehicle = candidates[0]
+        car["wiki_model"] = vehicle["model"]
+        for target, source in fields.items():
+            car[target] = vehicle[source]
+        if vehicle["price_dealer"] is None:
+            car["active"] = False
+        if vehicle["fuel_type"] == "Gas":
+            car["fuel_type"] = f"АИ-{FUEL_GRADES[vehicle['fuel_grade']]}"
+            car["fuel_unit"] = "л"
+        elif vehicle["fuel_type"] == "Electric":
+            car["fuel_type"] = "Электро"
+            car["fuel_unit"] = "кВт·ч"
+        else:
+            car["fuel_type"] = "Дизель"
+            car["fuel_unit"] = "л"
+        if "state_price_rub" in car:
+            car["state_price_rub"] = round(vehicle["price_dealer"] * .7) if vehicle["price_dealer"] is not None else None
+    temporary = path.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(cars, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(temporary, path)
+
+
 def main():
     global USE_CACHE
     parser = argparse.ArgumentParser()
@@ -327,7 +375,7 @@ def main():
     clothes = catalog_data["clothes"][0]["data"]["rows"]
     pending.update(f"/clothes/{row[0]}/" for row in clothes)
     pending = {path for path in pending if len(path.strip("/").split("/")) > 1 and path != "/vehicles/compare/"}
-    sections = {key: {"title": title, "data": catalog_data[key], "documents": {}} for key, title in SECTIONS.items()}
+    sections = {key: {"title": title, "data": catalog_data[key], "description": article_summary(Document(sources[f"/{key}/"]).root), "documents": {}} for key, title in SECTIONS.items()}
     seen = set(sources)
     failed = {}
     total = 0
@@ -374,7 +422,7 @@ def main():
                     "section": key, "image": document["image"], "chunk": chunk_name,
                 })
             dump(output / "details" / chunk_name, chunk)
-        dump(output / f"{key}.json", {"title": section["title"], "data": section["data"]})
+        dump(output / f"{key}.json", {"title": section["title"], "data": section["data"], "description": section["description"]})
     index = {
         "source": ORIGIN,
         "importedAt": datetime.now(timezone.utc).isoformat(),
@@ -384,6 +432,7 @@ def main():
         "failed": failed,
     }
     dump(output / "index.json", index)
+    synchronize_legacy_cars(catalog_data["vehicles"][0]["data"]["vehicles"])
     print(json.dumps({"pages": total, "failed": failed}, ensure_ascii=False), flush=True)
 
 

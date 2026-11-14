@@ -1,0 +1,200 @@
+{
+  "https://cdn.region.game/main/images/blip-cards/faction/5/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_government.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/tow-yard/2/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_car_showroom.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/tow-yard/3/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_car_showroom.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/tow-yard/4/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_car_showroom.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/tow-yard/5/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_car_showroom.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/44/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_tractor_rental.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/45/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_boat_parking_pier.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/46/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_boat_parking_pier.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/47/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_boat_parking_pier.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/48/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_car_rental.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/blip-cards/vehicle-terminal/49/medium.webp": {
+    "src": "https://wiki.region.game/blips/radar_region_truck_rental.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/animations/anim@mp_player_intincarthumbs_upbodhi@ds@^idle_a.png": {
+    "src": "https://wiki.region.game/icons/animation.svg",
+    "fit": "icon",
+    "unavailableVideo": "https://cdn.region.game/main/images/animations/anim@mp_player_intincarthumbs_upbodhi@ds@^idle_a.webm"
+  },
+  "https://cdn.region.game/main/images/animations/amb@code_human_in_car_mp_actions@v_sign@std@rds@base^idle_a.png": {
+    "src": "https://wiki.region.game/icons/animation.svg",
+    "fit": "icon",
+    "unavailableVideo": "https://cdn.region.game/main/images/animations/amb@code_human_in_car_mp_actions@v_sign@std@rds@base^idle_a.webm"
+  },
+  "https://cdn.region.game/main/images/inventory/items/143.avif": {
+    "src": "https://wiki.region.game/blips/radar_region_clothing_shop.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/144.avif": {
+    "src": "https://wiki.region.game/blips/radar_region_clothing_shop.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/145.avif": {
+    "src": "https://wiki.region.game/vehicle-placeholder.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/183.avif": {
+    "src": "https://wiki.region.game/blips/radar_region_gun_shop.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/213.avif": {
+    "src": "https://wiki.region.game/vehicle-placeholder.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/250.avif": {
+    "src": "https://wiki.region.game/blips/radar_region_clothing_shop.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/251.avif": {
+    "src": "https://wiki.region.game/blips/radar_region_clothing_shop.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/416.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/417.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/418.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/419.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/420.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/421.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/422.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/423.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/424.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/425.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/426.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/427.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/428.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/429.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/444.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/445.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/446.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/447.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/448.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/449.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/476.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/477.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/478.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/479.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/inventory/items/480.avif": {
+    "src": "https://wiki.region.game/icons/level.svg",
+    "fit": "icon"
+  },
+  "https://cdn.region.game/main/images/vehicles/mvd_gazel.png": {
+    "src": "https://wiki.region.game/vehicle-placeholder.svg",
+    "fit": "contain"
+  },
+  "https://cdn.region.game/main/images/vehicles/mvd_tigr.png": {
+    "src": "https://wiki.region.game/vehicle-placeholder.svg",
+    "fit": "contain"
+  },
+  "https://cdn.region.game/main/images/vehicles/news_lc200.png": {
+    "src": "https://wiki.region.game/vehicle-placeholder.svg",
+    "fit": "contain"
+  },
+  "https://cdn.region.game/main/images/vehicle-brands/region.avif": {
+    "src": "https://wiki.region.game/brand/region-logo.svg",
+    "fit": "contain"
+  }
+}

@@ -8,10 +8,12 @@
     "trunk_kg": 65,
     "max_speed_kmh": 185,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 8.21,
     "braking_100_0_s": 3,
     "price_rub": 225000,
-    "active": true
+    "active": true,
+    "wiki_model": "focus2003",
+    "fuel_unit": "л"
   },
   {
     "id": 2,
@@ -22,10 +24,12 @@
     "trunk_kg": 90,
     "max_speed_kmh": 168,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.48,
     "braking_100_0_s": 1,
     "price_rub": 655000,
-    "active": true
+    "active": true,
+    "wiki_model": "impala67",
+    "fuel_unit": "л"
   },
   {
     "id": 3,
@@ -36,10 +40,12 @@
     "trunk_kg": 35,
     "max_speed_kmh": 192,
     "handling": 4,
-    "acceleration_0_100_s": 6.7,
+    "acceleration_0_100_s": 6.94,
     "braking_100_0_s": 2,
     "price_rub": 725000,
-    "active": true
+    "active": true,
+    "wiki_model": "camaro2",
+    "fuel_unit": "л"
   },
   {
     "id": 4,
@@ -50,10 +56,12 @@
     "trunk_kg": 85,
     "max_speed_kmh": 242,
     "handling": 3,
-    "acceleration_0_100_s": 4.7,
+    "acceleration_0_100_s": 4.96,
     "braking_100_0_s": 2,
     "price_rub": 1550000,
-    "active": true
+    "active": true,
+    "wiki_model": "chevelless",
+    "fuel_unit": "л"
   },
   {
     "id": 5,
@@ -64,10 +72,12 @@
     "trunk_kg": 145,
     "max_speed_kmh": 207,
     "handling": 3,
-    "acceleration_0_100_s": 6.4,
+    "acceleration_0_100_s": 6.86,
     "braking_100_0_s": 1,
     "price_rub": 1600000,
-    "active": true
+    "active": true,
+    "wiki_model": "jeep15",
+    "fuel_unit": "л"
   },
   {
     "id": 6,
@@ -78,10 +88,12 @@
     "trunk_kg": 50,
     "max_speed_kmh": 259,
     "handling": 4,
-    "acceleration_0_100_s": 4.7,
+    "acceleration_0_100_s": 5.32,
     "braking_100_0_s": 3,
     "price_rub": 1780000,
-    "active": true
+    "active": true,
+    "wiki_model": "focusrs",
+    "fuel_unit": "л"
   },
   {
     "id": 7,
@@ -92,10 +104,12 @@
     "trunk_kg": 205,
     "max_speed_kmh": 164,
     "handling": 2,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 6.94,
     "braking_100_0_s": 1,
     "price_rub": 2100000,
-    "active": true
+    "active": true,
+    "wiki_model": "hummer",
+    "fuel_unit": "л"
   },
   {
     "id": 8,
@@ -106,10 +120,12 @@
     "trunk_kg": 85,
     "max_speed_kmh": 200,
     "handling": 4,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.23,
     "braking_100_0_s": 2,
     "price_rub": 2250000,
-    "active": true
+    "active": true,
+    "wiki_model": "charger20",
+    "fuel_unit": "л"
   },
   {
     "id": 9,
@@ -120,10 +136,12 @@
     "trunk_kg": 80,
     "max_speed_kmh": 185,
     "handling": 3,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.38,
     "braking_100_0_s": 1,
     "price_rub": 2840000,
-    "active": true
+    "active": true,
+    "wiki_model": "tahoe2",
+    "fuel_unit": "л"
   },
   {
     "id": 10,
@@ -134,10 +152,12 @@
     "trunk_kg": 80,
     "max_speed_kmh": 213,
     "handling": 3,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.08,
     "braking_100_0_s": 1,
     "price_rub": 3225000,
-    "active": true
+    "active": true,
+    "wiki_model": "cesc21",
+    "fuel_unit": "л"
   },
   {
     "id": 11,
@@ -148,10 +168,12 @@
     "trunk_kg": 40,
     "max_speed_kmh": 185,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 7.12,
     "braking_100_0_s": 2,
     "price_rub": 5000000,
-    "active": true
+    "active": true,
+    "wiki_model": "barracuda",
+    "fuel_unit": "л"
   },
   {
     "id": 12,
@@ -162,10 +184,12 @@
     "trunk_kg": 75,
     "max_speed_kmh": 160,
     "handling": 4,
-    "acceleration_0_100_s": 7.1,
+    "acceleration_0_100_s": 7.66,
     "braking_100_0_s": 1,
     "price_rub": 5990000,
-    "active": true
+    "active": true,
+    "wiki_model": "belair",
+    "fuel_unit": "л"
   },
   {
     "id": 13,
@@ -176,10 +200,12 @@
     "trunk_kg": 85,
     "max_speed_kmh": 326,
     "handling": 3,
-    "acceleration_0_100_s": 3.6,
+    "acceleration_0_100_s": 4.18,
     "braking_100_0_s": 3,
     "price_rub": 6200000,
-    "active": true
+    "active": true,
+    "wiki_model": "redeye",
+    "fuel_unit": "л"
   },
   {
     "id": 14,
@@ -190,12 +216,14 @@
     "trunk_kg": 60,
     "max_speed_kmh": 176,
     "handling": 4,
-    "acceleration_0_100_s": 7.2,
+    "acceleration_0_100_s": 7.49,
     "braking_100_0_s": 3,
     "price_rub": 140000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "lanos",
+    "fuel_unit": "л"
   },
   {
     "id": 15,
@@ -206,12 +234,14 @@
     "trunk_kg": 30,
     "max_speed_kmh": 142,
     "handling": 4,
-    "acceleration_0_100_s": 7.6,
+    "acceleration_0_100_s": 8.32,
     "braking_100_0_s": 3,
     "price_rub": 198000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "matiz",
+    "fuel_unit": "л"
   },
   {
     "id": 16,
@@ -222,12 +252,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 183,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.96,
     "braking_100_0_s": 3,
     "price_rub": 920000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "rio",
+    "fuel_unit": "л"
   },
   {
     "id": 17,
@@ -238,12 +270,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 197,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.16,
     "braking_100_0_s": 3,
     "price_rub": 950000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "solaris2020",
+    "fuel_unit": "л"
   },
   {
     "id": 18,
@@ -254,12 +288,14 @@
     "trunk_kg": 70,
     "max_speed_kmh": 175,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 6.99,
     "braking_100_0_s": 1,
     "price_rub": 1550000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "havalf7",
+    "fuel_unit": "л"
   },
   {
     "id": 19,
@@ -270,12 +306,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 230,
     "handling": 4,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.42,
     "braking_100_0_s": 2,
     "price_rub": 1650000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "kiastinger",
+    "fuel_unit": "л"
   },
   {
     "id": 20,
@@ -286,29 +324,32 @@
     "trunk_kg": 95,
     "max_speed_kmh": 203,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 7.12,
     "braking_100_0_s": 2,
     "price_rub": 1800000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "kiak5",
+    "fuel_unit": "л"
   },
   {
     "id": 21,
     "name": "Zeekr 001",
     "dealer": "Автосалон 1/5",
     "fuel_l": 100,
-    "fuel_unit": "кВт.",
+    "fuel_unit": "кВт·ч",
     "fuel_type": "Электро",
     "trunk_kg": 135,
     "max_speed_kmh": 197,
     "handling": 2,
-    "acceleration_0_100_s": 3.8,
+    "acceleration_0_100_s": 4.1,
     "braking_100_0_s": 1,
     "price_rub": 3600000,
     "sprite_sheet": "dealer-1",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "g_zeekr_001"
   },
   {
     "id": 22,
@@ -319,12 +360,14 @@
     "trunk_kg": 45,
     "max_speed_kmh": 175,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 7.11,
     "braking_100_0_s": 3,
     "price_rub": 220000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "civic6",
+    "fuel_unit": "л"
   },
   {
     "id": 23,
@@ -335,12 +378,14 @@
     "trunk_kg": 80,
     "max_speed_kmh": 186,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.74,
     "braking_100_0_s": 2,
     "price_rub": 500000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "mark100",
+    "fuel_unit": "л"
   },
   {
     "id": 24,
@@ -351,12 +396,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 154,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 11.68,
     "braking_100_0_s": 3,
     "price_rub": 550000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "civic2",
+    "fuel_unit": "л"
   },
   {
     "id": 25,
@@ -367,12 +414,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 180,
     "handling": 4,
-    "acceleration_0_100_s": 6.4,
+    "acceleration_0_100_s": 6.66,
     "braking_100_0_s": 2,
     "price_rub": 550000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "altezza",
+    "fuel_unit": "л"
   },
   {
     "id": 26,
@@ -383,12 +432,14 @@
     "trunk_kg": 80,
     "max_speed_kmh": 185,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.82,
     "braking_100_0_s": 2,
     "price_rub": 570000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "chaser",
+    "fuel_unit": "л"
   },
   {
     "id": 27,
@@ -399,12 +450,14 @@
     "trunk_kg": 85,
     "max_speed_kmh": 225,
     "handling": 4,
-    "acceleration_0_100_s": 6.7,
+    "acceleration_0_100_s": 6.89,
     "braking_100_0_s": 3,
     "price_rub": 850000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "CU2",
+    "fuel_unit": "л"
   },
   {
     "id": 28,
@@ -415,12 +468,14 @@
     "trunk_kg": 55,
     "max_speed_kmh": 188,
     "handling": 4,
-    "acceleration_0_100_s": 7.2,
+    "acceleration_0_100_s": 7.74,
     "braking_100_0_s": 3,
     "price_rub": 1000000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "mz320b",
+    "fuel_unit": "л"
   },
   {
     "id": 29,
@@ -431,12 +486,14 @@
     "trunk_kg": 45,
     "max_speed_kmh": 250,
     "handling": 4,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 5.66,
     "braking_100_0_s": 3,
     "price_rub": 1000000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "z350",
+    "fuel_unit": "л"
   },
   {
     "id": 30,
@@ -447,12 +504,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 209,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.93,
     "braking_100_0_s": 2,
     "price_rub": 1100000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "camry2",
+    "fuel_unit": "л"
   },
   {
     "id": 31,
@@ -463,12 +522,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 215,
     "handling": 5,
-    "acceleration_0_100_s": 3.5,
+    "acceleration_0_100_s": 3.77,
     "braking_100_0_s": 5,
     "price_rub": 1125000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "xjr1300",
+    "fuel_unit": "л"
   },
   {
     "id": 32,
@@ -479,12 +540,14 @@
     "trunk_kg": 45,
     "max_speed_kmh": 220,
     "handling": 4,
-    "acceleration_0_100_s": 6.3,
+    "acceleration_0_100_s": 7.8,
     "braking_100_0_s": 3,
     "price_rub": 1200000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "adgt86",
+    "fuel_unit": "л"
   },
   {
     "id": 33,
@@ -495,12 +558,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 232,
     "handling": 5,
-    "acceleration_0_100_s": 3.3,
+    "acceleration_0_100_s": 3.38,
     "braking_100_0_s": 5,
     "price_rub": 1250000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "g_vmax",
+    "fuel_unit": "л"
   },
   {
     "id": 34,
@@ -511,12 +576,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 206,
     "handling": 4,
-    "acceleration_0_100_s": 6.7,
+    "acceleration_0_100_s": 7.13,
     "braking_100_0_s": 2,
     "price_rub": 1450000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "camry70",
+    "fuel_unit": "л"
   },
   {
     "id": 35,
@@ -527,12 +594,14 @@
     "trunk_kg": 45,
     "max_speed_kmh": 234,
     "handling": 4,
-    "acceleration_0_100_s": 5.3,
+    "acceleration_0_100_s": 5.66,
     "braking_100_0_s": 3,
     "price_rub": 1500000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 13,
-    "active": true
+    "active": true,
+    "wiki_model": "evo10",
+    "fuel_unit": "л"
   },
   {
     "id": 36,
@@ -543,12 +612,14 @@
     "trunk_kg": 35,
     "max_speed_kmh": 170,
     "handling": 3,
-    "acceleration_0_100_s": 5,
+    "acceleration_0_100_s": 5.58,
     "braking_100_0_s": 2,
     "price_rub": 1620000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 14,
-    "active": true
+    "active": true,
+    "wiki_model": "a80",
+    "fuel_unit": "л"
   },
   {
     "id": 37,
@@ -559,12 +630,14 @@
     "trunk_kg": 80,
     "max_speed_kmh": 166,
     "handling": 4,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 6.7,
     "braking_100_0_s": 3,
     "price_rub": 1650000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 15,
-    "active": true
+    "active": true,
+    "wiki_model": "evo9",
+    "fuel_unit": "л"
   },
   {
     "id": 38,
@@ -575,12 +648,14 @@
     "trunk_kg": 65,
     "max_speed_kmh": 212,
     "handling": 4,
-    "acceleration_0_100_s": 5.7,
+    "acceleration_0_100_s": 5.93,
     "braking_100_0_s": 3,
     "price_rub": 1700000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 16,
-    "active": true
+    "active": true,
+    "wiki_model": "subwrx",
+    "fuel_unit": "л"
   },
   {
     "id": 39,
@@ -591,12 +666,14 @@
     "trunk_kg": 165,
     "max_speed_kmh": 208,
     "handling": 3,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.83,
     "braking_100_0_s": 1,
     "price_rub": 2500000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 17,
-    "active": true
+    "active": true,
+    "wiki_model": "lc200",
+    "fuel_unit": "л"
   },
   {
     "id": 40,
@@ -607,12 +684,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 207,
     "handling": 5,
-    "acceleration_0_100_s": 3.6,
+    "acceleration_0_100_s": 3.9,
     "braking_100_0_s": 5,
     "price_rub": 3150000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 18,
-    "active": true
+    "active": true,
+    "wiki_model": "24gsx8r",
+    "fuel_unit": "л"
   },
   {
     "id": 41,
@@ -621,14 +700,16 @@
     "fuel_l": 19,
     "fuel_type": "АИ-95",
     "trunk_kg": 0,
-    "max_speed_kmh": 285,
+    "max_speed_kmh": 274,
     "handling": 5,
-    "acceleration_0_100_s": 3.5,
+    "acceleration_0_100_s": 3.79,
     "braking_100_0_s": 5,
     "price_rub": 3425000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 19,
-    "active": true
+    "active": true,
+    "wiki_model": "20zh2",
+    "fuel_unit": "л"
   },
   {
     "id": 42,
@@ -639,12 +720,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 189,
     "handling": 5,
-    "acceleration_0_100_s": 4.3,
+    "acceleration_0_100_s": 4.59,
     "braking_100_0_s": 5,
     "price_rub": 3450000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 20,
-    "active": true
+    "active": true,
+    "wiki_model": "z1000a1",
+    "fuel_unit": "л"
   },
   {
     "id": 43,
@@ -655,12 +738,14 @@
     "trunk_kg": 22,
     "max_speed_kmh": 170,
     "handling": 5,
-    "acceleration_0_100_s": 4.8,
+    "acceleration_0_100_s": 4.81,
     "braking_100_0_s": 5,
     "price_rub": 3775000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 21,
-    "active": true
+    "active": true,
+    "wiki_model": "phmt09",
+    "fuel_unit": "л"
   },
   {
     "id": 44,
@@ -671,12 +756,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 222,
     "handling": 5,
-    "acceleration_0_100_s": 3.3,
+    "acceleration_0_100_s": 3.56,
     "braking_100_0_s": 5,
     "price_rub": 3950000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 22,
-    "active": true
+    "active": true,
+    "wiki_model": "25f750",
+    "fuel_unit": "л"
   },
   {
     "id": 45,
@@ -687,12 +774,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 267,
     "handling": 3,
-    "acceleration_0_100_s": 4.6,
+    "acceleration_0_100_s": 4.73,
     "braking_100_0_s": 3,
     "price_rub": 5250000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 23,
-    "active": true
+    "active": true,
+    "wiki_model": "gsf",
+    "fuel_unit": "л"
   },
   {
     "id": 46,
@@ -703,12 +792,14 @@
     "trunk_kg": 165,
     "max_speed_kmh": 208,
     "handling": 3,
-    "acceleration_0_100_s": 6.1,
+    "acceleration_0_100_s": 6.55,
     "braking_100_0_s": 1,
     "price_rub": 5650000,
     "sprite_sheet": "dealer-4",
     "sprite_index": 24,
-    "active": true
+    "active": true,
+    "wiki_model": "lk300",
+    "fuel_unit": "л"
   },
   {
     "id": 47,
@@ -717,14 +808,16 @@
     "fuel_l": 55,
     "fuel_type": "АИ-92",
     "trunk_kg": 65,
-    "max_speed_kmh": 167,
+    "max_speed_kmh": 169,
     "handling": 4,
-    "acceleration_0_100_s": 7.1,
+    "acceleration_0_100_s": 7.68,
     "braking_100_0_s": 3,
     "price_rub": 124000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "golfmk2",
+    "fuel_unit": "л"
   },
   {
     "id": 48,
@@ -735,12 +828,14 @@
     "trunk_kg": 45,
     "max_speed_kmh": 167,
     "handling": 4,
-    "acceleration_0_100_s": 7.3,
+    "acceleration_0_100_s": 7.69,
     "braking_100_0_s": 3,
     "price_rub": 173000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "peugeot206",
+    "fuel_unit": "л"
   },
   {
     "id": 49,
@@ -751,12 +846,14 @@
     "trunk_kg": 70,
     "max_speed_kmh": 186,
     "handling": 4,
-    "acceleration_0_100_s": 7.1,
+    "acceleration_0_100_s": 7.52,
     "braking_100_0_s": 3,
     "price_rub": 220000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "a42",
+    "fuel_unit": "л"
   },
   {
     "id": 50,
@@ -767,12 +864,14 @@
     "trunk_kg": 80,
     "max_speed_kmh": 185,
     "handling": 4,
-    "acceleration_0_100_s": 7.1,
+    "acceleration_0_100_s": 7.55,
     "braking_100_0_s": 3,
     "price_rub": 245000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwe30",
+    "fuel_unit": "л"
   },
   {
     "id": 51,
@@ -783,12 +882,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 220,
     "handling": 4,
-    "acceleration_0_100_s": 6.7,
+    "acceleration_0_100_s": 6.85,
     "braking_100_0_s": 3,
     "price_rub": 420000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "w210",
+    "fuel_unit": "л"
   },
   {
     "id": 52,
@@ -799,12 +900,14 @@
     "trunk_kg": 85,
     "max_speed_kmh": 232,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.9,
     "braking_100_0_s": 3,
     "price_rub": 425000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "e34",
+    "fuel_unit": "л"
   },
   {
     "id": 53,
@@ -815,12 +918,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 213,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 7.26,
     "braking_100_0_s": 3,
     "price_rub": 440000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "mb_w124",
+    "fuel_unit": "л"
   },
   {
     "id": 54,
@@ -831,12 +936,14 @@
     "trunk_kg": 70,
     "max_speed_kmh": 182,
     "handling": 4,
-    "acceleration_0_100_s": 7.3,
+    "acceleration_0_100_s": 7.5,
     "braking_100_0_s": 2,
     "price_rub": 520000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "astra",
+    "fuel_unit": "л"
   },
   {
     "id": 55,
@@ -847,12 +954,14 @@
     "trunk_kg": 65,
     "max_speed_kmh": 274,
     "handling": 4,
-    "acceleration_0_100_s": 4.7,
+    "acceleration_0_100_s": 4.63,
     "braking_100_0_s": 3,
     "price_rub": 575000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "golf7r",
+    "fuel_unit": "л"
   },
   {
     "id": 56,
@@ -863,12 +972,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 221,
     "handling": 4,
-    "acceleration_0_100_s": 6.7,
+    "acceleration_0_100_s": 7.28,
     "braking_100_0_s": 2,
     "price_rub": 740000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwe38",
+    "fuel_unit": "л"
   },
   {
     "id": 57,
@@ -879,12 +990,14 @@
     "trunk_kg": 60,
     "max_speed_kmh": 174,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 7.25,
     "braking_100_0_s": 2,
     "price_rub": 900000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "beetle",
+    "fuel_unit": "л"
   },
   {
     "id": 58,
@@ -895,12 +1008,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 251,
     "handling": 3,
-    "acceleration_0_100_s": 4.8,
+    "acceleration_0_100_s": 5.4,
     "braking_100_0_s": 2,
     "price_rub": 1300000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "s600w220",
+    "fuel_unit": "л"
   },
   {
     "id": 59,
@@ -911,12 +1026,14 @@
     "trunk_kg": 105,
     "max_speed_kmh": 245,
     "handling": 4,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.34,
     "braking_100_0_s": 3,
     "price_rub": 1300000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "octavia18",
+    "fuel_unit": "л"
   },
   {
     "id": 60,
@@ -927,12 +1044,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 198,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.71,
     "braking_100_0_s": 2,
     "price_rub": 1305000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 13,
-    "active": true
+    "active": true,
+    "wiki_model": "a4",
+    "fuel_unit": "л"
   },
   {
     "id": 61,
@@ -943,12 +1062,14 @@
     "trunk_kg": 105,
     "max_speed_kmh": 251,
     "handling": 3,
-    "acceleration_0_100_s": 4.6,
+    "acceleration_0_100_s": 4.74,
     "braking_100_0_s": 2,
     "price_rub": 1400000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 14,
-    "active": true
+    "active": true,
+    "wiki_model": "w221s63",
+    "fuel_unit": "л"
   },
   {
     "id": 62,
@@ -959,12 +1080,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 152,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 7.49,
     "braking_100_0_s": 2,
     "price_rub": 1400000,
     "sprite_sheet": "dealer-5a",
     "sprite_index": 15,
-    "active": true
+    "active": true,
+    "wiki_model": "amazon",
+    "fuel_unit": "л"
   },
   {
     "id": 63,
@@ -975,12 +1098,14 @@
     "trunk_kg": 125,
     "max_speed_kmh": 231,
     "handling": 3,
-    "acceleration_0_100_s": 6.2,
+    "acceleration_0_100_s": 7.77,
     "braking_100_0_s": 1,
     "price_rub": 1685000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "ml",
+    "fuel_unit": "л"
   },
   {
     "id": 64,
@@ -991,12 +1116,14 @@
     "trunk_kg": 85,
     "max_speed_kmh": 248,
     "handling": 4,
-    "acceleration_0_100_s": 5.2,
+    "acceleration_0_100_s": 5.64,
     "braking_100_0_s": 2,
     "price_rub": 1700000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwe39",
+    "fuel_unit": "л"
   },
   {
     "id": 65,
@@ -1007,12 +1134,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 246,
     "handling": 3,
-    "acceleration_0_100_s": 5.9,
+    "acceleration_0_100_s": 6.38,
     "braking_100_0_s": 2,
     "price_rub": 1725000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "s600",
+    "fuel_unit": "л"
   },
   {
     "id": 66,
@@ -1023,12 +1152,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 183,
     "handling": 3,
-    "acceleration_0_100_s": 5.9,
+    "acceleration_0_100_s": 6.44,
     "braking_100_0_s": 1,
     "price_rub": 1900000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "v60sp",
+    "fuel_unit": "л"
   },
   {
     "id": 67,
@@ -1039,12 +1170,14 @@
     "trunk_kg": 105,
     "max_speed_kmh": 221,
     "handling": 3,
-    "acceleration_0_100_s": 6.3,
+    "acceleration_0_100_s": 6.66,
     "braking_100_0_s": 1,
     "price_rub": 1950000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "touareg2",
+    "fuel_unit": "л"
   },
   {
     "id": 68,
@@ -1055,12 +1188,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 247,
     "handling": 4,
-    "acceleration_0_100_s": 5.1,
+    "acceleration_0_100_s": 5.53,
     "braking_100_0_s": 3,
     "price_rub": 2200000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwe46",
+    "fuel_unit": "л"
   },
   {
     "id": 69,
@@ -1071,12 +1206,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 229,
     "handling": 4,
-    "acceleration_0_100_s": 6.1,
+    "acceleration_0_100_s": 6.5,
     "braking_100_0_s": 3,
     "price_rub": 2450000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwg20",
+    "fuel_unit": "л"
   },
   {
     "id": 70,
@@ -1087,12 +1224,14 @@
     "trunk_kg": 120,
     "max_speed_kmh": 204,
     "handling": 4,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.66,
     "braking_100_0_s": 2,
     "price_rub": 2600000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "tiguan25",
+    "fuel_unit": "л"
   },
   {
     "id": 71,
@@ -1103,12 +1242,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 208,
     "handling": 3,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 5.56,
     "braking_100_0_s": 1,
     "price_rub": 2700000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "g55",
+    "fuel_unit": "л"
   },
   {
     "id": 72,
@@ -1119,29 +1260,32 @@
     "trunk_kg": 130,
     "max_speed_kmh": 180,
     "handling": 3,
-    "acceleration_0_100_s": 6.3,
+    "acceleration_0_100_s": 6.39,
     "braking_100_0_s": 1,
     "price_rub": 3000000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "volvoxc90",
+    "fuel_unit": "л"
   },
   {
     "id": 73,
     "name": "BMW i4 eDrive40 (2022)",
     "dealer": "Автосалон 5/5",
     "fuel_l": 81,
-    "fuel_unit": "кВт.",
+    "fuel_unit": "кВт·ч",
     "fuel_type": "Электро",
     "trunk_kg": 85,
     "max_speed_kmh": 187,
     "handling": 3,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 5.74,
     "braking_100_0_s": 1,
     "price_rub": 3100000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "i422"
   },
   {
     "id": 74,
@@ -1152,12 +1296,14 @@
     "trunk_kg": 20,
     "max_speed_kmh": 334,
     "handling": 4,
-    "acceleration_0_100_s": 4.3,
+    "acceleration_0_100_s": 3.13,
     "braking_100_0_s": 3,
     "price_rub": 3400000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "r820",
+    "fuel_unit": "л"
   },
   {
     "id": 75,
@@ -1168,12 +1314,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 230,
     "handling": 4,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.21,
     "braking_100_0_s": 2,
     "price_rub": 3610000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "macan",
+    "fuel_unit": "л"
   },
   {
     "id": 76,
@@ -1184,12 +1332,14 @@
     "trunk_kg": 210,
     "max_speed_kmh": 199,
     "handling": 3,
-    "acceleration_0_100_s": 6.5,
+    "acceleration_0_100_s": 6.91,
     "braking_100_0_s": 1,
     "price_rub": 3900000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 13,
-    "active": true
+    "active": true,
+    "wiki_model": "v250",
+    "fuel_unit": "л"
   },
   {
     "id": 77,
@@ -1200,12 +1350,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 248,
     "handling": 5,
-    "acceleration_0_100_s": 3.2,
+    "acceleration_0_100_s": 3.37,
     "braking_100_0_s": 5,
     "price_rub": 3925000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 14,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwsbkark",
+    "fuel_unit": "л"
   },
   {
     "id": 78,
@@ -1216,12 +1368,14 @@
     "trunk_kg": 60,
     "max_speed_kmh": 235,
     "handling": 4,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 5.79,
     "braking_100_0_s": 3,
     "price_rub": 4000000,
     "sprite_sheet": "dealer-5b",
     "sprite_index": 15,
-    "active": true
+    "active": true,
+    "wiki_model": "ftype",
+    "fuel_unit": "л"
   },
   {
     "id": 79,
@@ -1232,12 +1386,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 244,
     "handling": 3,
-    "acceleration_0_100_s": 4.2,
+    "acceleration_0_100_s": 4.37,
     "braking_100_0_s": 1,
     "price_rub": 4500000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "x6m18",
+    "fuel_unit": "л"
   },
   {
     "id": 80,
@@ -1248,12 +1404,14 @@
     "trunk_kg": 0,
     "max_speed_kmh": 214,
     "handling": 5,
-    "acceleration_0_100_s": 2.8,
+    "acceleration_0_100_s": 2.89,
     "braking_100_0_s": 5,
     "price_rub": 4550000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "20rocket3",
+    "fuel_unit": "л"
   },
   {
     "id": 81,
@@ -1264,12 +1422,14 @@
     "trunk_kg": 105,
     "max_speed_kmh": 235,
     "handling": 3,
-    "acceleration_0_100_s": 3.6,
+    "acceleration_0_100_s": 4.73,
     "braking_100_0_s": 2,
     "price_rub": 5100000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "a_rs6_20",
+    "fuel_unit": "л"
   },
   {
     "id": 82,
@@ -1280,12 +1440,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 253,
     "handling": 4,
-    "acceleration_0_100_s": 5.5,
+    "acceleration_0_100_s": 3.93,
     "braking_100_0_s": 2,
     "price_rub": 5250000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwm7",
+    "fuel_unit": "л"
   },
   {
     "id": 83,
@@ -1296,12 +1458,14 @@
     "trunk_kg": 80,
     "max_speed_kmh": 249,
     "handling": 3,
-    "acceleration_0_100_s": 3.5,
+    "acceleration_0_100_s": 3.84,
     "braking_100_0_s": 2,
     "price_rub": 5700000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "g82",
+    "fuel_unit": "л"
   },
   {
     "id": 84,
@@ -1312,12 +1476,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 253,
     "handling": 3,
-    "acceleration_0_100_s": 4.9,
+    "acceleration_0_100_s": 5.37,
     "braking_100_0_s": 1,
     "price_rub": 5740000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "x222",
+    "fuel_unit": "л"
   },
   {
     "id": 85,
@@ -1328,12 +1494,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 251,
     "handling": 4,
-    "acceleration_0_100_s": 5.5,
+    "acceleration_0_100_s": 5.86,
     "braking_100_0_s": 2,
     "price_rub": 5750000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "v222",
+    "fuel_unit": "л"
   },
   {
     "id": 86,
@@ -1344,12 +1512,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 267,
     "handling": 3,
-    "acceleration_0_100_s": 3.3,
+    "acceleration_0_100_s": 3.48,
     "braking_100_0_s": 2,
     "price_rub": 5780000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwm5f90",
+    "fuel_unit": "л"
   },
   {
     "id": 87,
@@ -1360,12 +1530,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 259,
     "handling": 4,
-    "acceleration_0_100_s": 5.4,
+    "acceleration_0_100_s": 5.69,
     "braking_100_0_s": 2,
     "price_rub": 6000000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "panamera",
+    "fuel_unit": "л"
   },
   {
     "id": 88,
@@ -1376,29 +1548,32 @@
     "trunk_kg": 75,
     "max_speed_kmh": 245,
     "handling": 3,
-    "acceleration_0_100_s": 4.1,
+    "acceleration_0_100_s": 4.33,
     "braking_100_0_s": 3,
     "price_rub": 6250000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "m2g87",
+    "fuel_unit": "л"
   },
   {
     "id": 89,
     "name": "Porsche Taycan",
     "dealer": "Автосалон 5/5",
     "fuel_l": 93,
-    "fuel_unit": "кВт.",
+    "fuel_unit": "кВт·ч",
     "fuel_type": "Электро",
     "trunk_kg": 85,
     "max_speed_kmh": 251,
     "handling": 3,
-    "acceleration_0_100_s": 4,
+    "acceleration_0_100_s": 4.08,
     "braking_100_0_s": 2,
     "price_rub": 6255000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "taycan"
   },
   {
     "id": 90,
@@ -1409,12 +1584,14 @@
     "trunk_kg": 75,
     "max_speed_kmh": 252,
     "handling": 3,
-    "acceleration_0_100_s": 3.9,
+    "acceleration_0_100_s": 4.12,
     "braking_100_0_s": 3,
     "price_rub": 6300000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "rs520",
+    "fuel_unit": "л"
   },
   {
     "id": 91,
@@ -1425,12 +1602,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 252,
     "handling": 3,
-    "acceleration_0_100_s": 3.4,
+    "acceleration_0_100_s": 3.64,
     "braking_100_0_s": 2,
     "price_rub": 6525000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "e63s",
+    "fuel_unit": "л"
   },
   {
     "id": 92,
@@ -1441,12 +1620,14 @@
     "trunk_kg": 115,
     "max_speed_kmh": 244,
     "handling": 3,
-    "acceleration_0_100_s": 3.8,
+    "acceleration_0_100_s": 4.37,
     "braking_100_0_s": 2,
     "price_rub": 7125000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 13,
-    "active": true
+    "active": true,
+    "wiki_model": "gle63",
+    "fuel_unit": "л"
   },
   {
     "id": 93,
@@ -1457,12 +1638,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 271,
     "handling": 3,
-    "acceleration_0_100_s": 3.3,
+    "acceleration_0_100_s": 4.72,
     "braking_100_0_s": 2,
     "price_rub": 7500000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 14,
-    "active": true
+    "active": true,
+    "wiki_model": "m5e60",
+    "fuel_unit": "л"
   },
   {
     "id": 94,
@@ -1473,12 +1656,14 @@
     "trunk_kg": 140,
     "max_speed_kmh": 241,
     "handling": 4,
-    "acceleration_0_100_s": 5.7,
+    "acceleration_0_100_s": 5.96,
     "braking_100_0_s": 2,
     "price_rub": 8000000,
     "sprite_sheet": "dealer-5c",
     "sprite_index": 15,
-    "active": true
+    "active": true,
+    "wiki_model": "cayenne19",
+    "fuel_unit": "л"
   },
   {
     "id": 95,
@@ -1489,12 +1674,14 @@
     "trunk_kg": 85,
     "max_speed_kmh": 313,
     "handling": 3,
-    "acceleration_0_100_s": 3.2,
+    "acceleration_0_100_s": 3.45,
     "braking_100_0_s": 3,
     "price_rub": 8250000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "gt63s",
+    "fuel_unit": "л"
   },
   {
     "id": 96,
@@ -1503,14 +1690,16 @@
     "fuel_l": 68,
     "fuel_type": "АИ-100",
     "trunk_kg": 80,
-    "max_speed_kmh": 250,
+    "max_speed_kmh": 237,
     "handling": 3,
-    "acceleration_0_100_s": 3.2,
+    "acceleration_0_100_s": 3.51,
     "braking_100_0_s": 2,
     "price_rub": 8250000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "m8",
+    "fuel_unit": "л"
   },
   {
     "id": 97,
@@ -1521,12 +1710,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 249,
     "handling": 3,
-    "acceleration_0_100_s": 3.6,
+    "acceleration_0_100_s": 3.87,
     "braking_100_0_s": 2,
     "price_rub": 9000000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "23touring",
+    "fuel_unit": "л"
   },
   {
     "id": 98,
@@ -1537,12 +1728,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 296,
     "handling": 3,
-    "acceleration_0_100_s": 3,
+    "acceleration_0_100_s": 3.2,
     "braking_100_0_s": 3,
     "price_rub": 9700000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "m5cs22b",
+    "fuel_unit": "л"
   },
   {
     "id": 99,
@@ -1553,12 +1746,14 @@
     "trunk_kg": 125,
     "max_speed_kmh": 246,
     "handling": 2,
-    "acceleration_0_100_s": 4.5,
+    "acceleration_0_100_s": 4.85,
     "braking_100_0_s": 1,
     "price_rub": 10900000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "g63",
+    "fuel_unit": "л"
   },
   {
     "id": 100,
@@ -1569,29 +1764,32 @@
     "trunk_kg": 95,
     "max_speed_kmh": 245,
     "handling": 2,
-    "acceleration_0_100_s": 4.3,
+    "acceleration_0_100_s": 4.53,
     "braking_100_0_s": 1,
     "price_rub": 11000000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwxm23",
+    "fuel_unit": "л"
   },
   {
     "id": 101,
     "name": "BMW i7 M70",
     "dealer": "Автосалон 5/5",
     "fuel_l": 101,
-    "fuel_unit": "кВт.",
+    "fuel_unit": "кВт·ч",
     "fuel_type": "Электро",
     "trunk_kg": 90,
     "max_speed_kmh": 244,
     "handling": 2,
-    "acceleration_0_100_s": 3.7,
+    "acceleration_0_100_s": 3.92,
     "braking_100_0_s": 1,
     "price_rub": 11200000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "i7m"
   },
   {
     "id": 102,
@@ -1602,12 +1800,14 @@
     "trunk_kg": 55,
     "max_speed_kmh": 249,
     "handling": 2,
-    "acceleration_0_100_s": 2.1,
+    "acceleration_0_100_s": 3.52,
     "braking_100_0_s": 1,
     "price_rub": 11500000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "s63w223",
+    "fuel_unit": "л"
   },
   {
     "id": 103,
@@ -1618,12 +1818,14 @@
     "trunk_kg": 85,
     "max_speed_kmh": 249,
     "handling": 2,
-    "acceleration_0_100_s": 3.5,
+    "acceleration_0_100_s": 3.76,
     "braking_100_0_s": 1,
     "price_rub": 12150000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "m5g60",
+    "fuel_unit": "л"
   },
   {
     "id": 104,
@@ -1634,12 +1836,14 @@
     "trunk_kg": 90,
     "max_speed_kmh": 249,
     "handling": 2,
-    "acceleration_0_100_s": 3.6,
+    "acceleration_0_100_s": 3.75,
     "braking_100_0_s": 1,
     "price_rub": 12550000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "m5g60w",
+    "fuel_unit": "л"
   },
   {
     "id": 105,
@@ -1650,29 +1854,32 @@
     "trunk_kg": 90,
     "max_speed_kmh": 296,
     "handling": 3,
-    "acceleration_0_100_s": 3.3,
+    "acceleration_0_100_s": 3.69,
     "braking_100_0_s": 2,
     "price_rub": 13500000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "turbogt22b",
+    "fuel_unit": "л"
   },
   {
     "id": 106,
     "name": "Mercedes-Benz AMG CLA 45 Electric",
     "dealer": "Автосалон 5/5",
     "fuel_l": 85,
-    "fuel_unit": "кВт.",
+    "fuel_unit": "кВт·ч",
     "fuel_type": "Электро",
     "trunk_kg": 95,
     "max_speed_kmh": 209,
     "handling": 3,
-    "acceleration_0_100_s": 6,
+    "acceleration_0_100_s": 6.39,
     "braking_100_0_s": 1,
     "price_rub": 14850000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "cla25"
   },
   {
     "id": 107,
@@ -1683,460 +1890,518 @@
     "trunk_kg": 65,
     "max_speed_kmh": 256,
     "handling": 2,
-    "acceleration_0_100_s": 4.2,
+    "acceleration_0_100_s": 4.36,
     "braking_100_0_s": 1,
     "price_rub": 15950000,
     "sprite_sheet": "dealer-5d",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "gls63",
+    "fuel_unit": "л"
   },
   {
     "id": 108,
     "name": "ЗАЗ 968М «Запорожец»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 40,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 35,
-    "max_speed_kmh": 118,
+    "max_speed_kmh": 127,
     "handling": 4,
-    "acceleration_0_100_s": 8,
+    "acceleration_0_100_s": 8.09,
     "braking_100_0_s": 2,
     "price_rub": 40000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "zaz968m",
+    "fuel_unit": "л"
   },
   {
     "id": 109,
     "name": "LADA 1111 «Ока»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 30,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 40,
-    "max_speed_kmh": 130,
+    "max_speed_kmh": 119,
     "handling": 4,
-    "acceleration_0_100_s": 7.9,
+    "acceleration_0_100_s": 13.13,
     "braking_100_0_s": 4,
     "price_rub": 45000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "oka",
+    "fuel_unit": "л"
   },
   {
     "id": 110,
     "name": "LADA 2105/07",
     "dealer": "Автосалон 3/5",
     "fuel_l": 39,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 70,
-    "max_speed_kmh": 150,
+    "max_speed_kmh": 154,
     "handling": 4,
-    "acceleration_0_100_s": 7.5,
+    "acceleration_0_100_s": 7.73,
     "braking_100_0_s": 2,
     "price_rub": 50000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "210507",
+    "fuel_unit": "л"
   },
   {
     "id": 111,
     "name": "ИЖ 2126 «Ода»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 45,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 55,
-    "max_speed_kmh": 150,
+    "max_speed_kmh": 153,
     "handling": 4,
-    "acceleration_0_100_s": 7.5,
+    "acceleration_0_100_s": 7.52,
     "braking_100_0_s": 3,
     "price_rub": 50000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "izh2126",
+    "fuel_unit": "л"
   },
   {
     "id": 112,
     "name": "Москвич АЗЛК-2141",
     "dealer": "Автосалон 3/5",
     "fuel_l": 55,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 70,
-    "max_speed_kmh": 155,
+    "max_speed_kmh": 160,
     "handling": 4,
-    "acceleration_0_100_s": 7.7,
+    "acceleration_0_100_s": 8.13,
     "braking_100_0_s": 3,
     "price_rub": 55000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "azlk2141",
+    "fuel_unit": "л"
   },
   {
     "id": 113,
     "name": "LADA 2106",
     "dealer": "Автосалон 3/5",
     "fuel_l": 39,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 65,
-    "max_speed_kmh": 150,
+    "max_speed_kmh": 155,
     "handling": 4,
-    "acceleration_0_100_s": 7.6,
+    "acceleration_0_100_s": 8,
     "braking_100_0_s": 3,
     "price_rub": 55000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz06",
+    "fuel_unit": "л"
   },
   {
     "id": 114,
     "name": "LADA 2108",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 60,
-    "max_speed_kmh": 156,
+    "max_speed_kmh": 153,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 7.87,
     "braking_100_0_s": 3,
     "price_rub": 65000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz08",
+    "fuel_unit": "л"
   },
   {
     "id": 115,
     "name": "LADA 2101",
     "dealer": "Автосалон 3/5",
     "fuel_l": 39,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 70,
-    "max_speed_kmh": 140,
+    "max_speed_kmh": 136,
     "handling": 4,
-    "acceleration_0_100_s": 7.8,
+    "acceleration_0_100_s": 8.05,
     "braking_100_0_s": 3,
     "price_rub": 70000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz01",
+    "fuel_unit": "л"
   },
   {
     "id": 116,
     "name": "Москвич 408",
     "dealer": "Автосалон 3/5",
     "fuel_l": 46,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 70,
-    "max_speed_kmh": 120,
+    "max_speed_kmh": 129,
     "handling": 4,
-    "acceleration_0_100_s": 8,
+    "acceleration_0_100_s": 14.73,
     "braking_100_0_s": 2,
     "price_rub": 70000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "azlk408",
+    "fuel_unit": "л"
   },
   {
     "id": 117,
     "name": "ГАЗ 2410 «Волга»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 55,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 90,
-    "max_speed_kmh": 147,
+    "max_speed_kmh": 164,
     "handling": 4,
-    "acceleration_0_100_s": 7.7,
+    "acceleration_0_100_s": 8.75,
     "braking_100_0_s": 1,
     "price_rub": 72000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "gaz2410",
+    "fuel_unit": "л"
   },
   {
     "id": 118,
     "name": "LADA 2109",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 60,
-    "max_speed_kmh": 156,
+    "max_speed_kmh": 153,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 8.15,
     "braking_100_0_s": 3,
     "price_rub": 74000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz09",
+    "fuel_unit": "л"
   },
   {
     "id": 119,
     "name": "ГАЗ 3110 «Волга»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 55,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 90,
-    "max_speed_kmh": 163,
+    "max_speed_kmh": 167,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 7.89,
     "braking_100_0_s": 2,
     "price_rub": 75000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "gaz3110",
+    "fuel_unit": "л"
   },
   {
     "id": 120,
     "name": "LADA 21099",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 80,
-    "max_speed_kmh": 156,
+    "max_speed_kmh": 163,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 7.75,
     "braking_100_0_s": 3,
     "price_rub": 82000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 12,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz99",
+    "fuel_unit": "л"
   },
   {
     "id": 121,
     "name": "LADA 2113",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 60,
-    "max_speed_kmh": 160,
+    "max_speed_kmh": 178,
     "handling": 4,
-    "acceleration_0_100_s": 7.4,
+    "acceleration_0_100_s": 8.74,
     "braking_100_0_s": 3,
     "price_rub": 122000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 13,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz13",
+    "fuel_unit": "л"
   },
   {
     "id": 122,
     "name": "LADA 2115",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 80,
-    "max_speed_kmh": 160,
+    "max_speed_kmh": 157,
     "handling": 4,
-    "acceleration_0_100_s": 7.3,
+    "acceleration_0_100_s": 7.75,
     "braking_100_0_s": 3,
     "price_rub": 125000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 14,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz15",
+    "fuel_unit": "л"
   },
   {
     "id": 123,
     "name": "LADA 2114",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 60,
-    "max_speed_kmh": 160,
+    "max_speed_kmh": 149,
     "handling": 4,
-    "acceleration_0_100_s": 7.3,
+    "acceleration_0_100_s": 10.27,
     "braking_100_0_s": 3,
     "price_rub": 130000,
     "sprite_sheet": "dealer-3a",
     "sprite_index": 15,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz14",
+    "fuel_unit": "л"
   },
   {
     "id": 124,
     "name": "LADA Kalina",
     "dealer": "Автосалон 3/5",
     "fuel_l": 50,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 45,
-    "max_speed_kmh": 160,
+    "max_speed_kmh": 163,
     "handling": 4,
-    "acceleration_0_100_s": 7.3,
+    "acceleration_0_100_s": 7.67,
     "braking_100_0_s": 3,
     "price_rub": 140000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "kalina",
+    "fuel_unit": "л"
   },
   {
     "id": 125,
     "name": "LADA 2112",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 75,
-    "max_speed_kmh": 180,
+    "max_speed_kmh": 179,
     "handling": 4,
-    "acceleration_0_100_s": 7.1,
+    "acceleration_0_100_s": 7.91,
     "braking_100_0_s": 3,
     "price_rub": 142000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "vaz12",
+    "fuel_unit": "л"
   },
   {
     "id": 126,
     "name": "LADA Priora хэтчбэк",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 65,
-    "max_speed_kmh": 183,
+    "max_speed_kmh": 180,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.36,
     "braking_100_0_s": 3,
     "price_rub": 175000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "lada2172",
+    "fuel_unit": "л"
   },
   {
     "id": 127,
     "name": "LADA 2170 Priora",
     "dealer": "Автосалон 3/5",
     "fuel_l": 43,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 80,
-    "max_speed_kmh": 183,
+    "max_speed_kmh": 184,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.52,
     "braking_100_0_s": 3,
     "price_rub": 230000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "lada2170",
+    "fuel_unit": "л"
   },
   {
     "id": 128,
     "name": "ГАЗ М-21 «Волга»",
     "dealer": "Автосалон 3/5",
     "fuel_l": 60,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 90,
-    "max_speed_kmh": 130,
+    "max_speed_kmh": 126,
     "handling": 4,
-    "acceleration_0_100_s": 8,
+    "acceleration_0_100_s": 9.77,
     "braking_100_0_s": 1,
     "price_rub": 350000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 4,
-    "active": true
+    "active": true,
+    "wiki_model": "gaz21a",
+    "fuel_unit": "л"
   },
   {
     "id": 129,
     "name": "LADA Niva Legend",
     "dealer": "Автосалон 3/5",
     "fuel_l": 42,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 50,
-    "max_speed_kmh": 142,
+    "max_speed_kmh": 146,
     "handling": 4,
-    "acceleration_0_100_s": 7.6,
+    "acceleration_0_100_s": 9.7,
     "braking_100_0_s": 1,
     "price_rub": 360000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 5,
-    "active": true
+    "active": true,
+    "wiki_model": "niva",
+    "fuel_unit": "л"
   },
   {
     "id": 130,
     "name": "LADA Granta FL (2018)",
     "dealer": "Автосалон 3/5",
     "fuel_l": 50,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 95,
-    "max_speed_kmh": 172,
+    "max_speed_kmh": 174,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 7.71,
     "braking_100_0_s": 3,
     "price_rub": 380000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 6,
-    "active": true
+    "active": true,
+    "wiki_model": "2018ladagrantafl",
+    "fuel_unit": "л"
   },
   {
     "id": 131,
     "name": "УАЗ Hunter",
     "dealer": "Автосалон 3/5",
     "fuel_l": 78,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 85,
-    "max_speed_kmh": 130,
+    "max_speed_kmh": 131,
     "handling": 3,
-    "acceleration_0_100_s": 8,
+    "acceleration_0_100_s": 12.26,
     "braking_100_0_s": 1,
     "price_rub": 495000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 7,
-    "active": true
+    "active": true,
+    "wiki_model": "uazhunter",
+    "fuel_unit": "л"
   },
   {
     "id": 132,
     "name": "УАЗ 3962",
     "dealer": "Автосалон 3/5",
     "fuel_l": 86,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 210,
-    "max_speed_kmh": 127,
+    "max_speed_kmh": 129,
     "handling": 3,
-    "acceleration_0_100_s": 8,
+    "acceleration_0_100_s": 10.81,
     "braking_100_0_s": 1,
     "price_rub": 500000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 8,
-    "active": true
+    "active": true,
+    "wiki_model": "3962",
+    "fuel_unit": "л"
   },
   {
     "id": 133,
     "name": "LADA Niva Travel (2023)",
     "dealer": "Автосалон 3/5",
     "fuel_l": 58,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 60,
-    "max_speed_kmh": 140,
+    "max_speed_kmh": 144,
     "handling": 4,
-    "acceleration_0_100_s": 7.7,
+    "acceleration_0_100_s": 8.27,
     "braking_100_0_s": 1,
     "price_rub": 650000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 9,
-    "active": true
+    "active": true,
+    "wiki_model": "2023nivatravel",
+    "fuel_unit": "л"
   },
   {
     "id": 134,
     "name": "LADA Vesta",
     "dealer": "Автосалон 3/5",
     "fuel_l": 55,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 90,
-    "max_speed_kmh": 182,
+    "max_speed_kmh": 174,
     "handling": 4,
-    "acceleration_0_100_s": 6.9,
+    "acceleration_0_100_s": 9.74,
     "braking_100_0_s": 3,
     "price_rub": 820000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 10,
-    "active": true
+    "active": true,
+    "wiki_model": "vesta",
+    "fuel_unit": "л"
   },
   {
     "id": 135,
     "name": "Москвич 3",
     "dealer": "Автосалон 3/5",
     "fuel_l": 50,
-    "fuel_type": "Бензин",
+    "fuel_type": "АИ-92",
     "trunk_kg": 95,
-    "max_speed_kmh": 170,
+    "max_speed_kmh": 133,
     "handling": 4,
-    "acceleration_0_100_s": 6.8,
+    "acceleration_0_100_s": 12.22,
     "braking_100_0_s": 2,
     "price_rub": 975000,
     "sprite_sheet": "dealer-3b",
     "sprite_index": 11,
-    "active": true
+    "active": true,
+    "wiki_model": "mos3",
+    "fuel_unit": "л"
   },
   {
     "id": 136,
@@ -2147,12 +2412,14 @@
     "trunk_kg": 165,
     "max_speed_kmh": 178,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 6.66,
     "braking_100_0_s": 0,
     "price_rub": 9700000,
     "sprite_sheet": "dealer-2b",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "23esv",
+    "fuel_unit": "л"
   },
   {
     "id": 137,
@@ -2163,12 +2430,14 @@
     "trunk_kg": 55,
     "max_speed_kmh": 253,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 4.25,
     "braking_100_0_s": 0,
     "price_rub": 2060000,
     "sprite_sheet": "dealer-4b",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "gra90",
+    "fuel_unit": "л"
   },
   {
     "id": 138,
@@ -2179,12 +2448,14 @@
     "trunk_kg": 55,
     "max_speed_kmh": 243,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 5.58,
     "braking_100_0_s": 0,
     "price_rub": 2750000,
     "sprite_sheet": "dealer-4b",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "gtr33",
+    "fuel_unit": "л"
   },
   {
     "id": 139,
@@ -2195,13 +2466,14 @@
     "trunk_kg": 95,
     "max_speed_kmh": 193,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 5.45,
     "braking_100_0_s": 0,
     "price_rub": 3600000,
     "sprite_sheet": "dealer-1b",
     "sprite_index": 0,
     "active": true,
-    "fuel_unit": "кВт."
+    "fuel_unit": "кВт·ч",
+    "wiki_model": "kiaev6"
   },
   {
     "id": 140,
@@ -2212,12 +2484,14 @@
     "trunk_kg": 165,
     "max_speed_kmh": 167,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 6.17,
     "braking_100_0_s": 0,
     "price_rub": 5400000,
     "sprite_sheet": "dealer-1b",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "gwmtank500",
+    "fuel_unit": "л"
   },
   {
     "id": 141,
@@ -2228,13 +2502,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 274,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 2.99,
     "braking_100_0_s": 0,
     "price_rub": 6750000,
     "sprite_sheet": "dealer-1b",
     "sprite_index": 2,
     "active": true,
-    "fuel_unit": "кВт."
+    "fuel_unit": "кВт·ч",
+    "wiki_model": "xsu7"
   },
   {
     "id": 142,
@@ -2245,13 +2520,14 @@
     "trunk_kg": 130,
     "max_speed_kmh": 244,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 3.32,
     "braking_100_0_s": 0,
     "price_rub": 7650000,
     "sprite_sheet": "dealer-1b",
     "sprite_index": 3,
     "active": true,
-    "fuel_unit": "кВт."
+    "fuel_unit": "кВт·ч",
+    "wiki_model": "zeekr9x"
   },
   {
     "id": 143,
@@ -2262,12 +2538,14 @@
     "trunk_kg": 105,
     "max_speed_kmh": 245,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 4.82,
     "braking_100_0_s": 0,
     "price_rub": 1600000,
     "sprite_sheet": "dealer-5e",
     "sprite_index": 0,
-    "active": true
+    "active": true,
+    "wiki_model": "w221s600",
+    "fuel_unit": "л"
   },
   {
     "id": 144,
@@ -2278,12 +2556,14 @@
     "trunk_kg": 100,
     "max_speed_kmh": 241,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 4.45,
     "braking_100_0_s": 0,
     "price_rub": 5050000,
     "sprite_sheet": "dealer-5e",
     "sprite_index": 1,
-    "active": true
+    "active": true,
+    "wiki_model": "f10m5",
+    "fuel_unit": "л"
   },
   {
     "id": 145,
@@ -2294,12 +2574,14 @@
     "trunk_kg": 30,
     "max_speed_kmh": 241,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 8.87,
     "braking_100_0_s": 0,
     "price_rub": 6000000,
     "sprite_sheet": "dealer-5e",
     "sprite_index": 2,
-    "active": true
+    "active": true,
+    "wiki_model": "300sl",
+    "fuel_unit": "л"
   },
   {
     "id": 146,
@@ -2310,11 +2592,13 @@
     "trunk_kg": 135,
     "max_speed_kmh": 258,
     "handling": 0,
-    "acceleration_0_100_s": 0,
+    "acceleration_0_100_s": 4.72,
     "braking_100_0_s": 0,
     "price_rub": 8100000,
     "sprite_sheet": "dealer-5e",
     "sprite_index": 3,
-    "active": true
+    "active": true,
+    "wiki_model": "bmwg07",
+    "fuel_unit": "л"
   }
 ]
