@@ -105,7 +105,7 @@
 .prose .reward-tracks { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
 .prose .reward-track { min-width: 0; padding: 18px; background: #ffffff02; border: 1px solid var(--line); border-radius: 4px; }
 .prose .reward-track h3 { margin: 0 0 14px; font-size: 14px; }
-.prose .reward-track .related-grid { grid-template-columns: repeat(2,minmax(0,1fr)); margin: 0; }
+.prose .reward-track .related-grid { grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); margin: 0; }
 .prose .detail-unlocks { list-style: none; padding: 0; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
 .prose .detail-unlocks li { margin: 0; border-bottom: 1px solid var(--line); }
 .prose .detail-unlocks li:last-child { border: 0; }
@@ -139,6 +139,9 @@
 .leaderboard-prizes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
 .leaderboard-prize { padding: 13px; background: #ffffff03; border: 1px solid var(--line); border-radius: 4px; }
 .leaderboard-prize > h3 { font-size: 14px; margin: 0 0 12px; }
+.prose .leaderboard-prize .related-grid { grid-template-columns: minmax(0,1fr); margin: 0; }
+.prose .leaderboard-prize .related-media { height: 180px; }
+.prose .related-card--clothes .related-media > span:not(.related-badge):not(.detail-fallback) { position: absolute; bottom: 8px; right: 8px; color: #a9adb7; font-size: 9px; }
 .prose .detail-table-wrap { max-width: 100%; overflow-x: auto; margin: 20px 0; border: 1px solid var(--line); border-radius: 4px; }
 .prose .detail-table { margin: 0; font-size: 12px; }
 .prose .detail-table th, .prose .detail-table td { padding: 13px; min-width: 90px; }
