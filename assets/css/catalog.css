@@ -1,0 +1,166 @@
+.catalog-layout { display: grid; grid-template-columns: 200px minmax(0,1fr); gap: 24px; align-items: start; }
+.catalog-layout--simple { grid-template-columns: minmax(0,1fr); }
+.catalog-filters { position: sticky; top: 100px; max-height: calc(100vh - 120px); overflow-y: auto; scrollbar-width: thin; padding-right: 8px; border-top: 2px solid var(--accent); }
+.catalog-facet { padding: 18px 0; border-top: 1px solid var(--line); }
+.catalog-facet summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; list-style: none; font-size: 12px; font-weight: 700; }
+.catalog-facet summary::-webkit-details-marker { display: none; }
+.catalog-facet summary .icon { width: 14px; height: 14px; color: var(--muted); transition: transform .15s; }
+.catalog-facet:not([open]) summary .icon { transform: rotate(-90deg); }
+.catalog-facet[open] summary { margin-bottom: 14px; }
+.facet-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.facet-options button { display: inline-flex; align-items: center; gap: 7px; text-align: left; background: var(--panel); color: #bfc0c6; border: 1px solid var(--line); border-radius: 3px; padding: 7px 9px; font-size: 10px; line-height: 1.4; }
+.facet-options button small { color: #777b85; font-size: 9px; }
+.facet-options button:hover { border-color: #77717a; }
+.facet-options button[aria-pressed="true"] { border-color: #b4313a; color: #ff858b; background: var(--accent-soft); }
+.catalog-facet .filter-label { font-size: 11px; }
+.catalog-facet select { width: 100%; padding: 11px 9px; font-size: 11px; }
+.catalog-content { min-width: 0; }
+.hero > .hero-image { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; object-fit: cover; object-position: center right; opacity: .5; mask-image: linear-gradient(90deg,transparent 20%,#000 100%); }
+.item-capabilities { display: grid; gap: 12px; padding: 16px 0; border-top: 1px solid var(--line); }
+.item-capabilities label { display: flex; align-items: center; gap: 8px; font-size: 10px; color: #bfc1c8; }
+.item-capabilities input { accent-color: var(--accent); }
+.catalog-season-summary { margin-bottom: 20px; }
+.catalog-season-summary .detail-heading { padding: 22px; }
+.catalog-season-summary .detail-metrics { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.catalog-season-summary .catalog-season-title { margin: 10px 0 20px; font-size: 26px; font-weight: 800; }
+.catalog-season-summary .detail-heading > div:has(> a) { display: flex; flex-wrap: wrap; gap: 10px; }
+.catalog-season-summary .detail-heading > div > a { padding: 8px 12px; border: 1px solid var(--line); border-radius: 3px; text-decoration: none; color: #d9dbe2; font-size: 11px; }
+.catalog-controls { display: flex; flex-wrap: wrap; gap: 9px; align-items: stretch; scroll-margin-top: 100px; }
+.catalog-search { display: flex; flex: 1; min-width: 150px; align-items: center; gap: 10px; padding: 0 13px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+.catalog-search .icon { width: 17px; height: 17px; color: var(--muted); }
+.catalog-search input { width: 100%; border: 0; background: none; padding: 13px 0; font-size: 12px; }
+.catalog-controls > select { max-width: 200px; font-size: 11px; }
+.catalog-filter-toggle { display: none; }
+.catalog-content .result-line { margin: 18px 0; font-size: 11px; }
+.catalog-content .result-line strong { color: var(--text); font-size: 14px; }
+.catalog-content .result-line select { font-size: 11px; }
+.catalog-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.catalog-card { border-radius: 4px; border-color: color-mix(in srgb,var(--tone) 22%,var(--line)); box-shadow: inset 0 -2px color-mix(in srgb,var(--tone) 30%,transparent); background: linear-gradient(150deg,var(--panel) 55%,color-mix(in srgb,var(--tone) 5%,var(--panel))); }
+.catalog-card:hover { border-color: color-mix(in srgb,var(--tone) 65%,var(--line)); }
+.card-visual { position: relative; }
+.card-media { height: 168px; flex-basis: auto; background: radial-gradient(ellipse at 50% 110%,#44464b44,transparent 75%),#151619; }
+.card-media--light { background: #d1d2d5; }
+.card-media img { padding: 20px; }
+.card-media img.cover { padding: 0; }
+.card-media img.media-icon { padding: 48px; }
+.card-badge { z-index: 2; top: 10px; left: 10px; border-radius: 3px; padding: 4px 7px; font-size: 9px; color: color-mix(in srgb,var(--tone) 55%,white); border-color: color-mix(in srgb,var(--tone) 35%,transparent); background: color-mix(in srgb,var(--tone) 25%,#111214e8); }
+.card-body { display: block; padding: 14px; }
+.card-category { display: flex; gap: 6px; align-items: center; font-size: 10px; line-height: 1.5; margin-bottom: 5px; }
+.category-icon { width: 15px; height: 15px; object-fit: contain; flex-shrink: 0; }
+.card-body h2 { font-size: 15px; line-height: 1.35; margin: 0 0 9px; font-weight: 750; overflow-wrap: anywhere; }
+.card-price { display: inline-block; padding: 5px 8px; border-radius: 3px; font-size: 12px; color: #ff9298; background: #f0373f12; border: 1px solid #f0373f22; margin: 0 0 2px; }
+.card-description { margin: 0 0 10px; font-size: 11px; line-height: 1.55; }
+.card-stats, .card-body > .card-stats { margin: 12px 0 0; padding-top: 10px; gap: 10px; font-size: 11px; }
+.card-stats dt { font-size: 9px; margin-bottom: 3px; }
+.card-stats dd { line-height: 1.4; }
+.card-foot { margin: 10px 0 0; font-size: 10px; }
+.catalog-card--business .card-stats, .catalog-card--estate .card-stats, .catalog-card--items .card-stats { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.catalog-card--business .card-body, .catalog-card--estate .card-body { padding-bottom: 16px; }
+.catalog-grid--items, .catalog-grid--appearance { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.catalog-card--items .card-media { height: 140px; }
+.catalog-card--items .card-description { display: none; }
+.catalog-card--items .card-stats { gap: 6px; }
+.catalog-card--items h2 { font-size: 13px; }
+.catalog-card--clothes .card-media, .catalog-card--appearance .card-media { height: 210px; }
+.catalog-card--clothes .card-media img, .catalog-card--appearance .card-media img { padding: 12px; }
+.catalog-card--clothes .card-stats { grid-template-columns: 1fr; gap: 7px; }
+.catalog-card--clothes .card-stats > div { display: flex; gap: 8px; align-items: baseline; }
+.catalog-card--clothes .card-stats dt { min-width: 55px; }
+.catalog-card--clothes .card-description { color: #b3b5bd; margin-bottom: 9px; }
+.catalog-card--appearance .card-description { display: none; }
+.catalog-card--cases .card-media { height: 195px; }
+.catalog-card--cases .card-description { color: #c2c4cb; }
+.catalog-card--animations .card-media { height: 210px; }
+.card-preview { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px; display: grid; place-items: center; background: #111214e8; color: #eee; border: 1px solid #ffffff30; border-radius: 3px; }
+.card-preview[aria-pressed="true"] { color: #ff7e85; border-color: var(--accent); }
+.card-preview .icon { width: 17px; height: 17px; }
+.card-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #111214; }
+.catalog-grid--achievements { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.catalog-card--achievements { display: grid; grid-template-columns: 90px minmax(0,1fr); align-items: start; }
+.catalog-card--achievements .card-media { height: 120px; margin: 12px 0 0 12px; background: none; }
+.catalog-card--achievements .card-media img { padding: 12px 5px; }
+.catalog-card--achievements .card-badge { top: 0; left: 0; }
+.catalog-card--achievements .card-body h2 { font-size: 14px; }
+.catalog-card--achievements .card-stats { grid-template-columns: 1fr; }
+.catalog-card--achievements .card-stats > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.catalog-card--achievements .card-stats dt { margin: 0; }
+.catalog-card--achievements .card-stats dd { text-align: right; }
+.catalog-card--season .card-media { height: 155px; }
+.catalog-card--season .card-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.catalog-card--levels .card-media { height: 100px; }
+.catalog-card--levels .media-placeholder { color: var(--accent); font-style: italic; font-weight: 900; }
+.catalog-card--rentals .card-media { height: 145px; }
+.catalog-card--rentals .card-media img.media-icon { padding: 42px; }
+.catalog-card--updates .card-media { height: 210px; }
+.catalog-card--updates .card-description { display: block; font-size: 12px; }
+.catalog-grid.catalog-grid--updates { grid-template-columns: minmax(0,1fr); }
+.catalog-card--updates { display: grid; grid-template-columns: 260px minmax(0,1fr); }
+.catalog-card--updates .card-visual { height: 100%; }
+.catalog-card--updates .card-media { height: 100%; min-height: 185px; }
+.catalog-card--updates .card-body { padding: 22px; }
+.catalog-card--updates .card-body h2 { font-size: 19px; margin-bottom: 12px; }
+.catalog-card--updates .card-category { margin-bottom: 10px; }
+.catalog-card--updates .card-description { max-width: 75ch; font-size: 13px; line-height: 1.8; margin: 0; }
+.catalog-card--updates .media-placeholder .icon { width: 35px; height: 35px; }
+.catalog-table-wrap { border: 1px solid var(--line); border-radius: 4px; }
+.catalog-table { font-size: 12px; }
+.catalog-table thead { background: #1b1c20; }
+.catalog-table th, .catalog-table td { padding: 15px; }
+.catalog-table tbody tr:nth-child(even) { background: #ffffff02; }
+.catalog-table tbody tr:hover { background: #f0373f08; }
+.catalog-table tbody th { font-weight: 600; }
+.catalog-table th:first-child { min-width: 160px; }
+.catalog-table .table-title { display: flex; align-items: center; gap: 12px; min-width: 180px; color: #e4e6ed; }
+.table-title img { width: 62px; height: 46px; object-fit: contain; background: #191b20; border-radius: 3px; }
+.table-title img.cover { object-fit: cover; }
+.table-title small { display: block; color: var(--muted); font-size: 10px; margin-top: 4px; font-weight: 400; }
+.table-price { color: #ff969c; white-space: nowrap; font-weight: 650; }
+@media (min-width: 1800px) {
+  .catalog-grid:not(.catalog-grid--achievements):not(.catalog-grid--updates) { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .catalog-grid--items, .catalog-grid--appearance { grid-template-columns: repeat(5,minmax(0,1fr)); }
+  .catalog-grid--updates { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 1250px) {
+  .catalog-layout { grid-template-columns: 180px minmax(0,1fr); gap: 20px; }
+  .catalog-layout--simple { grid-template-columns: minmax(0,1fr); }
+  .catalog-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .catalog-grid--items, .catalog-grid--appearance { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .catalog-grid--achievements { grid-template-columns: 1fr; }
+  .catalog-controls > select { max-width: 170px; flex: 1; }
+}
+@media (max-width: 760px) {
+  .catalog-grid--updates { grid-template-columns: minmax(0,1fr); }
+  .catalog-card--updates { grid-template-columns: 170px minmax(0,1fr); }
+  .catalog-card--updates .card-body { padding: 16px; }
+  .catalog-card--updates .card-body h2 { font-size: 16px; }
+  .catalog-season-summary .detail-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .catalog-season-summary .detail-metrics > div:first-child { grid-column: 1 / -1; }
+  .catalog-layout { grid-template-columns: minmax(0,1fr); }
+  .catalog-filters { display: none; position: static; max-height: none; padding: 0; }
+  .catalog-filters.is-open { display: block; }
+  .catalog-filter-toggle { display: inline-flex; }
+  .catalog-filter-toggle .icon { width: 15px; height: 15px; }
+  .catalog-search { flex-basis: 100%; }
+  .catalog-controls > select { max-width: none; }
+  .catalog-content .result-line { display: flex; }
+  .facet-options button { font-size: 11px; padding: 9px 11px; }
+}
+@media (max-width: 480px) {
+  .catalog-card--updates { grid-template-columns: minmax(0,1fr); }
+  .catalog-card--updates .card-media { height: 180px; min-height: 0; }
+  .catalog-grid--business, .catalog-grid--estate, .catalog-grid--factions, .catalog-grid--rentals, .catalog-grid--updates { grid-template-columns: 1fr; }
+  .catalog-grid--items, .catalog-grid--appearance { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .catalog-grid { gap: 12px; }
+  .catalog-card--business .card-media, .catalog-card--estate .card-media, .catalog-card--factions .card-media, .catalog-card--updates .card-media { height: 190px; }
+  .catalog-card--clothes .card-media, .catalog-card--appearance .card-media { height: 165px; }
+  .catalog-card--clothes .card-body, .catalog-card--items .card-body, .catalog-card--appearance .card-body { padding: 11px; }
+  .catalog-card--clothes h2, .catalog-card--appearance h2 { font-size: 12px; }
+  .catalog-card--clothes .card-stats > div { display: block; }
+  .catalog-card--items .card-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .catalog-card--items .card-stats > div:last-child { grid-column: 1 / -1; }
+  .catalog-card--achievements { grid-template-columns: 75px minmax(0,1fr); }
+  .catalog-card--achievements .card-media { height: 100px; margin-left: 8px; }
+  .catalog-card--season .card-body h2 { font-size: 13px; }
+  .catalog-card--season .card-category { font-size: 9px; }
+  .catalog-card--season .card-stats { grid-template-columns: 1fr; }
+}

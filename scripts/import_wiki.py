@@ -173,7 +173,7 @@ def internal_links(doc):
 
 
 DROP = {"script", "style", "svg", "noscript", "dialog", "input", "select", "template"}
-KEEP = {"p", "h2", "h3", "h4", "h5", "ul", "ol", "li", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "dl", "dt", "dd", "strong", "em", "b", "i", "a", "code", "kbd", "figure", "figcaption", "img", "details", "summary", "br", "hr", "video", "source", "section", "div", "span"}
+KEEP = {"p", "h2", "h3", "h4", "h5", "ul", "ol", "li", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "dl", "dt", "dd", "strong", "em", "b", "i", "a", "code", "kbd", "figure", "figcaption", "img", "details", "summary", "br", "hr", "video", "source", "section", "div", "span", "aside"}
 CONTENT_CLASSES = {
     "hero": "imported-hero", "pp-hero": "imported-hero",
     "stage": "imported-stage", "pp-stage": "imported-stage",
@@ -181,6 +181,40 @@ CONTENT_CLASSES = {
     "swatches": "gallery", "where": "shop-list", "where-row": "shop-row",
     "cl-shops": "shop-logos", "kpis": "imported-kpis", "kpi": "imported-kpi",
     "groups": "imported-groups",
+    "pp-stats": "detail-metrics", "pp-badge": "detail-badge", "pp-photo": "detail-photo",
+    "pp-cat": "detail-category", "pp-rows": "detail-rows", "pp-sec": "detail-section",
+    "pg-head": "detail-heading", "is-price": "metric-price", "is-text": "metric-text",
+    "pc-fallback": "detail-fallback", "ic-fallback": "detail-fallback",
+    "ic-card": "related-card", "pc-card": "related-card--property", "cl-card": "related-card--clothes",
+    "vc-card": "related-card--vehicle", "ic-stage": "related-media", "pc-photo": "related-media",
+    "cl-stage": "related-media", "vc-stage": "related-media", "is-contain": "related-media--contain",
+    "ic-body": "related-body", "cl-body": "related-body", "ic-cat": "related-category",
+    "cl-meta": "related-category", "ic-name": "related-title", "cl-name": "related-title",
+    "pc-head": "related-head", "pc-price": "related-price", "cl-price": "related-price",
+    "vc-price": "related-price", "pc-foot": "related-stats", "cl-foot": "related-foot",
+    "ic-rar": "related-badge", "cl-rar": "related-badge", "pc-blip": "related-blip",
+    "pc-sub": "related-description", "rt-img": "reward-image", "rt-video": "reward-video",
+    "rt-glyph": "reward-glyph", "rt-sign": "reward-sign", "vc-brandmark": "brand-watermark",
+    "vc-car": "vehicle-image", "flag": "country-flag", "vc-head": "related-body",
+    "vc-names": "related-names", "vc-brand": "related-category", "vc-specs": "related-stats",
+    "vc-tags": "related-tags", "vc-class": "related-badge", "am-card": "article-link",
+    "am-cat": "article-link-category", "am-title": "article-link-title", "am-desc": "article-link-summary",
+    "am-go": "article-link-arrow", "lv-unlocks": "detail-unlocks", "lv-nav": "detail-pager",
+    "sp-tracks": "reward-tracks", "sp-track": "reward-track", "sp-stars": "detail-stars",
+    "cl-colors": "detail-colors", "cl-li": "related-clothing", "cl-note": "related-description",
+    "fr-n": "rank-number", "fr-name": "rank-name", "fr-pay": "rank-pay",
+    "pp-floorbar": "floor-tabs", "pp-flatlist": "flat-list", "pp-flat-name": "flat-name",
+    "pp-flat-meta": "flat-meta", "pp-flat-lvl": "flat-level", "pp-flat-price": "flat-price",
+    "pp-flat-go": "flat-arrow", "sp-products": "pass-products", "sp-product": "pass-product",
+    "sp-prices": "pass-prices", "sp-places": "leaderboard-prizes", "sp-place": "leaderboard-prize",
+    "sp-tasks": "season-tasks", "vc-table-wrap": "detail-table-wrap", "vc-table": "detail-table",
+    "sp-note": "detail-note",
+    "stat-wrap": "article-stat-wrap", "stat-grid": "article-stats", "stat-v": "article-stat-value",
+    "callout": "article-callout", "callout-title": "callout-title", "callout-body": "callout-body",
+    "steps": "article-steps", "kbds": "key-group", "kbd": "key-cap",
+    "photo": "article-photo", "photo-cap": "image-caption", "scr": "article-screenshot",
+    "scr-frame": "screenshot-frame", "scr-marks": "screen-annotations", "scr-mark": "screen-annotation",
+    "scr-cap": "image-caption",
 }
 
 
@@ -195,10 +229,10 @@ def safe_url(url):
 def serialize(node):
     if isinstance(node, str):
         return html.escape(node.replace("\ue000", " RC"))
-    if node.tag in DROP or "hidden" in node.attrs or node.attrs.get("aria-hidden") == "true":
-        return ""
     classes = (node.attrs.get("class") or "").split()
-    if "sr-only" in classes or node.tag in {"aside", "nav", "footer", "header"}:
+    if node.tag in DROP or ("hidden" in node.attrs and "pp-flatlist" not in classes) or node.attrs.get("aria-hidden") == "true":
+        return ""
+    if "sr-only" in classes or node.tag in {"nav", "footer", "header"} or (node.tag == "aside" and "callout" not in classes):
         return ""
     if node.tag == "astro-island":
         return ""
@@ -208,11 +242,25 @@ def serialize(node):
     if node.tag not in KEEP:
         return inner
     attrs = {}
-    mapped = [CONTENT_CLASSES[value] for value in classes if value in CONTENT_CLASSES]
+    mapped = list(dict.fromkeys(CONTENT_CLASSES[value] for value in classes if value in CONTENT_CLASSES))
+    if any(value in classes for value in ("pc-grid", "ic-grid", "cl-grid", "vc-grid")):
+        mapped.append("related-grid")
+    if "vc-grid" in classes:
+        mapped.append("related-grid--vehicles")
+    if "cl-grid" in classes:
+        mapped.append("related-grid--clothes")
     if mapped:
         attrs["class"] = " ".join(mapped)
-    if any(value in classes for value in ("pc-grid", "ic-grid", "cl-grid", "vc-grid")):
-        attrs["class"] = "related-grid"
+    tone = re.search(r"--tone\s*:\s*(#[0-9a-fA-F]{3,8})(?:\s*[;} ]|$)", node.attrs.get("style", ""))
+    if tone:
+        attrs["style"] = f"--tone:{tone.group(1)}"
+    if "pp-flatlist" in classes and "hidden" in node.attrs:
+        attrs["hidden"] = ""
+    if "scr-mark" in classes:
+        dot = next((child for child in node.find_all("span") if "scr-dot" in (child.attrs.get("class") or "").split()), None)
+        coordinates = re.search(r"--x:([\d.]+);\s*--y:([\d.]+)", dot.attrs.get("style", "")) if dot else None
+        if coordinates and all(0 <= float(value) <= 100 for value in coordinates.groups()):
+            attrs["data-x"], attrs["data-y"] = coordinates.groups()
     if node.tag == "div" and "data-thumbs" in node.attrs:
         attrs["class"] = "gallery"
     if node.attrs.get("id"):
@@ -446,6 +494,10 @@ def main():
         payload = {"title": section["title"], "data": section["data"], "description": section["description"]}
         if key == "vehicles":
             payload["brands"] = vehicle_brands(sources["/vehicles/"], section["data"][0]["data"]["vehicles"])
+        if key == "season":
+            header = next((node for node in Document(sources["/season/"]).root.find_all("section") if "pg-head" in (node.attrs.get("class") or "").split()), None)
+            payload["headerHtml"] = serialize(header) if header else ""
+            payload["seasonTitle"] = clean(text_only(header.find("h1"))) if header and header.find("h1") else ""
         dump(output / f"{key}.json", payload)
     index = {
         "source": ORIGIN,

@@ -87,7 +87,7 @@
 
   function loadSection(section) {
     if (!sectionCache.has(section)) {
-      const request = getJson(`data/wiki/${section}.json${section === "vehicles" ? "?v=20261114-4" : ""}`).catch((error) => {
+      const request = getJson(`data/wiki/${section}.json?v=20261114-5`).catch((error) => {
         sectionCache.delete(section);
         throw error;
       });
@@ -104,7 +104,7 @@
     const entry = manifest.pages.find((page) => page.path === path);
     if (!entry) return Promise.resolve(null);
     if (!documentCache.has(entry.chunk)) {
-      const request = getJson(`data/wiki/details/${entry.chunk}`).catch((error) => {
+      const request = getJson(`data/wiki/details/${entry.chunk}?v=20261114-5`).catch((error) => {
         documentCache.delete(entry.chunk);
         throw error;
       });
@@ -168,7 +168,7 @@
       ["/articles/crime/house-burglary/", "Кражи со взломом"],
       ["/articles/vehicles/car-market/", "Продажа машины на авторынке"]
     ];
-    main.innerHTML = `<section class="hero"><p class="eyebrow">Мир Region</p><h1>Всё для жизни<br>в регионе</h1><p>Игровые механики, транспорт, предметы и места. Цены улучшений и калькулятор тюнинга — рядом с автомобилями.</p><div class="hero-links"><a class="primary-button" href="#/articles">Изучить механики ↗</a><a class="quiet-button" href="#/vehicles">Выбрать автомобиль</a></div></section>
+    main.innerHTML = `<section class="hero"><img class="hero-image" src="https://wiki.region.game/img/hero/city-1600.webp" alt="" fetchpriority="high"><p class="eyebrow">Мир Region</p><h1>Всё для жизни<br>в регионе</h1><p>Игровые механики, транспорт, предметы и места. Цены улучшений и калькулятор тюнинга — рядом с автомобилями.</p><div class="hero-links"><a class="primary-button" href="#/articles">Изучить механики ↗</a><a class="quiet-button" href="#/vehicles">Выбрать автомобиль</a></div></section>
       <div class="section-heading"><h2>Справочник</h2><a href="#/search">Поиск по всем разделам ↗</a></div>
       <div class="section-grid">${featured.map((id) => `<a class="section-card" href="#/${id}"><span class="section-icon" aria-hidden="true">${icon(icons[id])}</span><span class="arrow" aria-hidden="true">↗</span><h3>${sectionTitle(id)}</h3><p>${counts[id]}</p></a>`).join("")}</div>
       <div class="home-columns"><section><div class="section-heading"><h2>Обновления игры</h2><a href="#/updates">Все обновления ↗</a></div><a class="update-card" href="#/updates/2026-11-14-pets-heists-car-market/"><img src="${sourceOrigin}/img/updates/2026-11-14-pets-heists-car-market/cover-thumb.webp" alt="Обновление Region" loading="lazy"><div><time datetime="2026-11-14">14 ноября 2026</time><h3>Питомцы, кражи со взломом и авторынок</h3><p>Уход за животными, налёты на жильё и продажа машин.</p></div></a></section>
@@ -194,8 +194,11 @@
         id: item.id, href: `/items/${item.id}/`, title: item.name, sub: item.description,
         image: `${mediaBase}/inventory/items/${item.id}.avif`, kind: item.category, kindLabel: label(item.category),
         level: String(item.rarity), levelLabel: ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][item.rarity] || String(item.rarity),
-        stats: [`${numbers.format(item.weight_kg)} кг`, `${item.size_w}×${item.size_h}`, `${item.max_stack} шт.`],
-        sortBy: { weight: item.weight_kg, stack: item.max_stack, rarity: item.rarity }
+        badge: ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][item.rarity],
+        tone: ["", "#707070", "#65df2c", "#527fff", "#a477ff", "#ffad45", "#ff6464"][item.rarity],
+        stats: [item.weight_kg < 1 ? `${numbers.format(item.weight_kg * 1000)} г` : `${numbers.format(item.weight_kg)} кг`, `${item.size_w}×${item.size_h}`, `${numbers.format(Math.max(1, item.max_stack || 1))} шт.`],
+        usable: Boolean(item.is_usable), tradable: Boolean(item.is_tradable),
+        sortBy: { weight: item.weight_kg, stack: Math.max(1, item.max_stack || 1), rarity: item.rarity }
       }));
     }
     if (section === "clothes") {
@@ -204,7 +207,8 @@
         id: row[0], href: `/clothes/${row[0]}/`, title: row[2], kind: row[4], kindLabel: label(row[4]),
         level: row[3], levelLabel: label(row[3]), city: (row[8] || "").split(",").filter(Boolean).map(label),
         image: `${mediaBase}/clothes/${slots[row[4]] || row[4].toLowerCase()}/${row[3] === "Shared" ? "male" : row[3].toLowerCase()}/${row[5]}/${row[10]}_small.avif`,
-        sub: `Расцветки · ${row[9]}`, price: row[7],
+        sub: `${row[9]} расцветок`, price: row[7], badge: ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][row[6]],
+        tone: ["", "#707070", "#65df2c", "#527fff", "#a477ff", "#ffad45", "#ff6464"][row[6]],
         stats: [(row[8] || "").split(",").map(label).join(" · "), row[12] ? "Из кейса" : "", row[14] ? "Сезонный пропуск" : ""],
         sortBy: { price: row[7], colors: row[9], rarity: row[6] }
       }));
@@ -229,7 +233,7 @@
       sorts: [{ key: "name", dir: "asc", label: "По названию" }, { key: "price", dir: "asc", label: "Сначала дешевле" }, { key: "price", dir: "desc", label: "Сначала дороже" }, { key: "speed", dir: "desc", label: "По скорости" }, { key: "acceleration", dir: "asc", label: "По разгону" }, { key: "trunk", dir: "desc", label: "По багажнику" }]
     };
     if (section === "items") return {
-      kindTitle: "Категория", levelTitle: "Редкость",
+      kindTitle: "Категория", levelTitle: "Редкость", columns: ["Вес", "Размер", "В ячейке"],
       sorts: [{ key: "name", dir: "asc", label: "По названию" }, { key: "weight", dir: "asc", label: "Легче" }, { key: "weight", dir: "desc", label: "Тяжелее" }, { key: "rarity", dir: "desc", label: "По редкости" }]
     };
     if (section === "clothes") return {
@@ -249,10 +253,33 @@
     return `<label class="filter-label">${escapeHtml(title)}<select data-filter="${field}"><option value="">Все</option>${combined}${[...values].sort((a, b) => collator.compare(a[1], b[1])).map(([value, text]) => `<option value="${escapeHtml(value)}" ${selected === value ? "selected" : ""}>${escapeHtml(text)}</option>`).join("")}</select></label>`;
   }
 
+  function catalogFacet(rows, field, title, selected) {
+    const choices = new Map();
+    for (const row of rows) {
+      const values = Array.isArray(row[field]) ? row[field] : [row[field]];
+      for (const value of values.filter((item) => item != null && item !== "")) {
+        const key = String(value);
+        const choice = choices.get(key) || { title: row[`${field}Label`] || key, count: 0 };
+        choice.count += 1;
+        choices.set(key, choice);
+      }
+    }
+    if (choices.size < 2) return "";
+    const contents = choices.size > 28 ? filterSelect(rows, field, title, selected)
+      : `<div class="facet-options">${[...choices].sort((a, b) => collator.compare(a[1].title, b[1].title)).map(([value, choice]) => `<button type="button" data-facet="${field}" data-value="${escapeHtml(value)}" aria-pressed="${selected.split(",").includes(value)}"><span>${escapeHtml(choice.title)}</span><small>${choice.count}</small></button>`).join("")}</div>`;
+    return `<details class="catalog-facet" open><summary>${escapeHtml(title)}${icon("chevron-down")}</summary>${contents}</details>`;
+  }
+
+  function catalogStat(value, section) {
+    const text = section === "business" ? String(value ?? "—").replace(/^(налог|склад)\s+/i, "") : String(value ?? "—");
+    return /^\d+$/.test(text) ? numbers.format(Number(text)) : text;
+  }
+
   function cardHtml(row, section, settings) {
     const currencyReward = row.level === "money" || row.level === "rc";
     const symbol = row.level === "money" ? "₽" : row.level === "rc" ? "RC" : section === "levels" ? String(row.id) : "";
     const iconUrl = row.blip ? new URL(row.blip, sourceOrigin).href : "";
+    const tone = /^#[0-9a-f]{3,8}$/i.test(row.tone || "") ? row.tone : "#f0373f";
     let media = `<span class="media-placeholder ${currencyReward ? "media-placeholder--currency" : ""}" aria-hidden="true">${symbol ? escapeHtml(symbol) : icon(icons[section] || "package")}</span>`;
     if (row.image) {
       const presentation = imageOverrides[row.image];
@@ -262,18 +289,22 @@
     } else if (iconUrl && !currencyReward && section !== "levels") {
       media = `<img class="media-icon" src="${escapeHtml(iconUrl)}" alt="" loading="lazy">`;
     }
-    const category = [row.kindLabel, row.levelLabel, ["vehicles", "clothes"].includes(section) ? "" : Array.isArray(row.city) ? row.city.join(", ") : row.city].filter(Boolean).join(" · ");
-    const description = row.vehicle ? "" : row.sub || (row.cat && !category.includes(row.cat) ? row.cat : "");
-    const statLabels = row.vehicle ? ["Скорость", "0–100 км/ч", "Места", "Багажник"]
-      : section === "items" ? ["Вес", "Размер", "В стопке"]
-      : section === "clothes" ? ["Магазины", "Источник", "Источник"] : settings.columns || [];
+    const categoryParts = [row.kindLabel, row.levelLabel, ["clothes", "appearance"].includes(section) ? "" : Array.isArray(row.city) ? row.city.join(", ") : row.city];
+    if (["business", "estate", "factions"].includes(section)) categoryParts.splice(1, 1);
+    const category = [...new Set(categoryParts.filter((value) => value && value !== row.title))].join(" · ");
+    const statLabels = section === "items" ? ["Вес", "Размер", "В ячейке"] : section === "clothes" ? ["Магазины", "Источник", "Источник"] : settings.columns || [];
     const stats = (row.stats || []).map((value, index) => {
       if (value === null || value === undefined || value === "" || value === "—") return "";
       if (section === "season" && index === 0 && row.badge) return "";
-      return `<div>${statLabels[index] ? `<dt>${escapeHtml(statLabels[index])}</dt>` : ""}<dd>${escapeHtml(value)}</dd></div>`;
+      if (section === "appearance") return "";
+      const text = catalogStat(value, section);
+      return `<div>${statLabels[index] ? `<dt>${escapeHtml(statLabels[index])}</dt>` : ""}<dd>${escapeHtml(text)}</dd></div>`;
     }).join("");
-    const foot = row.foot && !["season", "levels"].includes(section) ? `<p class="card-foot">${escapeHtml(row.foot)}</p>` : "";
-    return `<article class="catalog-card"><a class="card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-icon="${escapeHtml(iconUrl)}" data-symbol="${escapeHtml(symbol)}" data-section="${escapeHtml(section)}">${section === "season" && row.badge ? `<span class="card-badge">${escapeHtml(row.badge)}</span>` : ""}${media}</a><div class="card-body"><p class="card-category">${escapeHtml(category)}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${row.price != null ? `<p class="card-price">${row.priceLabel ? `<small>${escapeHtml(row.priceLabel)}</small>` : ""}${money(row.price, row.currency)}</p>` : ""}${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}${stats ? `<dl class="card-stats">${stats}</dl>` : ""}${foot}</div>${row.vehicle ? `<label class="compare-select"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}>Добавить к сравнению</label>` : ""}</article>`;
+    const description = row.sub || (row.cat && !category.includes(row.cat) ? row.cat : "");
+    const foot = row.foot && !["season", "levels"].includes(section) && !(row.stats || []).includes(row.foot) ? `<p class="card-foot">${escapeHtml(row.foot)}</p>` : "";
+    const priceLabel = row.priceLabel || (section === "estate" ? { Complex: "Квартиры от", Hotel: "За сутки от" }[row.kind] : section === "rentals" && row.kind === "rental" ? "В час от" : "");
+    const preview = row.video && !imageOverrides[row.image]?.unavailableVideo ? `<button class="card-preview" type="button" data-preview="${escapeHtml(row.href)}" aria-label="Посмотреть анимацию ${escapeHtml(row.title)}" aria-pressed="false">${icon("play")}</button>` : "";
+    return `<article class="catalog-card catalog-card--${section}" style="--tone:${tone}"><div class="card-visual"><a class="card-media ${row.light ? "card-media--light" : ""}" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-icon="${escapeHtml(iconUrl)}" data-symbol="${escapeHtml(symbol)}" data-section="${escapeHtml(section)}">${row.badge ? `<span class="card-badge">${escapeHtml(row.badge)}</span>` : ""}${media}</a>${preview}</div><div class="card-body"><p class="card-category">${iconUrl && ["business", "estate", "factions", "rentals"].includes(section) ? `<img class="category-icon" src="${escapeHtml(iconUrl)}" alt="">` : ""}${escapeHtml(category)}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}${row.price != null && !settings.noPrice ? `<p class="card-price">${priceLabel ? `<small>${escapeHtml(priceLabel)}</small>` : ""}${money(row.price, row.currency)}</p>` : ""}${stats ? `<dl class="card-stats">${stats}</dl>` : ""}${foot}</div></article>`;
   }
 
   function paginationHtml(page, pages) {
@@ -282,8 +313,10 @@
     return `<nav class="pagination" aria-label="Страницы каталога"><button data-page="${page - 1}" ${page === 1 ? "disabled" : ""} aria-label="Предыдущая страница">←</button>${[...choices].filter((value) => value > 0 && value <= pages).sort((a, b) => a - b).map((value) => `<button data-page="${value}" ${page === value ? 'aria-current="page"' : ""}>${value}</button>`).join("")}<button data-page="${page + 1}" ${page === pages ? "disabled" : ""} aria-label="Следующая страница">→</button></nav>`;
   }
 
-  function tableHtml(rows, settings) {
-    return `<div class="catalog-table-wrap"><table class="catalog-table"><thead><tr><th scope="col">Название</th>${(settings.columns || []).map((title) => `<th scope="col">${escapeHtml(title)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr><th scope="row"><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></th>${(settings.columns || []).map((title, index) => `<td>${escapeHtml(row.stats?.[index] ?? "—")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  function tableHtml(rows, settings, section) {
+    const hasPrice = !settings.noPrice && section !== "rentals" && rows.some((row) => row.price != null);
+    const cover = ["business", "estate", "factions", "updates"].includes(section);
+    return `<div class="catalog-table-wrap"><table class="catalog-table"><thead><tr><th scope="col">Название</th>${hasPrice ? '<th scope="col">Цена</th>' : ""}${(settings.columns || []).map((title) => `<th scope="col">${escapeHtml(title)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr><th scope="row"><a class="table-title" href="${localHref(row.href)}">${row.image ? `<img class="${cover ? "cover" : ""}" src="${escapeHtml(imageUrl(row.image))}" alt="" loading="lazy">` : ""}<span>${escapeHtml(row.title)}${row.kindLabel ? `<small>${escapeHtml(row.kindLabel)}</small>` : ""}</span></a></th>${hasPrice ? `<td class="table-price">${money(row.price, row.currency)}${section === "estate" && row.kind === "Hotel" ? " / сутки" : ""}</td>` : ""}${(settings.columns || []).map((title, index) => `<td>${escapeHtml(catalogStat(row.stats?.[index], section))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
   function vehicleCardHtml(row, presentation) {
@@ -455,27 +488,34 @@
     const state = {
       query: incoming.get("q") || "", kind: incoming.get("kind") || "", level: incoming.get("level") || "",
       city: incoming.get("city") || "", sort: incoming.get("sort") || initialSort,
-      min: incoming.get("min") || "", max: incoming.get("max") || "", page: Math.max(1, Number(incoming.get("page")) || 1), size: 24,
-      view: incoming.get("view") || settings.defaultView || "cards"
+      min: incoming.get("min") || "", max: incoming.get("max") || "", page: Math.max(1, Number(incoming.get("page")) || 1), size: [24, 48, 96].includes(Number(incoming.get("size"))) ? Number(incoming.get("size")) : 24,
+      view: incoming.get("view") || settings.defaultView || "cards",
+      weightMin: incoming.get("weightMin") || "", weightMax: incoming.get("weightMax") || "",
+      usable: incoming.get("usable") === "1", tradable: incoming.get("tradable") === "1"
     };
     const introductions = {
       vehicles: "Полный каталог транспорта. В карточках автомобилей — наши расчёты стоимости улучшений и внешнего тюнинга.",
       estate: "Квартиры открываются внутри карточек жилых комплексов. Дома и отели представлены отдельными карточками.",
-      season: payload.description || ""
+      season: payload.headerHtml ? "" : payload.description || ""
     };
-    const guide = section === "season" ? '<p class="catalog-guide"><a href="#/articles/systems/season-pass/">Задания, опыт и покупка премиума ↗</a></p>' : "";
+    const guide = section === "season" ? `<div class="prose catalog-season-summary">${documentMarkup(payload.headerHtml || "")}</div><p class="catalog-guide"><a href="#/articles/systems/season-pass/">Задания, опыт и покупка премиума ↗</a></p>` : "";
+    const itemFilters = section === "items" ? `<details class="catalog-facet" open><summary>Вес, кг${icon("chevron-down")}</summary><div class="range-inputs"><label><span>От</span><input type="number" min="0" step="0.001" data-item-range="weightMin" aria-label="Вес от" value="${escapeHtml(state.weightMin)}" placeholder="0"></label><label><span>До</span><input type="number" min="0" step="0.001" data-item-range="weightMax" aria-label="Вес до" value="${escapeHtml(state.weightMax)}" placeholder="Любой"></label></div></details><div class="item-capabilities"><label><input type="checkbox" data-capability="usable" ${state.usable ? "checked" : ""}>Можно использовать</label><label><input type="checkbox" data-capability="tradable" ${state.tradable ? "checked" : ""}>Можно передавать</label></div>` : "";
+    const facets = catalogFacet(rows, "kind", settings.kindTitle || "Тип", state.kind) + catalogFacet(rows, "level", settings.levelTitle || "Категория", state.level) + catalogFacet(rows, "city", settings.cityTitle || "Город", state.city);
+    const hasPrice = !settings.noPrice && rows.some((row) => row.price != null);
+    const hasFilters = Boolean(facets || hasPrice);
+    const tableAvailable = settings.columns?.length > 0;
     main.innerHTML = pageHeading(payload.title, introductions[section] || "", section) + guide +
-      `<div class="toolbar"><input type="search" id="catalogQuery" aria-label="Поиск в разделе" placeholder="${escapeHtml(settings.search || "Найти в разделе")}" value="${escapeHtml(state.query)}">${filterSelect(rows, "kind", settings.kindTitle || "Тип", state.kind)}${filterSelect(rows, "level", settings.levelTitle || "Категория", state.level)}${filterSelect(rows, "city", settings.cityTitle || "Город", state.city)}<label class="filter-label">Сортировка<select id="catalogSort">${sorts.map((sort) => `<option value="${sort.key}:${sort.dir}" ${state.sort === `${sort.key}:${sort.dir}` ? "selected" : ""}>${escapeHtml(sort.label)}</option>`).join("")}</select></label>${rows.some((row) => row.price != null) ? `<label class="filter-label">Цена от<input id="minPrice" type="number" min="0" aria-label="Минимальная цена" value="${escapeHtml(state.min)}"></label><label class="filter-label">Цена до<input id="maxPrice" type="number" min="0" aria-label="Максимальная цена" value="${escapeHtml(state.max)}"></label>` : ""}<button class="quiet-button" id="resetFilters" type="button">Сбросить</button></div><div id="catalogResults" aria-live="polite"></div>${section === "vehicles" ? '<p class="source-note"><a href="cars.html">Наш каталог с замерами управляемости и торможения ↗</a></p>' : ""}${sourceNote(`/${section}/`)}`;
+      `<div class="catalog-layout ${!hasFilters ? "catalog-layout--simple" : ""}">${hasFilters ? `<aside class="catalog-filters" id="catalogFilters" aria-label="Фильтры каталога"><div class="filter-heading"><h2>Фильтры</h2><button id="resetFilters" type="button">Сбросить</button></div>${facets}${itemFilters}${hasPrice ? `<details class="catalog-facet" open><summary>Цена, ${rows.some((row) => row.currency === "rc") ? "RC / ₽" : "₽"}${icon("chevron-down")}</summary><div class="range-inputs"><label><span>От</span><input id="minPrice" type="number" min="0" aria-label="Минимальная цена" value="${escapeHtml(state.min)}" placeholder="0"></label><label><span>До</span><input id="maxPrice" type="number" min="0" aria-label="Максимальная цена" value="${escapeHtml(state.max)}" placeholder="Любая"></label></div></details>` : ""}</aside>` : ""}<section class="catalog-content" aria-label="${escapeHtml(payload.title)}"><div class="catalog-controls"><label class="catalog-search">${icon("search")}<input type="search" id="catalogQuery" aria-label="Поиск в разделе" placeholder="${escapeHtml(settings.search || "Найти в разделе")}" value="${escapeHtml(state.query)}"></label><select id="catalogSort" aria-label="Сортировка">${sorts.map((sort) => `<option value="${sort.key}:${sort.dir}" ${state.sort === `${sort.key}:${sort.dir}` ? "selected" : ""}>${escapeHtml(sort.label)}</option>`).join("")}</select>${tableAvailable ? `<div class="view-switch" role="group" aria-label="Вид каталога"><button data-catalog-view="cards" type="button" aria-label="Карточки" aria-pressed="${state.view === "cards"}">${icon("layout-grid")}</button><button data-catalog-view="table" type="button" aria-label="Таблица" aria-pressed="${state.view === "table"}">${icon("list")}</button></div>` : ""}${hasFilters ? `<button class="quiet-button catalog-filter-toggle" id="catalogFilterToggle" type="button" aria-expanded="false" aria-controls="catalogFilters">${icon("sliders-horizontal")}<span>Фильтры</span></button>` : ""}</div><div id="catalogResults" aria-live="polite"></div></section></div>${sourceNote(`/${section}/`)}`;
+    if (section === "season") {
+      const summary = main.querySelector(".catalog-season-summary");
+      const title = document.createElement("h2"); title.className = "catalog-season-title"; title.textContent = payload.seasonTitle || "";
+      summary.querySelector(".detail-metrics")?.before(title);
+      localizeDocument(summary, "/season/");
+    }
     const results = main.querySelector("#catalogResults");
-    const filterToggle = document.createElement("button");
-    filterToggle.className = "quiet-button filter-toggle";
-    filterToggle.type = "button";
-    filterToggle.setAttribute("aria-expanded", "false");
-    filterToggle.textContent = "Фильтры";
-    const toolbar = main.querySelector(".toolbar");
-    main.querySelector("#catalogQuery").after(filterToggle);
-    filterToggle.addEventListener("click", () => {
-      filterToggle.setAttribute("aria-expanded", String(toolbar.classList.toggle("filters-open")));
+    const filterToggle = main.querySelector("#catalogFilterToggle");
+    filterToggle?.addEventListener("click", () => {
+      filterToggle.setAttribute("aria-expanded", String(main.querySelector("#catalogFilters").classList.toggle("is-open")));
     });
 
     function matchesFacet(value, selected) {
@@ -485,8 +525,8 @@
     }
 
     function draw() {
-      const filterCount = [state.kind, state.level, state.city, state.min, state.max].filter((value) => value !== "").length;
-      filterToggle.textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
+      const filterCount = [state.kind, state.level, state.city, state.min, state.max, state.weightMin, state.weightMax, state.usable, state.tradable].filter(Boolean).length;
+      if (filterToggle) filterToggle.querySelector("span").textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
       const terms = normalize(state.query).split(/\s+/).filter(Boolean);
       const filtered = rows.filter((row) => {
         const haystack = normalize([row.title, row.sub, row.kindLabel, row.levelLabel, row.city, row.id, ...(row.stats || [])].join(" "));
@@ -495,7 +535,10 @@
           && matchesFacet(row.level, state.level)
           && matchesFacet(row.city, state.city)
           && (state.min === "" || (row.price != null && row.price >= Number(state.min)))
-          && (state.max === "" || (row.price != null && row.price <= Number(state.max)));
+          && (state.max === "" || (row.price != null && row.price <= Number(state.max)))
+          && (!state.usable || row.usable) && (!state.tradable || row.tradable)
+          && (state.weightMin === "" || row.sortBy?.weight >= Number(state.weightMin))
+          && (state.weightMax === "" || row.sortBy?.weight <= Number(state.weightMax));
       });
       const [key, direction] = state.sort.split(":");
       filtered.sort((a, b) => {
@@ -511,12 +554,30 @@
       state.page = Math.min(state.page, pages);
       const pageRows = filtered.slice((state.page - 1) * state.size, state.page * state.size);
       const tableAvailable = settings.columns?.length > 0;
-      const content = state.view === "table" && tableAvailable ? tableHtml(pageRows, settings) : `<div class="catalog-grid">${pageRows.map((row) => cardHtml(row, section, settings)).join("")}</div>`;
-      results.innerHTML = `<div class="result-line"><span>Найдено ${numbers.format(filtered.length)} из ${numbers.format(rows.length)}</span>${tableAvailable ? `<label>Вид <select id="catalogView" aria-label="Вид каталога"><option value="cards" ${state.view === "cards" ? "selected" : ""}>Карточки</option><option value="table" ${state.view === "table" ? "selected" : ""}>Таблица</option></select></label>` : ""}<label>На странице <select id="pageSize" aria-label="Количество на странице">${[24, 48, 96].map((size) => `<option ${state.size === size ? "selected" : ""}>${size}</option>`).join("")}</select></label></div>${pageRows.length ? content : '<div class="empty">По выбранным условиям ничего не найдено.</div>'}${paginationHtml(state.page, pages)}`;
+      const content = state.view === "table" && tableAvailable ? tableHtml(pageRows, settings, section) : `<div class="catalog-grid catalog-grid--${section}">${pageRows.map((row) => cardHtml(row, section, settings)).join("")}</div>`;
+      results.innerHTML = `<div class="result-line"><span><strong>${numbers.format(filtered.length)}</strong> из ${numbers.format(rows.length)}</span><label>На странице <select id="pageSize" aria-label="Количество на странице">${[24, 48, 96].map((size) => `<option ${state.size === size ? "selected" : ""}>${size}</option>`).join("")}</select></label></div>${pageRows.length ? content : '<div class="empty">По выбранным условиям ничего не найдено.</div>'}${paginationHtml(state.page, pages)}`;
+      main.querySelectorAll("[data-facet]").forEach((button) => button.setAttribute("aria-pressed", String(state[button.dataset.facet].split(",").includes(button.dataset.value))));
+      main.querySelectorAll("[data-catalog-view]").forEach((button) => button.setAttribute("aria-pressed", String(state.view === button.dataset.catalogView)));
+      results.querySelectorAll("[data-preview]").forEach((button) => button.addEventListener("click", () => {
+        const media = button.closest(".catalog-card").querySelector(".card-media");
+        const existing = media.querySelector("video");
+        results.querySelectorAll(".card-media video").forEach((video) => { video.pause(); video.remove(); });
+        results.querySelectorAll("[data-preview]").forEach((control) => { control.setAttribute("aria-pressed", "false"); control.innerHTML = icon("play"); });
+        if (existing) return;
+        const row = pageRows.find((item) => item.href === button.dataset.preview);
+        const video = document.createElement("video");
+        video.src = row.video; video.muted = true; video.loop = true; video.playsInline = true;
+        media.append(video);
+        button.setAttribute("aria-pressed", "true"); button.innerHTML = icon("x");
+        video.play().catch(() => {
+          if (!video.isConnected) return;
+          video.remove(); button.setAttribute("aria-pressed", "false"); button.innerHTML = icon("play"); showToast("Видеопревью недоступно.");
+        });
+      }));
       results.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
         state.page = Number(button.dataset.page);
         draw();
-        main.querySelector(".toolbar").scrollIntoView({ block: "start" });
+        main.querySelector(".catalog-controls").scrollIntoView({ block: "start" });
       }));
       results.querySelector("#pageSize").addEventListener("change", (event) => { state.size = Number(event.target.value); state.page = 1; draw(); });
       results.querySelector("#catalogView")?.addEventListener("change", (event) => { state.view = event.target.value; draw(); });
@@ -525,12 +586,15 @@
         input.checked = comparison.has(input.dataset.compare);
       }));
       const query = new URLSearchParams();
-      for (const field of ["kind", "level", "city", "min", "max", "sort"]) {
+      for (const field of ["kind", "level", "city", "min", "max", "sort", "weightMin", "weightMax"]) {
         if (state[field]) query.set(field, state[field]);
       }
+      if (state.usable) query.set("usable", "1");
+      if (state.tradable) query.set("tradable", "1");
       if (state.query) query.set("q", state.query);
       if (state.view !== "cards") query.set("view", state.view);
       if (state.page > 1) query.set("page", state.page);
+      if (state.size !== 24) query.set("size", state.size);
       history.replaceState(null, "", `#/${section}${query.size ? `?${query}` : ""}`);
     }
 
@@ -540,7 +604,17 @@
     for (const [id, field] of [["minPrice", "min"], ["maxPrice", "max"]]) {
       main.querySelector(`#${id}`)?.addEventListener("input", (event) => { state[field] = event.target.value; state.page = 1; draw(); });
     }
-    main.querySelector("#resetFilters").addEventListener("click", () => { history.replaceState(null, "", `#/${section}`); route(); });
+    main.querySelectorAll("[data-item-range]").forEach((input) => input.addEventListener("input", () => { state[input.dataset.itemRange] = input.value; state.page = 1; draw(); }));
+    main.querySelectorAll("[data-capability]").forEach((input) => input.addEventListener("change", () => { state[input.dataset.capability] = input.checked; state.page = 1; draw(); }));
+    main.querySelectorAll("[data-facet]").forEach((button) => button.addEventListener("click", () => {
+      const field = button.dataset.facet;
+      const selected = new Set(state[field].split(",").filter(Boolean));
+      if (selected.has(button.dataset.value)) selected.delete(button.dataset.value);
+      else selected.add(button.dataset.value);
+      state[field] = [...selected].join(","); state.page = 1; draw();
+    }));
+    main.querySelectorAll("[data-catalog-view]").forEach((button) => button.addEventListener("click", () => { state.view = button.dataset.catalogView; draw(); }));
+    main.querySelector("#resetFilters")?.addEventListener("click", () => { history.replaceState(null, "", `#/${section}`); route(); });
     draw();
   }
 
@@ -606,17 +680,151 @@
       image.tabIndex = 0;
       image.setAttribute("role", "button");
       image.setAttribute("aria-label", image.alt || "Посмотреть расцветку");
+      image.setAttribute("aria-pressed", String(index === 0));
       function showImage() {
-        const preview = container.querySelector("img:not([data-full])");
+        const hero = image.closest(".imported-hero") || container;
+        const preview = hero.querySelector(".imported-stage > img");
         if (preview) { preview.src = image.dataset.full; preview.alt = image.alt; }
-        const variantName = container.querySelector(".imported-info > p > span");
+        const variantName = hero.querySelector(".imported-info > p > span");
         if (variantName) variantName.textContent = image.alt;
-        const counter = [...container.querySelectorAll(".imported-stage > span")].find((span) => /\d+\s*\/\s*\d+/.test(span.textContent));
+        const counter = [...hero.querySelectorAll(".imported-stage > span")].find((span) => /\d+\s*\/\s*\d+/.test(span.textContent));
         if (counter) counter.textContent = `${index + 1} / ${images.length}`;
+        images.forEach((thumbnail) => thumbnail.setAttribute("aria-pressed", String(thumbnail === image)));
       }
       image.addEventListener("click", showImage);
       image.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); showImage(); } });
     });
+    container.querySelectorAll(".article-photo img, .screenshot-frame img").forEach((image) => {
+      image.tabIndex = 0;
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", `Увеличить изображение${image.alt ? ` · ${image.alt}` : ""}`);
+      function openImage() {
+        const expanded = document.querySelector("#expandedImage");
+        expanded.src = image.dataset.full || image.src;
+        expanded.alt = image.alt;
+        document.querySelector("#expandedImageCaption").textContent = image.closest("figure")?.querySelector("figcaption")?.textContent || image.alt;
+        document.querySelector("#imageDialog").showModal();
+      }
+      image.addEventListener("click", openImage);
+      image.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openImage(); } });
+    });
+    container.querySelectorAll(".article-screenshot").forEach((figure) => {
+      const frame = figure.querySelector(".screenshot-frame");
+      if (!frame) return;
+      figure.querySelectorAll(".screen-annotation[data-x]").forEach((annotation, index) => {
+        const point = document.createElement("button");
+        point.className = "screenshot-point";
+        point.type = "button";
+        point.textContent = String(index + 1);
+        point.title = annotation.textContent;
+        point.setAttribute("aria-label", `${index + 1} · ${annotation.textContent}`);
+        point.style.left = `${annotation.dataset.x}%`;
+        point.style.top = `${annotation.dataset.y}%`;
+        point.addEventListener("click", () => {
+          figure.querySelectorAll(".screen-annotation").forEach((item) => item.classList.toggle("is-selected", item === annotation));
+          annotation.scrollIntoView({ block: "nearest" });
+        });
+        frame.append(point);
+      });
+    });
+  }
+
+  function enhanceDocument(section, documentData, params) {
+    const layout = main.querySelector(".article-layout");
+    const prose = layout.querySelector(".prose");
+    prose.classList.add(`prose--${section}`);
+    const structured = !["articles", "updates"].includes(section);
+    if (structured) {
+      const hero = prose.querySelector(".imported-hero, .detail-heading");
+      if (hero && section !== "vehicles") {
+        const info = hero.querySelector(".imported-info") || hero;
+        const heading = main.querySelector(".page-head");
+        heading.querySelector(".intro")?.remove();
+        const category = info.querySelector(":scope > a, :scope > .detail-category");
+        if (category) category.after(heading);
+        else info.prepend(heading);
+        const overview = document.createElement("section");
+        overview.className = `prose detail-overview detail-overview--${section}`;
+        overview.append(hero);
+        layout.before(overview);
+        if (hero.classList.contains("imported-hero")) {
+          [...hero.children].slice(2).forEach((extra) => { extra.classList.add("detail-extra"); info.append(extra); });
+        }
+      }
+      main.querySelectorAll(".imported-info > div, .detail-heading > div").forEach((group) => {
+        if (group.querySelector(":scope > div > b")) group.classList.add("detail-metrics");
+      });
+      prose.querySelectorAll(".related-card--vehicle, .related-card--clothes, .related-card--property").forEach((card) => card.classList.add("related-card"));
+      prose.querySelectorAll(".related-grid + .related-grid").forEach((grid) => {
+        grid.previousElementSibling.append(...grid.children);
+        grid.remove();
+      });
+    }
+    const details = main.querySelector("#pageToc");
+    const headings = [...prose.querySelectorAll("h2")];
+    details.innerHTML = '<summary>На этой странице</summary>' + headings.map((heading, index) => {
+      const anchor = heading.dataset.anchor || heading.closest("section[data-anchor]")?.dataset.anchor || `section-${index + 1}`;
+      heading.dataset.anchor = anchor;
+      return `<a href="${localHref(documentData.path)}?anchor=${encodeURIComponent(anchor)}">${escapeHtml(heading.textContent)}</a>`;
+    }).join("");
+    details.closest(".article-toc").hidden = headings.length === 0;
+
+    const floorBar = prose.querySelector(".floor-tabs");
+    const floors = [...prose.querySelectorAll(".flat-list")];
+    if (floorBar && floors.length) {
+      floorBar.setAttribute("role", "tablist");
+      floorBar.setAttribute("aria-label", "Этаж");
+      floorBar.innerHTML = floors.map((floor, index) => `<button type="button" role="tab" id="floor-tab-${index}" aria-controls="flat-floor-${index}" data-floor-index="${index}" aria-selected="${!floor.hidden}" tabindex="${floor.hidden ? -1 : 0}">${escapeHtml(floor.dataset.anchor?.replace("floor-", "") || index + 1)} этаж</button>`).join("");
+      floors.forEach((floor, index) => {
+        floor.id = `flat-floor-${index}`; floor.setAttribute("role", "tabpanel"); floor.setAttribute("aria-labelledby", `floor-tab-${index}`);
+      });
+      function selectFloor(index) {
+        floors.forEach((floor, position) => { floor.hidden = index !== position; });
+        floorBar.querySelectorAll("button").forEach((button, position) => { button.setAttribute("aria-selected", String(index === position)); button.tabIndex = index === position ? 0 : -1; });
+      }
+      const requestedFloor = floors.findIndex((floor) => floor.dataset.anchor === params.get("anchor"));
+      if (requestedFloor >= 0) selectFloor(requestedFloor);
+      floorBar.addEventListener("click", (event) => { const button = event.target.closest("button"); if (button) selectFloor(Number(button.dataset.floorIndex)); });
+      floorBar.addEventListener("keydown", (event) => {
+        const current = Number(event.target.dataset.floorIndex);
+        const targets = { ArrowLeft: (current + floors.length - 1) % floors.length, ArrowRight: (current + 1) % floors.length, Home: 0, End: floors.length - 1 };
+        if (!(event.key in targets)) return;
+        event.preventDefault(); selectFloor(targets[event.key]); floorBar.querySelectorAll("button")[targets[event.key]].focus();
+      });
+    }
+
+    const observers = [];
+    const maps = documentData.widgets.filter((widget) => widget.component.includes("MiniMap"));
+    const figures = [...prose.querySelectorAll('figure[data-anchor^="map"]')];
+    maps.forEach((widget, index) => {
+      const data = widget.data;
+      const figure = figures[index];
+      if (!figure || !Number.isFinite(data.x) || !Number.isFinite(data.y)) return;
+      const preview = document.createElement("a");
+      preview.className = "map-preview";
+      preview.href = localHref(data.href || `/map/?x=${data.x}&y=${data.y}`);
+      preview.setAttribute("aria-label", `${data.label || "Расположение"} на карте`);
+      figure.prepend(preview);
+      function draw() {
+        const zoom = Math.max(2, Math.min(6, Math.round(data.zoom || 5)));
+        const size = 256 * 2 ** zoom;
+        const centerX = (data.x + 8192) / 16384 * size;
+        const centerY = (8192 - data.y) / 16384 * size;
+        const offsetX = preview.clientWidth / 2 - centerX;
+        const offsetY = preview.clientHeight / 2 - centerY;
+        const tiles = [];
+        for (let x = Math.max(0, Math.floor(-offsetX / 256)); x <= Math.min(2 ** zoom - 1, Math.floor((preview.clientWidth - offsetX) / 256)); x += 1) {
+          for (let y = Math.max(0, Math.floor(-offsetY / 256)); y <= Math.min(2 ** zoom - 1, Math.floor((preview.clientHeight - offsetY) / 256)); y += 1) {
+            tiles.push(`<img src="https://cdn.region.game/map/dark/${zoom}/${x}/${y}.png" alt="" loading="lazy" style="left:${x * 256 + offsetX}px;top:${y * 256 + offsetY}px">`);
+          }
+        }
+        preview.innerHTML = tiles.join("") + `<span class="map-preview-marker">${data.icon ? `<img src="${escapeHtml(new URL(data.icon, sourceOrigin).href)}" alt="">` : icon("map")}</span><span class="map-preview-action">Открыть карту ${icon("arrow-up-right")}</span>`;
+      }
+      const observer = new ResizeObserver(draw);
+      observer.observe(preview);
+      observers.push(observer);
+    });
+    cleanupView = () => observers.forEach((observer) => observer.disconnect());
   }
 
   async function renderDocument(section, payload, path, params, version) {
@@ -628,7 +836,7 @@
     document.title = `${documentData.title} — Region Info`;
     main.innerHTML = pageHeading(documentData.title, documentData.summary, section) +
       (vehicle ? `<div class="detail-hero"><img class="detail-image" src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="${escapeHtml(documentData.title)}"><div class="detail-facts">${fact(vehicle.price_dealer == null ? "Оценочная стоимость" : "Базовая цена в салоне", money(vehicle.price_dealer ?? vehicle.price_donate))}${fact("Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`)}${fact("Разгон 0–100", vehicle.t100_s == null ? "—" : `${numbers.format(vehicle.t100_s)} с`)}${fact("Багажник", `${vehicle.trunk_kg} кг`)}</div></div><button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению"}</button><section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer > 0 ? tuningHtml(vehicle.price_dealer) : '<p class="tuning-note">Для этой модели отсутствует салонная цена. Укажите стоимость в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
-      `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentMarkup(documentData.html)}</article>${toc ? `<aside class="article-toc" aria-label="На этой странице"><details id="pageToc"><summary>На этой странице</summary>${toc}</details></aside>` : ""}</div>${documentData.widgets.filter((widget) => widget.component.includes("MiniMap")).map((widget) => `<p><a class="quiet-button" href="#/map?x=${widget.data.x}&y=${widget.data.y}">На карте · ${escapeHtml(widget.data.label || "Расположение")} ↗</a></p>`).join("")}${sourceNote(path)}`;
+      `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentMarkup(documentData.html)}</article><aside class="article-toc" aria-label="На этой странице"><details id="pageToc"><summary>На этой странице</summary>${toc}</details></aside></div>${sourceNote(path)}`;
     const tocDetails = main.querySelector("#pageToc");
     if (tocDetails) tocDetails.open = !matchMedia("(max-width: 1200px)").matches;
     if (vehicle) {
@@ -641,6 +849,7 @@
       }
     }
     localizeDocument(main.querySelector(".prose"), path);
+    enhanceDocument(section, documentData, params);
     main.querySelector("#detailCompare")?.addEventListener("click", (event) => {
       toggleComparison(vehicle);
       event.target.textContent = comparison.has(vehicle.model) ? "Убрать из сравнения" : "Добавить к сравнению";
@@ -675,8 +884,8 @@
       ["Максимальная скорость", "max_speed_kmh", "max", (value) => `${numbers.format(value)} км/ч`],
       ["Разгон 0–100", "t100_s", "min", (value) => value == null ? "—" : `${numbers.format(value)} с`],
       ["Багажник", "trunk_kg", "max", (value) => `${numbers.format(value)} кг`],
-      ["Мест", "seats", "max", String], ["Масса", "mass_kg", "", (value) => `${numbers.format(value)} кг`],
-      ["Топливо", "fuel_type", "", label], ["Бак", "fuel_capacity_l", "max", (value) => numbers.format(value)],
+      ["Мест", "seats", "max", String], ["Масса", "mass_kg", "", (value) => value == null ? "—" : `${numbers.format(value)} кг`],
+      ["Топливо", "fuel_type", "", label], ["Бак", "fuel_capacity_l", "max", (value) => value == null ? "—" : numbers.format(value)],
       ["Расход под нагрузкой", "fuel_load_l100", "min", (value) => numbers.format(value)],
       ["Привод", "drivetrain", "", label]
     ];
@@ -824,6 +1033,7 @@
   }
 
   async function route() {
+    document.querySelector("#imageDialog").close();
     if (!manifest) return;
     const version = ++routeVersion;
     cleanupView();
@@ -896,6 +1106,14 @@
   });
   document.addEventListener("error", (event) => {
     if (event.target.tagName === "VIDEO") {
+      const card = event.target.closest(".catalog-card");
+      if (card) {
+        const button = card.querySelector("[data-preview]");
+        if (button) { button.setAttribute("aria-pressed", "false"); button.innerHTML = icon("play"); }
+        event.target.remove();
+        showToast("Видеопревью недоступно.");
+        return;
+      }
       const message = document.createElement("p");
       message.className = "media-note";
       message.textContent = "Видеопревью пока недоступно.";
@@ -929,6 +1147,8 @@
       }
     }
   }, true);
+  document.querySelector("#imageDialogClose").addEventListener("click", () => document.querySelector("#imageDialog").close());
+  document.querySelector("#imageDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
   window.addEventListener("hashchange", route);
 
   Promise.all([getJson("data/wiki/index.json"), getJson("data/wiki/image-overrides.json").catch(() => ({}))]).then(([index, overrides]) => {
