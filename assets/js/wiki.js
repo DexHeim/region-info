@@ -39,6 +39,7 @@
   };
   let manifest;
   let imageOverrides = {};
+  let vehiclePriceOverrides = {};
   let routeVersion = 0;
   let cleanupView = () => {};
   let toastTimer;
@@ -338,15 +339,18 @@
   function normalizeRows(section, payload) {
     const data = payload.data.find((island) => island.data.rows || island.data.items || island.data.vehicles)?.data || {};
     if (section === "vehicles") {
-      return data.vehicles.map((vehicle) => ({
-        id: vehicle.model, href: `/vehicles/${vehicle.model}/`, title: `${vehicle.brand} ${vehicle.name}`,
-        image: `${mediaBase}/vehicles/${vehicle.model}.png`, price: vehicle.price_dealer ?? vehicle.price_donate,
-        priceLabel: vehicle.price_dealer == null ? "Оценочная стоимость" : "Цена в салоне",
-        sub: `${label(vehicle.class)} · ${label(vehicle.access)}`, kind: vehicle.class, kindLabel: label(vehicle.class),
-        level: vehicle.access, levelLabel: label(vehicle.access), city: vehicle.brand,
-        stats: [`${numbers.format(vehicle.max_speed_kmh)} км/ч`, vehicle.t100_s == null ? "" : `${numbers.format(vehicle.t100_s)} с`, String(vehicle.seats), `${vehicle.trunk_kg} кг`],
-        sortBy: { price: vehicle.price_dealer ?? vehicle.price_donate, speed: vehicle.max_speed_kmh, acceleration: vehicle.t100_s, trunk: vehicle.trunk_kg }, vehicle
-      }));
+      return data.vehicles.map((vehicle) => {
+        const costs = vehicleCosts(vehicle);
+        return {
+          id: vehicle.model, href: `/vehicles/${vehicle.model}/`, title: `${vehicle.brand} ${vehicle.name}`,
+          image: `${mediaBase}/vehicles/${vehicle.model}.png`, price: costs.vehiclePrice,
+          priceLabel: vehicle.price_dealer == null || vehiclePriceOverrides[vehicle.model]?.vehicle_price != null ? "Цена машины" : "Цена в салоне",
+          sub: `${label(vehicle.class)} · ${label(vehicle.access)}`, kind: vehicle.class, kindLabel: label(vehicle.class),
+          level: vehicle.access, levelLabel: label(vehicle.access), city: vehicle.brand,
+          stats: [`${numbers.format(vehicle.max_speed_kmh)} км/ч`, vehicle.t100_s == null ? "" : `${numbers.format(vehicle.t100_s)} с`, String(vehicle.seats), `${vehicle.trunk_kg} кг`],
+          sortBy: { price: costs.vehiclePrice, speed: vehicle.max_speed_kmh, acceleration: vehicle.t100_s, trunk: vehicle.trunk_kg }, vehicle
+        };
+      });
     }
     if (section === "items") {
       return data.items.map((item) => ({
@@ -479,13 +483,22 @@
   }
 
   function vehicleCosts(vehicle) {
-    const price = vehicle.price_dealer ?? vehicle.price_donate;
-    const basePrice = Number.isFinite(price) && price > 0 ? price : null;
+    const verified = vehiclePriceOverrides[vehicle.model] || {};
+    const price = verified.tuning_base ?? vehicle.price_dealer ?? vehicle.price_donate;
+    const tuningBase = Number.isFinite(price) && price > 0 ? price : null;
+    const statePrice = verified.state_buyback ?? (vehicle.price_dealer == null ? null : Math.floor(vehicle.price_dealer * .7));
     return {
-      basePrice,
-      statePrice: basePrice == null ? null : Math.round(basePrice * .7),
-      tuningPrice: basePrice == null ? null : tuning.calculatePerformanceTotal(basePrice)
+      vehiclePrice: verified.vehicle_price ?? vehicle.price_dealer,
+      statePrice,
+      buybackConfirmed: verified.state_buyback != null,
+      tuningBase,
+      tuningPrice: tuningBase == null ? null : tuning.calculatePerformanceTotal(tuningBase)
     };
+  }
+
+  function vehicleBuybackText(costs) {
+    if (costs.statePrice == null) return "—";
+    return `${costs.buybackConfirmed ? "" : "≈ "}${money(costs.statePrice)}`;
   }
 
   function vehicleCardHtml(row, presentation) {
@@ -505,8 +518,8 @@
         <div class="vehicle-badges"><span>${escapeHtml(row.kindLabel)}</span>${vehicle.rarity > 1 ? `<span class="rarity-badge">${rarity}</span>` : ""}</div>
       </a>
       <label class="vehicle-compare" title="Добавить к сравнению"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}><span>${icon("scale")}<span class="sr-only">Сравнить ${escapeHtml(row.title)}</span></span></label>
-      <div class="vehicle-body"><div class="vehicle-heading"><div><p class="vehicle-brand">${escapeHtml(vehicle.brand)}${presentation?.flag ? `<img class="country-flag" src="${escapeHtml(presentation.flag)}" alt="${escapeHtml(presentation.country)}" width="16" height="12" loading="lazy">` : ""}</p><h2><a href="${localHref(row.href)}">${escapeHtml(vehicle.name)}</a></h2></div><div class="vehicle-price">${row.price != null ? `${vehicle.price_dealer == null ? "<small>Оценочная стоимость</small>" : "<small>Цена в салоне</small>"}<strong>${money(row.price)}</strong>` : '<span>Служебный</span>'}</div></div>
-      <dl class="vehicle-costs"><div title="70% ${vehicle.price_dealer == null ? "оценочной стоимости" : "базовой цены для машины, купленной в салоне"}"><dt>Госстоимость</dt><dd>${money(costs.statePrice)}</dd></div><div title="Приблизительная сумма покупки всех уровней двигателя, трансмиссии, тормозов, подвески и турбо по порядку"><dt>Полный тюнинг</dt><dd>${costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`}</dd></div></dl>
+      <div class="vehicle-body"><div class="vehicle-heading"><div><p class="vehicle-brand">${escapeHtml(vehicle.brand)}${presentation?.flag ? `<img class="country-flag" src="${escapeHtml(presentation.flag)}" alt="${escapeHtml(presentation.country)}" width="16" height="12" loading="lazy">` : ""}</p><h2><a href="${localHref(row.href)}">${escapeHtml(vehicle.name)}</a></h2></div><div class="vehicle-price">${row.price != null ? `<small>${escapeHtml(row.priceLabel)}</small><strong>${money(row.price)}</strong>` : `<span>${vehicle.access === "service" ? "Служебный" : "Цена уточняется"}</span>`}</div></div>
+      <dl class="vehicle-costs"><div title="${costs.buybackConfirmed ? "Сумма подтверждена в игровом окне автоскупа" : costs.statePrice == null ? "Требуется подтверждение в игре" : "Расчёт 70% от базовой цены в салоне"}"><dt>Госвыкуп</dt><dd>${vehicleBuybackText(costs)}</dd></div><div title="Приблизительная сумма покупки всех уровней двигателя, трансмиссии, тормозов, подвески и турбо по порядку"><dt>Полный тюнинг</dt><dd>${costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`}</dd></div></dl>
       <dl class="vehicle-stats">${stats.map(([name, title, value]) => `<div title="${title}"><dt class="sr-only">${title}</dt>${icon(name)}<dd>${escapeHtml(value)}</dd></div>`).join("")}</dl></div>
     </article>`;
   }
@@ -826,22 +839,23 @@
   }
 
   function tuningHtml(price, vehicle = null) {
-    const statePrice = vehicle ? vehicleCosts(vehicle).statePrice : Math.round(price * .7);
-    const priceLabel = vehicle && vehicle.price_dealer == null ? "Оценочная стоимость для расчёта" : "Цена автомобиля для расчёта";
-    const stateLabel = vehicle ? "Госстоимость" : "Выкуп 70% для салонной машины";
+    const costs = vehicle ? vehicleCosts(vehicle) : null;
+    const statePrice = costs ? vehicleBuybackText(costs) : money(Math.floor(price * .7));
+    const priceLabel = "База расчёта улучшений";
+    const stateLabel = vehicle ? "Госвыкуп" : "Выкуп 70% для салонной машины";
     const groups = (title, collection, kind, open) => `<details ${open ? "open" : ""}><summary>${title}</summary><div class="tuning-groups">${collection.map((group) => `<section class="tuning-group"><h3>${escapeHtml(group.title)}</h3><ul>${group.options.map(([name, referencePrice]) => `<li><span>${escapeHtml(name)}</span><strong>${money(tuning.calculatePrice(referencePrice, price, kind))}</strong></li>`).join("")}</ul></section>`).join("")}</div></details>`;
     const fixed = [{ title: "Фиксированные цены ателье из Wiki", options: [["Бронированный кузов", 30000], ["Смена типа краски", 15000]] }];
-    return `<div class="tuning-summary"><div><span>${priceLabel}</span><strong>${money(price)}</strong></div><div><span>${stateLabel}</span><strong>${money(statePrice)}</strong></div><div><span>Все уровни улучшений по порядку</span><strong>${money(tuning.calculatePerformanceTotal(price))}</strong></div></div>${groups("Улучшения", tuning.performance, "mechanical", true)}${groups("Покраска, тонировка, колёса и фары", tuning.appearance, "visual", false)}${groups("Клаксон", [tuning.horns], "fixed", false)}${groups("Другие услуги ателье", fixed, "fixed", false)}<p class="tuning-note"><a href="#/articles/vehicles/fuel-repair-tuning/">Механики нитро, GPS-маячка, ливрей, дыма шин, шлема и ремонта ↗</a></p>`;
+    return `<div class="tuning-summary"><div><span>${priceLabel}</span><strong>${money(price)}</strong></div><div><span>${stateLabel}</span><strong>${statePrice}</strong></div><div><span>Все уровни улучшений по порядку</span><strong>${money(tuning.calculatePerformanceTotal(price))}</strong></div></div>${groups("Улучшения", tuning.performance, "mechanical", true)}${groups("Покраска, тонировка, колёса и фары", tuning.appearance, "visual", false)}${groups("Клаксон", [tuning.horns], "fixed", false)}${groups("Другие услуги ателье", fixed, "fixed", false)}<p class="tuning-note"><a href="#/articles/vehicles/fuel-repair-tuning/">Механики нитро, GPS-маячка, ливрей, дыма шин, шлема и ремонта ↗</a></p>`;
   }
 
   function tuningNote() {
-    return '<p class="tuning-note">Приблизительный расчёт Region Info по фактическим ценам BMW M5 (E39) за 1 700 000 ₽. Цены масштабируются по стоимости машины с округлением до 100 ₽, минимум улучшения — 10 000 ₽. Клаксоны имеют фиксированную цену. Итог включает покупку каждого уровня последовательно.</p>';
+    return '<p class="tuning-note">Приблизительный расчёт Region Info по фактическим ценам BMW M5 (E39) за 1 700 000 ₽. Цены масштабируются по базе расчёта улучшений с округлением до 100 ₽, минимум улучшения — 10 000 ₽. Клаксоны имеют фиксированную цену. Итог включает покупку каждого уровня последовательно.</p>';
   }
 
   function renderTuning(params) {
     const initialPrice = Math.max(1, Number(params.get("price")) || 1700000);
     main.innerHTML = pageHeading("Калькулятор тюнинга", "Наши дополнительные расчёты цен двигателя, трансмиссии, тормозов, подвески, турбо и внешнего вида.") +
-      `<form class="calculator-form" id="calculatorForm"><label>Исходная стоимость<select id="priceType"><option value="sale">Цена автомобиля</option><option value="state">Гос. стоимость салонной машины (70%)</option></select></label><label>Сумма, ₽<input id="tuningPrice" type="number" min="1" step="100" value="${initialPrice}" inputmode="numeric" required></label></form><section class="tuning-panel">${tuningNote()}<div id="tuningResults" aria-live="polite"></div></section><p class="source-note"><a href="cars.html">Открыть прежний каталог с замерами автомобилей ↗</a></p>`;
+      `<form class="calculator-form" id="calculatorForm"><label>Исходная стоимость<select id="priceType"><option value="sale">База расчёта улучшений</option><option value="state">Выкуп салонной машины (70%)</option></select></label><label>Сумма, ₽<input id="tuningPrice" type="number" min="1" step="100" value="${initialPrice}" inputmode="numeric" required></label></form><section class="tuning-panel">${tuningNote()}<div id="tuningResults" aria-live="polite"></div></section><p class="source-note"><a href="cars.html">Открыть прежний каталог с замерами автомобилей ↗</a></p>`;
     const priceInput = main.querySelector("#tuningPrice");
     const priceType = main.querySelector("#priceType");
     function draw() {
@@ -854,7 +868,7 @@
     draw();
   }
 
-  function localizeDocument(container, path) {
+  function localizeDocument(container, path, vehicles = []) {
     const iconSources = new Set(Object.values(imageOverrides).filter((replacement) => replacement.fit === "icon").map((replacement) => replacement.src));
     container.querySelectorAll("img").forEach((image) => {
       if (iconSources.has(image.src)) image.dataset.mediaKind = "icon";
@@ -873,6 +887,14 @@
         link.target = "_blank";
         link.rel = "noreferrer";
       }
+    });
+    container.querySelectorAll(".related-card--vehicle").forEach((card) => {
+      const model = card.getAttribute("href")?.match(/\/vehicles\/([^/?#]+)/)?.[1];
+      const vehicle = vehicles.find((entry) => entry.model === model);
+      const price = card.querySelector(".related-price");
+      if (!vehicle || !price) return;
+      const costs = vehicleCosts(vehicle);
+      price.textContent = costs.vehiclePrice == null ? "Цена уточняется" : money(costs.vehiclePrice);
     });
     container.querySelectorAll("video").forEach((video) => {
       video.removeAttribute("muted");
@@ -951,14 +973,14 @@
     const originalActions = info.lastElementChild;
     const rows = [
       ['store', 'Цена в салоне', money(vehicle.price_dealer), vehicle.price_dealer == null ? 'В салонах нет' : 'Базовая цена. Владелец салона может изменить её в пределах игры.'],
-      ['gift', 'Оценочная стоимость', money(vehicle.price_donate ?? vehicle.price_dealer), 'Кейсы, пропуски и магазин'],
-      ['building-2', 'Госстоимость · 70%', money(costs.statePrice), vehicle.price_dealer == null ? 'От оценочной стоимости' : 'От базовой цены в салоне'],
+      ['gift', 'Цена машины', money(costs.vehiclePrice), vehiclePriceOverrides[vehicle.model]?.source || 'Цена кейсового транспорта требует игрового подтверждения'],
+      ['building-2', 'Госвыкуп', vehicleBuybackText(costs), costs.buybackConfirmed ? 'Подтверждено в игровом окне «ИП Автоскуп»' : costs.statePrice == null ? 'Сумма требует игрового подтверждения' : 'Расчёт от базовой цены в салоне · 70%'],
       ['wrench', 'Полный тюнинг', costs.tuningPrice == null ? '—' : `≈ ${money(costs.tuningPrice)}`, 'Все уровни улучшений по порядку']
     ];
     originalPrices.className = 'vehicle-finances';
     originalPrices.innerHTML = rows.map(([name, title, value, note], index) => {
-      if (vehicle.access === 'service' && index < 2) return '';
-      return `<div class="vehicle-finance ${index > 1 ? 'vehicle-finance--accent' : ''}">${icon(name)}<div><span>${title}</span><strong>${index === 3 && costs.basePrice != null ? `<a href="${localHref(`/vehicles/${vehicle.model}/`)}?anchor=region-tuning">${value} ${icon('arrow-up-right')}</a>` : value}</strong></div>${vehicle.access === 'service' ? '' : `<p>${note}</p>`}</div>`;
+      if ((vehicle.access === 'service' && index < 2) || (index === 1 && vehicle.price_dealer != null && !vehiclePriceOverrides[vehicle.model]?.vehicle_price)) return '';
+      return `<div class="vehicle-finance ${index > 1 ? 'vehicle-finance--accent' : ''}">${icon(name)}<div><span>${title}</span><strong>${index === 3 && costs.tuningBase != null ? `<a href="${localHref(`/vehicles/${vehicle.model}/`)}?anchor=region-tuning">${value} ${icon('arrow-up-right')}</a>` : value}</strong></div>${vehicle.access === 'service' ? '' : `<p>${note}</p>`}</div>`;
     }).join('');
     if (vehicle.dealership_business_id != null) {
       const salonLink = document.createElement('a');
@@ -968,7 +990,7 @@
       originalPrices.firstElementChild.querySelector('p').append(document.createElement('br'), salonLink);
     }
     originalActions.className = 'detail-actions';
-    originalActions.innerHTML = `${similarModels ? `<button type="button" class="primary-button" id="similarCompare" data-models="${escapeHtml(similarModels)}">${icon('scale')}Сравнить с похожей</button>` : ''}<button type="button" class="quiet-button" id="detailCompare">${comparison.has(vehicle.model) ? 'Убрать из сравнения' : 'Добавить к сравнению'}</button><a class="quiet-button" href="#/vehicles?kind=${encodeURIComponent(vehicle.class)}">Весь класс ${icon('arrow-up-right')}</a>`;
+    originalActions.innerHTML = `${similarModels ? `<button type="button" class="primary-button" id="similarCompare" data-models="${escapeHtml(similarModels)}">${icon('scale')}Сравнить с похожей</button>` : ''}<button type="button" class="quiet-button" id="detailCompare" data-model="${escapeHtml(vehicle.model)}">${comparison.has(vehicle.model) ? 'Убрать из сравнения' : 'Добавить к сравнению'}</button><a class="quiet-button" href="#/vehicles?kind=${encodeURIComponent(vehicle.class)}">Весь класс ${icon('arrow-up-right')}</a>`;
     overview.querySelector('.imported-stage > span:nth-child(2)')?.classList.add('vehicle-rarity');
     const highlights = main.querySelector('.imported-kpis');
     if (highlights) {
@@ -1115,12 +1137,18 @@
     const documentData = await loadDocument(path);
     if (version !== routeVersion) return;
     if (!documentData) throw new Error("Эта страница отсутствует в локальной базе.");
-    const vehicle = section === "vehicles" ? payload.data[0].data.vehicles.find((item) => item.model === path.split("/")[2]) : null;
+    let vehicleCatalog = [];
+    if (section === "vehicles" || documentData.html.includes("related-card--vehicle")) {
+      const vehiclePayload = section === "vehicles" ? payload : await loadSection("vehicles");
+      vehicleCatalog = vehiclePayload.data[0].data.vehicles;
+    }
+    if (version !== routeVersion) return;
+    const vehicle = section === "vehicles" ? vehicleCatalog.find((item) => item.model === path.split("/")[2]) : null;
     const costs = vehicle ? vehicleCosts(vehicle) : null;
     const toc = documentData.headings.filter((heading) => heading.id).map((heading) => `<a href="${localHref(path)}?anchor=${encodeURIComponent(heading.id)}">${escapeHtml(heading.title)}</a>`).join("") + (vehicle ? `<a href="${localHref(path)}?anchor=region-tuning">Расчёт тюнинга</a>` : "");
     document.title = `${documentData.title} — Region Info`;
     main.innerHTML = pageHeading(documentData.title, documentData.summary, section) +
-      (vehicle ? `<section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${vehicle.price_dealer == null && costs.basePrice != null ? '<p class="tuning-note">Для этой модели расчёт выполнен по оценочной стоимости из Wiki.</p>' : ""}${costs.basePrice != null ? tuningHtml(costs.basePrice, vehicle) : '<p class="tuning-note">Для этой модели в Wiki отсутствует стоимость. Укажите цену в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
+      (vehicle ? `<section id="vehicleTuning" class="tuning-panel"><h2>Стоимость улучшений и тюнинга</h2>${tuningNote()}${costs.tuningBase != null ? tuningHtml(costs.tuningBase, vehicle) : '<p class="tuning-note">Для этой модели в Wiki отсутствует стоимость. Укажите цену в калькуляторе для расчёта.</p><a class="quiet-button" href="#/tuning">Открыть калькулятор</a>'}</section><div id="legacySpecs"></div>` : "") +
       `<div class="article-layout"><article class="prose ${vehicle ? "prose--vehicle" : ""}">${documentMarkup(documentData.html)}</article><aside class="article-toc" aria-label="На этой странице"><details id="pageToc"><summary>На этой странице</summary>${toc}</details></aside></div>${sourceNote(path)}`;
     const tocDetails = main.querySelector("#pageToc");
     if (tocDetails) tocDetails.open = !matchMedia("(max-width: 1200px)").matches;
@@ -1133,7 +1161,7 @@
         tuningPanel.after(main.querySelector("#legacySpecs"));
       }
     }
-    localizeDocument(main.querySelector(".prose"), path);
+    localizeDocument(main.querySelector(".prose"), path, vehicleCatalog);
     enhanceDocument(section, documentData, params, vehicle);
     const animation = section === "animations" ? normalizeRows(section, payload).find((row) => row.href === path) : null;
     const soundCleanups = [];
@@ -1174,17 +1202,39 @@
     if (comparison.has(vehicle.model)) comparison.delete(vehicle.model);
     else if (comparison.size < 4) comparison.set(vehicle.model, vehicle);
     else showToast("В сравнении может быть до четырёх моделей.");
+    updateComparison();
+  }
+
+  function updateComparison() {
     document.querySelector("#compareTray").hidden = comparison.size === 0;
     document.querySelector("#compareCount").textContent = `В сравнении ${comparison.size} из 4`;
     document.querySelector("#compareOpen").disabled = comparison.size < 2;
+    document.querySelector("#compareSelection").innerHTML = [...comparison.values()].map((vehicle) => `<div class="compare-vehicle"><span>${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</span><button type="button" data-remove-comparison="${escapeHtml(vehicle.model)}" aria-label="Убрать ${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)} из сравнения">${icon("x")}</button></div>`).join("");
+    main.querySelectorAll("[data-compare]").forEach((input) => { input.checked = comparison.has(input.dataset.compare); });
+    const detailButton = main.querySelector("#detailCompare");
+    if (detailButton) detailButton.textContent = comparison.has(detailButton.dataset.model) ? "Убрать из сравнения" : "Добавить к сравнению";
+  }
+
+  function removeFromComparison(model) {
+    const index = [...comparison.keys()].indexOf(model);
+    if (index < 0) return;
+    const dialog = document.querySelector("#compareDialog");
+    const wasOpen = dialog.open;
+    comparison.delete(model);
+    updateComparison();
+    if (wasOpen && comparison.size) renderComparison();
+    if (wasOpen && !comparison.size) dialog.close();
+    const controls = document.querySelectorAll(`${wasOpen && comparison.size ? "#compareContent" : "#compareSelection"} [data-remove-comparison]`);
+    if (controls.length) controls[Math.min(index, controls.length - 1)].focus({ preventScroll: true });
+    else main.focus({ preventScroll: true });
   }
 
   function renderComparison() {
-    const list = [...comparison.values()].map((vehicle) => ({ ...vehicle, assessment: vehicle.price_donate ?? vehicle.price_dealer, ...vehicleCosts(vehicle) }));
+    const list = [...comparison.values()].map((vehicle) => ({ ...vehicle, ...vehicleCosts(vehicle) }));
     const metrics = [
-      ["Цена в салоне", "price_dealer", "min", (value) => money(value)],
-      ["Оценочная стоимость", "assessment", "min", (value) => money(value)],
-      ["Госстоимость", "statePrice", "max", (value) => money(value)],
+      ["Цена машины", "vehiclePrice", "min", (value) => money(value)],
+      ["Госвыкуп", "statePrice", "max", (value, vehicle) => vehicleBuybackText(vehicle)],
+      ["База расчёта улучшений", "tuningBase", "", (value) => money(value)],
       ["Полный тюнинг · расчёт", "tuningPrice", "min", (value) => value == null ? "—" : `≈ ${money(value)}`],
       ["Максимальная скорость", "max_speed_kmh", "max", (value) => `${numbers.format(value)} км/ч`],
       ["Разгон 0–100", "t100_s", "min", (value) => value == null ? "—" : `${numbers.format(value)} с`],
@@ -1194,12 +1244,13 @@
       ["Расход под нагрузкой", "fuel_load_l100", "min", (value, vehicle) => `${numbers.format(value)} ${vehicle.fuel_type === 'Electric' ? 'ед.' : 'л'}/100 км`],
       ["Привод", "drivetrain", "", label]
     ];
-    document.querySelector("#compareContent").innerHTML = `<p class="compare-help">Таблицу можно прокручивать по горизонтали.</p><table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col"><img src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
+    document.querySelector("#compareContent").innerHTML = `<p class="compare-help">Таблицу можно прокручивать по горизонтали.</p><table class="compare-table"><thead><tr><th scope="col">Характеристика</th>${list.map((vehicle) => `<th scope="col" class="compare-vehicle-column"><button class="compare-remove icon-button" type="button" data-remove-comparison="${escapeHtml(vehicle.model)}" aria-label="Убрать ${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)} из сравнения">${icon("x")}</button><img src="${escapeHtml(imageUrl(`${mediaBase}/vehicles/${vehicle.model}.png`))}" alt="">${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.name)}</th>`).join("")}</tr></thead><tbody>${metrics.map(([title, field, direction, format]) => {
       const values = list.map((vehicle) => vehicle[field]).filter((value) => typeof value === "number");
       const best = direction === "min" ? Math.min(...values) : Math.max(...values);
       return `<tr><th scope="row">${title}</th>${list.map((vehicle) => `<td ${direction && vehicle[field] != null && vehicle[field] === best ? 'class="best"' : ""}>${escapeHtml(vehicle[field] == null ? '—' : format(vehicle[field], vehicle))}</td>`).join("")}</tr>`;
     }).join("")}</tbody></table>`;
-    document.querySelector("#compareDialog").showModal();
+    const dialog = document.querySelector("#compareDialog");
+    if (!dialog.open) dialog.showModal();
   }
 
   function searchMediaHtml(page, row = {}) {
@@ -1217,7 +1268,7 @@
     if (row?.vehicle) {
       const costs = vehicleCosts(row.vehicle);
       description = `${row.stats[0]}${row.stats[1] ? ` · 0–100 за ${row.stats[1]}` : ""} · багажник ${row.stats[3]}`;
-      facts = [[row.priceLabel, money(row.price)], ["Госстоимость", money(costs.statePrice)], ["Полный тюнинг", costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`]];
+      facts = [[row.priceLabel, money(row.price)], ["Госвыкуп", vehicleBuybackText(costs)], ["Полный тюнинг", costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`]];
     } else if (page.section === "map") {
       facts = (page.facts || []).slice(0, 3).map((fact) => [fact.label, fact.value]);
     } else if (page.section === "rentals" && page.previewFacts?.length) {
@@ -1678,11 +1729,14 @@
   });
   document.querySelector("#compareClear").addEventListener("click", () => {
     comparison.clear();
-    document.querySelector("#compareTray").hidden = true;
-    main.querySelectorAll("[data-compare]").forEach((input) => { input.checked = false; });
-    const detailButton = main.querySelector("#detailCompare");
-    if (detailButton) detailButton.textContent = "Добавить к сравнению";
+    updateComparison();
   });
+  for (const selector of ["#compareSelection", "#compareContent"]) {
+    document.querySelector(selector).addEventListener("click", (event) => {
+      const control = event.target.closest("[data-remove-comparison]");
+      if (control) removeFromComparison(control.dataset.removeComparison);
+    });
+  }
   document.querySelector("#compareOpen").addEventListener("click", renderComparison);
   document.querySelector("#compareClose").addEventListener("click", () => document.querySelector("#compareDialog").close());
   document.querySelector("#compareDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
@@ -1744,9 +1798,10 @@
   document.querySelector("#imageDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
   window.addEventListener("hashchange", route);
 
-  Promise.all([getJson("data/wiki/index.json"), getJson("data/wiki/image-overrides.json").catch(() => ({}))]).then(([index, overrides]) => {
+  Promise.all([getJson("data/wiki/index.json"), getJson("data/wiki/image-overrides.json").catch(() => ({})), getJson("data/wiki/vehicle-price-overrides.json?v=20261114-14").catch(() => ({}))]).then(([index, overrides, prices]) => {
     manifest = index;
     imageOverrides = overrides;
+    vehiclePriceOverrides = prices;
     searchTrigger.disabled = false;
     document.querySelector("#importDate").textContent = `База от ${dates.format(new Date(index.importedAt))}`;
     route();

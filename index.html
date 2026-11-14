@@ -8,7 +8,7 @@
   <title>Region Info — справочник по игре Region</title>
   <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-13">
+  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-14">
   <link rel="stylesheet" href="assets/css/catalog.css?v=20261114-9">
   <link rel="stylesheet" href="assets/css/details.css?v=20261114-9">
 </head>
@@ -60,9 +60,8 @@
     </div>
   </dialog>
   <aside id="compareTray" class="compare-tray" hidden aria-live="polite">
-    <span id="compareCount"></span>
-    <button id="compareClear" class="quiet-button" type="button">Очистить</button>
-    <button id="compareOpen" class="primary-button" type="button">Сравнить</button>
+    <div class="compare-tray-top"><span id="compareCount"></span><div class="compare-tray-actions"><button id="compareClear" class="quiet-button" type="button">Очистить всё</button><button id="compareOpen" class="primary-button" type="button">Сравнить</button></div></div>
+    <div id="compareSelection" class="compare-selection" role="group" aria-label="Выбранные автомобили"></div>
   </aside>
   <dialog id="compareDialog" class="compare-dialog" aria-labelledby="compareTitle">
     <div class="dialog-head"><h2 id="compareTitle">Сравнение транспорта</h2><button class="icon-button" id="compareClose" aria-label="Закрыть сравнение"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#x"></use></svg></button></div>
@@ -76,6 +75,6 @@
   <div id="toast" class="toast" role="status" hidden></div>
   <noscript><p>Для поиска, каталогов и карты включите JavaScript. <a href="https://wiki.region.game/">Открыть Region Wiki</a></p></noscript>
   <script src="assets/js/tuning.js?v=20260925-4"></script>
-  <script src="assets/js/wiki.js?v=20261114-13" defer></script>
+  <script src="assets/js/wiki.js?v=20261114-14" defer></script>
 </body>
 </html>
