@@ -1,2 +1,3 @@
 spreadsheet-work/
 outputs/**/*.inspect.ndjson
+__pycache__/
