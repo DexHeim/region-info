@@ -181,7 +181,7 @@
         priceLabel: vehicle.price_dealer == null ? "Оценочная стоимость" : "Цена в салоне",
         sub: `${label(vehicle.class)} · ${label(vehicle.access)}`, kind: vehicle.class, kindLabel: label(vehicle.class),
         level: vehicle.access, levelLabel: label(vehicle.access), city: vehicle.brand,
-        stats: [`${numbers.format(vehicle.max_speed_kmh)} км/ч`, vehicle.t100_s == null ? "" : `${numbers.format(vehicle.t100_s)} с до 100`, `${vehicle.seats} мест`, `${vehicle.trunk_kg} кг`],
+        stats: [`${numbers.format(vehicle.max_speed_kmh)} км/ч`, vehicle.t100_s == null ? "" : `${numbers.format(vehicle.t100_s)} с`, String(vehicle.seats), `${vehicle.trunk_kg} кг`],
         sortBy: { price: vehicle.price_dealer ?? vehicle.price_donate, speed: vehicle.max_speed_kmh, acceleration: vehicle.t100_s, trunk: vehicle.trunk_kg }, vehicle
       }));
     }
@@ -200,7 +200,7 @@
         id: row[0], href: `/clothes/${row[0]}/`, title: row[2], kind: row[4], kindLabel: label(row[4]),
         level: row[3], levelLabel: label(row[3]), city: (row[8] || "").split(",").filter(Boolean).map(label),
         image: `${mediaBase}/clothes/${slots[row[4]] || row[4].toLowerCase()}/${row[3] === "Shared" ? "male" : row[3].toLowerCase()}/${row[5]}/${row[10]}_small.avif`,
-        sub: `${label(row[3])} · ${row[9]} расцветок`, price: row[7],
+        sub: `Расцветки · ${row[9]}`, price: row[7],
         stats: [(row[8] || "").split(",").map(label).join(" · "), row[12] ? "Из кейса" : "", row[14] ? "Сезонный пропуск" : ""],
         sortBy: { price: row[7], colors: row[9], rarity: row[6] }
       }));
