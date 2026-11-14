@@ -51,7 +51,7 @@
   }
 
   function icon(name) {
-    return `<svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#${escapeHtml(name)}"></use></svg>`;
+    return `<svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg?v=20261114-11#${escapeHtml(name)}"></use></svg>`;
   }
 
   function normalize(value) {
@@ -141,6 +141,100 @@
     const unavailableVideos = Object.values(imageOverrides).map((replacement) => replacement.unavailableVideo).filter(Boolean);
     return markup.replace(/<video\b[\s\S]*?<\/video>/g, (video) => unavailableVideos.some((url) => video.includes(url))
       ? '<p class="media-note">Видеопревью этой анимации пока недоступно.</p>' : video);
+  }
+
+  function attachAnimationSound(video, soundUrl, container) {
+    const audio = document.createElement("audio");
+    audio.src = soundUrl;
+    audio.preload = "none";
+    audio.loop = video.loop;
+    audio.hidden = true;
+    const controls = document.createElement("div");
+    controls.className = "animation-audio";
+    controls.innerHTML = `<button class="animation-sound" type="button"></button><input class="animation-volume" type="range" min="0" max="1" step="0.05" value="0.5" aria-label="Громкость анимации">`;
+    const button = controls.querySelector("button");
+    const volume = controls.querySelector("input");
+    let disposed = false;
+    video.classList.add("animation-video--audio");
+    video.volume = 0.5;
+    container.append(audio, controls);
+
+    function updateControls() {
+      if (audio.error) return;
+      const enabled = !video.muted && video.volume > 0;
+      button.innerHTML = `${icon(enabled ? "volume-2" : "volume-x")}<span>Звук</span>`;
+      button.setAttribute("aria-label", enabled ? "Выключить звук анимации" : "Включить звук анимации");
+      button.setAttribute("aria-pressed", String(enabled));
+      button.title = enabled ? "Выключить звук" : "Включить звук";
+      volume.value = video.volume;
+      volume.setAttribute("aria-valuetext", `${Math.round(video.volume * 100)}%`);
+      audio.volume = video.volume;
+      audio.muted = video.muted;
+    }
+
+    function playSound() {
+      if (disposed || video.paused || video.seeking || video.muted || video.volume === 0 || video.error || audio.error) return;
+      audio.play().catch((error) => {
+        if (disposed || error.name === "AbortError") return;
+        video.muted = true;
+        updateControls();
+        if (error.name === "NotAllowedError") showToast("Нажмите кнопку звука для воспроизведения аудиодорожки.");
+      });
+    }
+
+    function seekSound() {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      audio.currentTime = video.currentTime % audio.duration;
+    }
+
+    button.addEventListener("click", () => {
+      video.muted = !video.muted;
+      if (!video.muted && video.volume === 0) video.volume = 0.5;
+      updateControls();
+      if (video.muted) audio.pause();
+      else if (video.paused) video.play().catch(() => showToast("Не удалось запустить видеопревью."));
+      else playSound();
+    });
+    volume.addEventListener("input", () => {
+      video.volume = Number(volume.value);
+      video.muted = video.volume === 0;
+    });
+    video.addEventListener("play", playSound);
+    video.addEventListener("playing", playSound);
+    video.addEventListener("pause", () => audio.pause());
+    video.addEventListener("waiting", () => audio.pause());
+    video.addEventListener("error", () => audio.pause());
+    video.addEventListener("ended", () => audio.pause());
+    video.addEventListener("seeking", () => { audio.pause(); seekSound(); });
+    video.addEventListener("seeked", () => { seekSound(); playSound(); });
+    video.addEventListener("ratechange", () => { audio.playbackRate = video.playbackRate; });
+    audio.addEventListener("loadedmetadata", seekSound);
+    video.addEventListener("volumechange", () => {
+      updateControls();
+      if (video.muted || video.volume === 0) audio.pause();
+      else playSound();
+    });
+    audio.addEventListener("error", () => {
+      if (disposed) return;
+      audio.pause();
+      button.disabled = true;
+      button.innerHTML = `${icon("volume-x")}<span>Звук недоступен</span>`;
+      button.setAttribute("aria-label", "Аудиодорожка недоступна");
+      button.setAttribute("aria-pressed", "false");
+      button.title = "Аудиодорожка недоступна";
+      volume.disabled = true;
+      showToast("Не удалось загрузить звук анимации.");
+    });
+    updateControls();
+    return () => {
+      disposed = true;
+      video.pause();
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      audio.remove();
+      controls.remove();
+    };
   }
 
   async function getJson(url) {
@@ -600,6 +694,8 @@
       localizeDocument(summary, "/season/");
     }
     const results = main.querySelector("#catalogResults");
+    let cleanupPreview = () => {};
+    cleanupView = () => cleanupPreview();
     const filterToggle = main.querySelector("#catalogFilterToggle");
     filterToggle?.addEventListener("click", () => {
       filterToggle.setAttribute("aria-expanded", String(main.querySelector("#catalogFilters").classList.toggle("is-open")));
@@ -612,6 +708,7 @@
     }
 
     function draw() {
+      cleanupPreview();
       const filterCount = [state.kind, state.level, state.city, state.min, state.max, state.weightMin, state.weightMax, state.usable, state.tradable].filter(Boolean).length;
       if (filterToggle) filterToggle.querySelector("span").textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
       const terms = searchText(state.query).split(/\s+/).filter(Boolean);
@@ -648,17 +745,28 @@
       results.querySelectorAll("[data-preview]").forEach((button) => button.addEventListener("click", () => {
         const media = button.closest(".catalog-card").querySelector(".card-media");
         const existing = media.querySelector("video");
-        results.querySelectorAll(".card-media video").forEach((video) => { video.pause(); video.remove(); });
-        results.querySelectorAll("[data-preview]").forEach((control) => { control.setAttribute("aria-pressed", "false"); control.innerHTML = icon("play"); });
+        cleanupPreview();
         if (existing) return;
         const row = pageRows.find((item) => item.href === button.dataset.preview);
         const video = document.createElement("video");
-        video.src = row.video; video.muted = true; video.loop = true; video.playsInline = true;
+        video.src = row.video;
+        video.loop = true;
+        video.playsInline = true;
         media.append(video);
+        const cleanupSound = row.sound ? attachAnimationSound(video, row.sound, media.parentElement) : () => {};
+        cleanupPreview = () => {
+          cleanupSound();
+          video.pause();
+          video.remove();
+          button.setAttribute("aria-pressed", "false");
+          button.innerHTML = icon("play");
+          cleanupPreview = () => {};
+        };
         button.setAttribute("aria-pressed", "true"); button.innerHTML = icon("x");
         video.play().catch(() => {
           if (!video.isConnected) return;
-          video.remove(); button.setAttribute("aria-pressed", "false"); button.innerHTML = icon("play"); showToast("Видеопревью недоступно.");
+          cleanupPreview();
+          showToast("Видеопревью недоступно.");
         });
       }));
       results.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
@@ -766,7 +874,11 @@
         link.rel = "noreferrer";
       }
     });
-    container.querySelectorAll("video").forEach((video) => { video.muted = true; });
+    container.querySelectorAll("video").forEach((video) => {
+      video.removeAttribute("muted");
+      video.muted = false;
+      video.playsInline = true;
+    });
     container.querySelectorAll(".gallery img[data-full]").forEach((image, index, images) => {
       image.tabIndex = 0;
       image.setAttribute("role", "button");
@@ -1023,6 +1135,17 @@
     }
     localizeDocument(main.querySelector(".prose"), path);
     enhanceDocument(section, documentData, params, vehicle);
+    const animation = section === "animations" ? normalizeRows(section, payload).find((row) => row.href === path) : null;
+    const soundCleanups = [];
+    main.querySelectorAll("video").forEach((video) => {
+      const sound = video.closest("[data-animation-sound]")?.dataset.animationSound || animation?.sound;
+      if (sound) soundCleanups.push(attachAnimationSound(video, sound, video.parentElement));
+    });
+    const cleanupDocument = cleanupView;
+    cleanupView = () => {
+      soundCleanups.forEach((cleanup) => cleanup());
+      cleanupDocument();
+    };
     main.querySelector('#similarCompare')?.addEventListener('click', (event) => {
       const models = event.currentTarget.dataset.models.split(',');
       comparison.clear();

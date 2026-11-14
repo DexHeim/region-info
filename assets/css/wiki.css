@@ -132,6 +132,15 @@ h3 { font-size: 16px; line-height: 1.4; }
 .media-placeholder--currency { color: #d5ba7b; font-size: 92px; }
 .media-unavailable { font-size: 12px; color: var(--muted); }
 .media-note { border: 1px solid var(--line); border-radius: 9px; padding: 18px; background: var(--panel); color: var(--muted); font-size: 13px; }
+.animation-audio { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 12px; }
+.animation-sound { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 4px; background: #151619; color: var(--text); font-size: 12px; white-space: nowrap; }
+.animation-sound[aria-pressed="true"] { color: #ff969d; border-color: #a13d46; }
+.animation-sound .icon { width: 18px; height: 18px; }
+.animation-audio .animation-volume { flex: 1; width: 100%; max-width: 160px; min-width: 60px; padding: 0; accent-color: var(--accent); }
+.card-visual .animation-audio { position: absolute; bottom: 10px; left: 10px; z-index: 1; width: auto; margin: 0; }
+.card-visual .animation-sound { width: 36px; min-height: 36px; padding: 8px; background: #111214e8; }
+.card-visual .animation-volume, .card-visual .animation-sound span { display: none; }
+.animation-video--audio::-webkit-media-controls-mute-button, .animation-video--audio::-webkit-media-controls-volume-slider, .animation-video--audio::-webkit-media-controls-volume-control-container { display: none; }
 .card-badge { position: absolute; z-index: 1; top: 12px; left: 12px; padding: 5px 9px; border: 1px solid #ffffff24; border-radius: 6px; background: #101113d9; font-size: 11px; font-weight: 600; }
 .card-body { display: flex; flex-direction: column; padding: 18px; flex: 1; }
 .card-category { font-size: 12px; color: var(--muted); margin: 0 0 8px; }

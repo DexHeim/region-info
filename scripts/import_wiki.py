@@ -265,6 +265,8 @@ def serialize(node):
         attrs["class"] = "gallery"
     if node.attrs.get("id"):
         attrs["data-anchor"] = node.attrs["id"]
+    if node.attrs.get("data-snd-stage"):
+        attrs["data-animation-sound"] = safe_url(node.attrs["data-snd-stage"])
     if node.tag == "a":
         url = node.attrs.get("href", "")
         attrs["href"] = url if url.startswith("#") else safe_url(url)
@@ -278,7 +280,7 @@ def serialize(node):
             if node.attrs.get("data-full"):
                 attrs["data-full"] = safe_url(node.attrs["data-full"])
         if node.tag == "video":
-            attrs.update({"controls": "", "muted": "", "loop": "", "preload": "none"})
+            attrs.update({"controls": "", "playsinline": "", "loop": "", "preload": "none"})
             if node.attrs.get("poster"):
                 attrs["poster"] = safe_url(node.attrs["poster"])
     for key in ("colspan", "rowspan"):
