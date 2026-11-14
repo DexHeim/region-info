@@ -13,18 +13,18 @@
   const comparison = new Map();
   const tuning = window.REGION_TUNING;
   const icons = {
-    home: "⌂", vehicles: "▰", items: "▧", clothes: "♧", estate: "⌂",
-    business: "▤", appearance: "◇", map: "⌖", cases: "▣", animations: "▷",
-    season: "✦", achievements: "☆", levels: "↗", factions: "♜", rentals: "▱",
-    articles: "≡", updates: "◷", tuning: "⚙"
+    home: "house", vehicles: "car", items: "package", clothes: "shirt", estate: "building-2",
+    business: "store", appearance: "scan-face", map: "map", cases: "box", animations: "play",
+    season: "calendar-days", achievements: "trophy", levels: "layers", factions: "shield", rentals: "square-parking",
+    articles: "book-open", updates: "history", tuning: "wrench"
   };
   const labels = {
     Car: "Автомобиль", Bike: "Мотоцикл", Bicycle: "Велосипед", Boat: "Лодка", Trailer: "Прицеп",
     Compact: "Компакт", Sedan: "Седаны", SUV: "Внедорожники", Coupe: "Купе", Muscle: "Маслкары",
     SportClassic: "Спорт-классика", Sport: "Спорт", Super: "Суперкары", OffRoad: "Внедорожники",
-    Industrial: "Промышленные", Utility: "Служебные", Van: "Фургоны", VAN: "Фургоны", Motorcycle: "Мотоциклы",
-    Commercial: "Коммерческий", Emergency: "Спецслужбы", Helicopter: "Вертолёты", Military: "Военный",
-    Offroad: "Внедорожники", Service: "Служебные", service: "Служебный",
+    Industrial: "Грузовые", Utility: "Хозяйственные", Van: "Фургоны", VAN: "Фургоны", Motorcycle: "Мотоциклы",
+    Commercial: "Коммерческие", Emergency: "Спецтранспорт", Helicopter: "Вертолёты", Military: "Военные",
+    Offroad: "Бездорожье", Service: "Служебные", service: "Служебный",
     Gas: "Бензин", Diesel: "Дизель", Electric: "Электро", Petrol: "Бензин", GasAvia: "Авиабензин", None: "Без топлива", Heli: "Вертолёт",
     FWD: "Передний", RWD: "Задний", AWD: "Полный",
     dealer: "Автосалон", donate: "Донат", faction: "Фракция", job: "Работа", rental: "Прокат",
@@ -47,6 +47,10 @@
     return String(value ?? "").replaceAll("\ue000", "RC").replace(/[&<>"']/g, (character) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     })[character]);
+  }
+
+  function icon(name) {
+    return `<svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#${escapeHtml(name)}"></use></svg>`;
   }
 
   function normalize(value) {
@@ -83,7 +87,7 @@
 
   function loadSection(section) {
     if (!sectionCache.has(section)) {
-      const request = getJson(`data/wiki/${section}.json`).catch((error) => {
+      const request = getJson(`data/wiki/${section}.json${section === "vehicles" ? "?v=20261114-4" : ""}`).catch((error) => {
         sectionCache.delete(section);
         throw error;
       });
@@ -149,7 +153,7 @@
     document.querySelector("#navigation").innerHTML = groups.map(([title, items]) => (
       `${title ? `<p class="nav-label">${title}</p>` : ""}${items.map((id) => {
         const text = id === "home" ? "Главная" : id === "tuning" ? "Расчёт тюнинга" : sectionTitle(id);
-        return `<a class="nav-link" href="#/${id === "home" ? "" : id}" ${id === section ? 'aria-current="page"' : ""}><span class="nav-icon" aria-hidden="true">${icons[id]}</span>${text}</a>`;
+        return `<a class="nav-link" href="#/${id === "home" ? "" : id}" ${id === section ? 'aria-current="page"' : ""}><span class="nav-icon" aria-hidden="true">${icon(icons[id])}</span>${text}</a>`;
       }).join("")}`
     )).join("");
   }
@@ -166,10 +170,10 @@
     ];
     main.innerHTML = `<section class="hero"><p class="eyebrow">Мир Region</p><h1>Всё для жизни<br>в регионе</h1><p>Игровые механики, транспорт, предметы и места. Цены улучшений и калькулятор тюнинга — рядом с автомобилями.</p><div class="hero-links"><a class="primary-button" href="#/articles">Изучить механики ↗</a><a class="quiet-button" href="#/vehicles">Выбрать автомобиль</a></div></section>
       <div class="section-heading"><h2>Справочник</h2><a href="#/search">Поиск по всем разделам ↗</a></div>
-      <div class="section-grid">${featured.map((id) => `<a class="section-card" href="#/${id}"><span class="section-icon" aria-hidden="true">${icons[id]}</span><span class="arrow" aria-hidden="true">↗</span><h3>${sectionTitle(id)}</h3><p>${counts[id]}</p></a>`).join("")}</div>
+      <div class="section-grid">${featured.map((id) => `<a class="section-card" href="#/${id}"><span class="section-icon" aria-hidden="true">${icon(icons[id])}</span><span class="arrow" aria-hidden="true">↗</span><h3>${sectionTitle(id)}</h3><p>${counts[id]}</p></a>`).join("")}</div>
       <div class="home-columns"><section><div class="section-heading"><h2>Обновления игры</h2><a href="#/updates">Все обновления ↗</a></div><a class="update-card" href="#/updates/2026-11-14-pets-heists-car-market/"><img src="${sourceOrigin}/img/updates/2026-11-14-pets-heists-car-market/cover-thumb.webp" alt="Обновление Region" loading="lazy"><div><time datetime="2026-11-14">14 ноября 2026</time><h3>Питомцы, кражи со взломом и авторынок</h3><p>Уход за животными, налёты на жильё и продажа машин.</p></div></a></section>
       <section><div class="section-heading"><h2>С чего начать</h2></div><div class="quick-links">${quick.map(([path, title]) => `<a href="${localHref(path)}">${title}<span>↗</span></a>`).join("")}</div></section></div>
-      <div class="section-heading"><h2>Больше в игре</h2></div><div class="section-grid">${["cases", "animations", "season", "achievements", "levels", "factions", "rentals", "tuning"].map((id) => `<a class="section-card" href="#/${id}"><span class="section-icon" aria-hidden="true">${icons[id]}</span><span class="arrow" aria-hidden="true">↗</span><h3>${id === "tuning" ? "Расчёт тюнинга" : sectionTitle(id)}</h3></a>`).join("")}</div>`;
+      <div class="section-heading"><h2>Больше в игре</h2></div><div class="section-grid">${["cases", "animations", "season", "achievements", "levels", "factions", "rentals", "tuning"].map((id) => `<a class="section-card" href="#/${id}"><span class="section-icon" aria-hidden="true">${icon(icons[id])}</span><span class="arrow" aria-hidden="true">↗</span><h3>${id === "tuning" ? "Расчёт тюнинга" : sectionTitle(id)}</h3></a>`).join("")}</div>`;
   }
 
   function normalizeRows(section, payload) {
@@ -247,9 +251,9 @@
 
   function cardHtml(row, section, settings) {
     const currencyReward = row.level === "money" || row.level === "rc";
-    const symbol = row.level === "money" ? "₽" : row.level === "rc" ? "RC" : section === "levels" ? String(row.id) : icons[section] || "◇";
+    const symbol = row.level === "money" ? "₽" : row.level === "rc" ? "RC" : section === "levels" ? String(row.id) : "";
     const iconUrl = row.blip ? new URL(row.blip, sourceOrigin).href : "";
-    let media = `<span class="media-placeholder ${currencyReward ? "media-placeholder--currency" : ""}" aria-hidden="true">${escapeHtml(symbol)}</span>`;
+    let media = `<span class="media-placeholder ${currencyReward ? "media-placeholder--currency" : ""}" aria-hidden="true">${symbol ? escapeHtml(symbol) : icon(icons[section] || "package")}</span>`;
     if (row.image) {
       const presentation = imageOverrides[row.image];
       const cover = !presentation && row.fit !== "contain" && ["estate", "business", "factions", "updates"].includes(section);
@@ -269,7 +273,7 @@
       return `<div>${statLabels[index] ? `<dt>${escapeHtml(statLabels[index])}</dt>` : ""}<dd>${escapeHtml(value)}</dd></div>`;
     }).join("");
     const foot = row.foot && !["season", "levels"].includes(section) ? `<p class="card-foot">${escapeHtml(row.foot)}</p>` : "";
-    return `<article class="catalog-card"><a class="card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-icon="${escapeHtml(iconUrl)}" data-symbol="${escapeHtml(symbol)}">${section === "season" && row.badge ? `<span class="card-badge">${escapeHtml(row.badge)}</span>` : ""}${media}</a><div class="card-body"><p class="card-category">${escapeHtml(category)}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${row.price != null ? `<p class="card-price">${row.priceLabel ? `<small>${escapeHtml(row.priceLabel)}</small>` : ""}${money(row.price, row.currency)}</p>` : ""}${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}${stats ? `<dl class="card-stats">${stats}</dl>` : ""}${foot}</div>${row.vehicle ? `<label class="compare-select"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}>Добавить к сравнению</label>` : ""}</article>`;
+    return `<article class="catalog-card"><a class="card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-icon="${escapeHtml(iconUrl)}" data-symbol="${escapeHtml(symbol)}" data-section="${escapeHtml(section)}">${section === "season" && row.badge ? `<span class="card-badge">${escapeHtml(row.badge)}</span>` : ""}${media}</a><div class="card-body"><p class="card-category">${escapeHtml(category)}</p><h2><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></h2>${row.price != null ? `<p class="card-price">${row.priceLabel ? `<small>${escapeHtml(row.priceLabel)}</small>` : ""}${money(row.price, row.currency)}</p>` : ""}${description ? `<p class="card-description">${escapeHtml(description)}</p>` : ""}${stats ? `<dl class="card-stats">${stats}</dl>` : ""}${foot}</div>${row.vehicle ? `<label class="compare-select"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}>Добавить к сравнению</label>` : ""}</article>`;
   }
 
   function paginationHtml(page, pages) {
@@ -282,7 +286,155 @@
     return `<div class="catalog-table-wrap"><table class="catalog-table"><thead><tr><th scope="col">Название</th>${(settings.columns || []).map((title) => `<th scope="col">${escapeHtml(title)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr><th scope="row"><a href="${localHref(row.href)}">${escapeHtml(row.title)}</a></th>${(settings.columns || []).map((title, index) => `<td>${escapeHtml(row.stats?.[index] ?? "—")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
+  function vehicleCardHtml(row, presentation) {
+    const vehicle = row.vehicle;
+    const rarity = ["", "Обычный", "Редкий", "Дорогой", "Великолепный", "Люкс", "VIP"][vehicle.rarity];
+    const stats = [
+      ["gauge", "Максимальная скорость", `${numbers.format(vehicle.max_speed_kmh)} км/ч`],
+      ["timer", "Разгон до 100 км/ч", vehicle.t100_s == null ? "—" : `${numbers.format(vehicle.t100_s)} с`],
+      ["fuel", "Топливо", label(vehicle.fuel_type)],
+      ["users", "Количество мест", String(vehicle.seats)]
+    ];
+    return `<article class="vehicle-card rarity-${vehicle.rarity}">
+      <a class="vehicle-media card-media" href="${localHref(row.href)}" aria-label="${escapeHtml(row.title)}" data-section="vehicles">
+        ${presentation?.logo ? `<img class="brand-watermark" src="${escapeHtml(imageUrl(presentation.logo))}" alt="" loading="lazy">` : ""}
+        <img class="vehicle-image" src="${escapeHtml(imageUrl(row.image))}" alt="" loading="lazy" decoding="async">
+        <div class="vehicle-badges"><span>${escapeHtml(row.kindLabel)}</span>${vehicle.rarity > 1 ? `<span class="rarity-badge">${rarity}</span>` : ""}</div>
+      </a>
+      <label class="vehicle-compare" title="Добавить к сравнению"><input type="checkbox" data-compare="${escapeHtml(row.id)}" ${comparison.has(row.id) ? "checked" : ""}><span>${icon("scale")}<span class="sr-only">Сравнить ${escapeHtml(row.title)}</span></span></label>
+      <div class="vehicle-body"><div class="vehicle-heading"><div><p class="vehicle-brand">${escapeHtml(vehicle.brand)}${presentation?.flag ? `<img class="country-flag" src="${escapeHtml(presentation.flag)}" alt="${escapeHtml(presentation.country)}" width="16" height="12" loading="lazy">` : ""}</p><h2><a href="${localHref(row.href)}">${escapeHtml(vehicle.name)}</a></h2></div><div class="vehicle-price">${row.price != null ? `${vehicle.price_dealer == null ? "<small>Оценка</small>" : ""}<strong>${money(row.price)}</strong>` : '<span>Служебный</span>'}</div></div>
+      <dl class="vehicle-stats">${stats.map(([name, title, value]) => `<div title="${title}"><dt class="sr-only">${title}</dt>${icon(name)}<dd>${escapeHtml(value)}</dd></div>`).join("")}</dl></div>
+    </article>`;
+  }
+
+  function renderVehicles(payload, params) {
+    const rows = normalizeRows("vehicles", payload);
+    const brands = payload.brands || {};
+    rows.forEach((row) => { row.country = brands[row.vehicle.brand_slug]?.country || ""; });
+    const sorts = catalogSettings("vehicles", payload).sorts;
+    const incoming = new URLSearchParams(params);
+    for (const [alias, field] of Object.entries({ class: "kind", access: "level" })) {
+      if (incoming.has(alias) && !incoming.has(field)) incoming.set(field, incoming.get(alias));
+    }
+    if (incoming.has("brand") && !incoming.has("city")) {
+      const brand = rows.find((row) => row.vehicle.brand_slug === incoming.get("brand"))?.vehicle.brand;
+      if (brand) incoming.set("city", brand);
+    }
+    const sortAliases = { max_speed_kmh: "speed", t100_s: "acceleration", price_dealer: "price", trunk_kg: "trunk" };
+    const requestedSort = incoming.get("sort") || "name:asc";
+    const sort = requestedSort.includes(":") ? requestedSort : `${sortAliases[requestedSort] || requestedSort}:${incoming.get("dir") || "asc"}`;
+    const ranges = [
+      { title: "Цена, ₽", low: "min", high: "max", key: "price", step: 1000 },
+      { title: "Макс. скорость, км/ч", low: "speedMin", high: "speedMax", key: "speed", step: 1 },
+      { title: "Разгон 0–100 км/ч, с", low: "accelerationMin", high: "accelerationMax", key: "acceleration", step: .1 },
+      { title: "Багажник, кг", low: "trunkMin", high: "trunkMax", key: "trunk", step: 1 }
+    ];
+    const state = {
+      query: incoming.get("q") || "", kind: incoming.get("kind") || "", level: incoming.get("level") || "",
+      city: incoming.get("city") || "", country: incoming.get("country") || "",
+      sort: sorts.some((item) => `${item.key}:${item.dir}` === sort) ? sort : "name:asc",
+      view: ["list", "table"].includes(incoming.get("view")) ? "list" : "cards",
+      page: Math.max(1, Math.floor(Number(incoming.get("page")) || 1)),
+      size: [24, 48, 96].includes(Number(incoming.get("size"))) ? Number(incoming.get("size")) : 24
+    };
+    for (const range of ranges) {
+      state[range.low] = incoming.get(range.low) || "";
+      state[range.high] = incoming.get(range.high) || "";
+    }
+    const classes = [...new Set(rows.map((row) => row.kind))];
+    const access = [["", "Все", "layout-grid"], ["dealer", "Салон", "store"], ["donate", "Кейсы", "gift"], ["service", "Служебные", "siren"]];
+    const rangeFields = ranges.flatMap((range) => [range.low, range.high]);
+    main.innerHTML = pageHeading("Транспорт", "Характеристики, цены и расчёт улучшений для каждой модели.", "vehicles") +
+      `<div class="vehicle-page-links"><a href="#/tuning">${icon("wrench")}Калькулятор тюнинга</a><a href="cars.html">Дополнительные замеры ${icon("arrow-up-right")}</a></div>
+      <div class="vehicle-catalog"><button class="quiet-button vehicle-filter-toggle" id="vehicleFilterToggle" aria-expanded="false" aria-controls="vehicleFilters">${icon("sliders-horizontal")}<span>Фильтры</span></button>
+      <aside class="vehicle-filters" id="vehicleFilters" aria-label="Фильтры транспорта"><div class="filter-heading"><h2>Фильтры</h2><button id="resetVehicleFilters" type="button">Сбросить</button></div>
+        <section class="filter-section"><h3>Как получить</h3><div class="access-grid">${access.map(([value, title, name]) => `<button type="button" data-access="${value}" aria-pressed="${state.level === value}">${icon(name)}<span class="access-count">${value ? rows.filter((row) => row.level === value).length : rows.length}</span><span>${title}</span></button>`).join("")}</div></section>
+        <section class="filter-section"><h3>Марка и страна</h3>${filterSelect(rows, "city", "Марка", state.city)}${filterSelect(rows, "country", "Страна", state.country)}</section>
+        <section class="filter-section"><h3>Класс</h3><div class="class-chips">${classes.map((value) => `<button type="button" data-class="${escapeHtml(value)}" aria-pressed="${state.kind.split(",").includes(value)}">${escapeHtml(label(value))}<span>${rows.filter((row) => row.kind === value).length}</span></button>`).join("")}</div></section>
+        ${ranges.map((range) => `<section class="filter-section"><h3>${range.title}</h3><div class="range-inputs"><label><span>От</span><input type="number" data-range="${range.low}" min="0" step="${range.step}" aria-label="${range.title} от" placeholder="0" value="${escapeHtml(state[range.low])}"></label><label><span>До</span><input type="number" data-range="${range.high}" min="0" step="${range.step}" aria-label="${range.title} до" placeholder="Любая" value="${escapeHtml(state[range.high])}"></label></div></section>`).join("")}
+      </aside><section class="vehicle-results" aria-label="Каталог транспорта"><div class="vehicle-toolbar"><label class="vehicle-search">${icon("search")}<input id="vehicleQuery" type="search" aria-label="Поиск транспорта" placeholder="Марка, модель или код" value="${escapeHtml(state.query)}"></label><select id="vehicleSort" aria-label="Сортировка транспорта">${sorts.map((item) => `<option value="${item.key}:${item.dir}" ${state.sort === `${item.key}:${item.dir}` ? "selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select><div class="view-switch" role="group" aria-label="Вид каталога"><button type="button" data-view="cards" aria-label="Карточки" aria-pressed="${state.view === "cards"}">${icon("layout-grid")}</button><button type="button" data-view="list" aria-label="Список" aria-pressed="${state.view === "list"}">${icon("list")}</button></div></div><div id="vehicleResults" aria-live="polite"></div></section></div>${sourceNote("/vehicles/")}`;
+    const results = main.querySelector("#vehicleResults");
+    const filterToggle = main.querySelector("#vehicleFilterToggle");
+    const filterPanel = main.querySelector("#vehicleFilters");
+
+    function draw() {
+      const terms = normalize(state.query).split(/\s+/).filter(Boolean);
+      const filtered = rows.filter((row) => {
+        const haystack = normalize([row.title, row.id, row.country, row.kindLabel].join(" "));
+        return terms.every((term) => haystack.includes(term))
+          && (!state.kind || state.kind.split(",").includes(row.kind))
+          && (!state.level || state.level.split(",").includes(row.level))
+          && (!state.city || state.city.split(",").includes(row.city))
+          && (!state.country || state.country === row.country)
+          && ranges.every((range) => {
+            const value = row.sortBy[range.key];
+            return (state[range.low] === "" || (value != null && value >= Number(state[range.low])))
+              && (state[range.high] === "" || (value != null && value <= Number(state[range.high])));
+          });
+      });
+      const [key, direction] = state.sort.split(":");
+      filtered.sort((first, second) => {
+        if (key === "name") return collator.compare(first.title, second.title) * (direction === "desc" ? -1 : 1);
+        const a = first.sortBy[key];
+        const b = second.sortBy[key];
+        if (a == null && b == null) return collator.compare(first.title, second.title);
+        if (a == null) return 1;
+        if (b == null) return -1;
+        return (a - b) * (direction === "desc" ? -1 : 1) || collator.compare(first.title, second.title);
+      });
+      const pages = Math.max(1, Math.ceil(filtered.length / state.size));
+      state.page = Math.min(state.page, pages);
+      const pageRows = filtered.slice((state.page - 1) * state.size, state.page * state.size);
+      results.innerHTML = `<div class="result-line"><span><strong>${numbers.format(filtered.length)}</strong> из ${rows.length} моделей</span><label>На странице<select id="vehiclePageSize" aria-label="Количество на странице">${[24, 48, 96].map((size) => `<option ${state.size === size ? "selected" : ""}>${size}</option>`).join("")}</select></label></div>${pageRows.length ? `<div class="vehicle-grid ${state.view === "list" ? "vehicle-grid--list" : ""}">${pageRows.map((row) => vehicleCardHtml(row, brands[row.vehicle.brand_slug])).join("")}</div>` : '<div class="empty">По выбранным условиям ничего не найдено.</div>'}${paginationHtml(state.page, pages)}`;
+      results.querySelectorAll("[data-compare]").forEach((input) => input.addEventListener("change", () => {
+        toggleComparison(rows.find((row) => row.id === input.dataset.compare).vehicle);
+        input.checked = comparison.has(input.dataset.compare);
+      }));
+      results.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
+        state.page = Number(button.dataset.page);
+        draw();
+        main.querySelector(".vehicle-toolbar").scrollIntoView({ block: "start" });
+      }));
+      results.querySelector("#vehiclePageSize").addEventListener("change", (event) => { state.size = Number(event.target.value); state.page = 1; draw(); });
+      main.querySelectorAll("[data-access]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.access === state.level)));
+      main.querySelectorAll("[data-class]").forEach((button) => button.setAttribute("aria-pressed", String(state.kind.split(",").includes(button.dataset.class))));
+      main.querySelectorAll("[data-view]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.view === state.view)));
+      const filterCount = [state.kind, state.level, state.city, state.country, ...rangeFields.map((field) => state[field])].filter(Boolean).length;
+      filterToggle.querySelector("span").textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
+      const query = new URLSearchParams();
+      for (const field of ["kind", "level", "city", "country", ...rangeFields]) {
+        if (state[field]) query.set(field, state[field]);
+      }
+      if (state.query) query.set("q", state.query);
+      if (state.sort !== "name:asc") query.set("sort", state.sort);
+      if (state.view !== "cards") query.set("view", state.view);
+      if (state.page > 1) query.set("page", state.page);
+      if (state.size !== 24) query.set("size", state.size);
+      history.replaceState(null, "", `#/vehicles${query.size ? `?${query}` : ""}`);
+    }
+
+    filterToggle.addEventListener("click", () => {
+      const open = filterPanel.classList.toggle("is-open");
+      filterToggle.setAttribute("aria-expanded", String(open));
+    });
+    main.querySelector("#vehicleQuery").addEventListener("input", (event) => { state.query = event.target.value; state.page = 1; draw(); });
+    main.querySelector("#vehicleSort").addEventListener("change", (event) => { state.sort = event.target.value; state.page = 1; draw(); });
+    main.querySelectorAll("[data-filter]").forEach((select) => select.addEventListener("change", () => { state[select.dataset.filter] = select.value; state.page = 1; draw(); }));
+    main.querySelectorAll("[data-range]").forEach((input) => input.addEventListener("input", () => { state[input.dataset.range] = input.value; state.page = 1; draw(); }));
+    main.querySelectorAll("[data-access]").forEach((button) => button.addEventListener("click", () => { state.level = button.dataset.access; state.page = 1; draw(); }));
+    main.querySelectorAll("[data-class]").forEach((button) => button.addEventListener("click", () => {
+      const selected = new Set(state.kind.split(",").filter(Boolean));
+      if (selected.has(button.dataset.class)) selected.delete(button.dataset.class);
+      else selected.add(button.dataset.class);
+      state.kind = [...selected].join(","); state.page = 1; draw();
+    }));
+    main.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => { state.view = button.dataset.view; draw(); }));
+    main.querySelector("#resetVehicleFilters").addEventListener("click", () => { history.replaceState(null, "", "#/vehicles"); route(); });
+    draw();
+  }
+
   function renderCatalog(section, payload, params) {
+    if (section === "vehicles") return renderVehicles(payload, params);
     const rows = normalizeRows(section, payload);
     const settings = catalogSettings(section, payload);
     const sorts = settings.sorts;
@@ -565,7 +717,7 @@
     let zoom = initialPlace ? 5 : 3;
     let center = initialPlace ? { x: initialPlace.x, y: initialPlace.y } : { x: params.has("x") ? Number(params.get("x")) : -600, y: params.has("y") ? Number(params.get("y")) : 6000 };
     let query = "";
-    main.innerHTML = pageHeading("Карта региона", "Работы, магазины, недвижимость, прокат и игровые зоны. Перетаскивайте карту и меняйте масштаб.") + `<div class="map-layout"><div class="map-filters"><input type="search" id="mapQuery" aria-label="Найти место на карте" placeholder="Найти место"><button class="quiet-button" id="mapAll" type="button">Снять все</button><h3>Места</h3>${data.categories.map((category) => `<label><input type="checkbox" data-category="${escapeHtml(category.id)}" checked>${escapeHtml(category.label)}</label>`).join("")}<h3>Зоны</h3>${data.zoneKinds.map((kind) => `<label><input type="checkbox" data-zone="${escapeHtml(kind.id)}">${escapeHtml(kind.label)}</label>`).join("")}</div><div class="map-surface" id="mapSurface" tabindex="0" aria-label="Карта. Стрелки перемещают карту, плюс и минус меняют масштаб."><div class="map-plane" id="mapPlane"></div><div class="map-controls"><button class="icon-button" id="zoomIn" aria-label="Приблизить">+</button><button class="icon-button" id="zoomOut" aria-label="Отдалить">−</button><button class="icon-button" id="mapCity" aria-label="К Петербургу">⌂</button></div><div class="map-popup" id="mapPopup" hidden></div></div></div><div id="mapLocations" class="map-location-list"></div>${sourceNote("/map/")}`;
+    main.innerHTML = pageHeading("Карта региона", "Работы, магазины, недвижимость, прокат и игровые зоны. Перетаскивайте карту и меняйте масштаб.") + `<div class="map-layout"><div class="map-filters"><input type="search" id="mapQuery" aria-label="Найти место на карте" placeholder="Найти место"><button class="quiet-button" id="mapAll" type="button">Снять все</button><h3>Места</h3>${data.categories.map((category) => `<label><input type="checkbox" data-category="${escapeHtml(category.id)}" checked>${escapeHtml(category.label)}</label>`).join("")}<h3>Зоны</h3>${data.zoneKinds.map((kind) => `<label><input type="checkbox" data-zone="${escapeHtml(kind.id)}">${escapeHtml(kind.label)}</label>`).join("")}</div><div class="map-surface" id="mapSurface" tabindex="0" aria-label="Карта. Стрелки перемещают карту, плюс и минус меняют масштаб."><div class="map-plane" id="mapPlane"></div><div class="map-controls"><button class="icon-button" id="zoomIn" aria-label="Приблизить">${icon("plus")}</button><button class="icon-button" id="zoomOut" aria-label="Отдалить">${icon("minus")}</button><button class="icon-button" id="mapCity" aria-label="К Петербургу">${icon("house")}</button></div><div class="map-popup" id="mapPopup" hidden></div></div></div><div id="mapLocations" class="map-location-list"></div>${sourceNote("/map/")}`;
     const surface = main.querySelector("#mapSurface");
     const plane = main.querySelector("#mapPlane");
     const popup = main.querySelector("#mapPopup");
@@ -577,7 +729,7 @@
 
     function showPlace(place) {
       const actions = [...(place.actions || []), ...(place.articles || [])];
-      popup.innerHTML = `<button class="icon-button" aria-label="Закрыть место">×</button><h3>${escapeHtml(place.name)}</h3><p>${escapeHtml(place.kindLabel || place.note || "")}</p>${place.description ? `<p>${escapeHtml(place.description)}</p>` : ""}${(place.facts || []).map((value) => `<p>${escapeHtml(Array.isArray(value) ? value.join(" · ") : typeof value === "object" ? `${value.label} · ${value.value}` : value)}</p>`).join("")}<p>Координаты ${numbers.format(place.x)}, ${numbers.format(place.y)}</p>${actions.map((action) => `<a href="${localHref(action.href || action.url || "/map/")}">${escapeHtml(action.label || action.title || "Подробнее")} ↗</a>`).join(" ")}`;
+      popup.innerHTML = `<button class="icon-button" aria-label="Закрыть место">${icon("x")}</button><h3>${escapeHtml(place.name)}</h3><p>${escapeHtml(place.kindLabel || place.note || "")}</p>${place.description ? `<p>${escapeHtml(place.description)}</p>` : ""}${(place.facts || []).map((value) => `<p>${escapeHtml(Array.isArray(value) ? value.join(" · ") : typeof value === "object" ? `${value.label} · ${value.value}` : value)}</p>`).join("")}<p>Координаты ${numbers.format(place.x)}, ${numbers.format(place.y)}</p>${actions.map((action) => `<a href="${localHref(action.href || action.url || "/map/")}">${escapeHtml(action.label || action.title || "Подробнее")} ↗</a>`).join(" ")}`;
       popup.hidden = false;
       popup.querySelector("button").addEventListener("click", () => { popup.hidden = true; });
     }
@@ -752,6 +904,7 @@
     }
     if (event.target.tagName !== "IMG") return;
     const image = event.target;
+    if (image.matches(".brand-watermark, .country-flag")) { image.hidden = true; return; }
     if (!image.dataset.fullTried && image.src.endsWith("_small.avif")) {
       image.dataset.fullTried = "true";
       image.src = image.src.replace("_small.avif", ".avif");
@@ -768,7 +921,7 @@
         const placeholder = document.createElement("span");
         placeholder.className = "media-placeholder";
         placeholder.setAttribute("aria-hidden", "true");
-        placeholder.textContent = media.dataset.symbol;
+        placeholder.innerHTML = media.dataset.symbol ? escapeHtml(media.dataset.symbol) : icon(icons[media.dataset.section] || "car");
         image.replaceWith(placeholder);
       } else {
         image.alt = image.alt || "Изображение недоступно";

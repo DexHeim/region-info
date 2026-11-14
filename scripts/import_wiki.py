@@ -339,6 +339,27 @@ def synchronize_legacy_cars(vehicles):
     os.replace(temporary, path)
 
 
+def vehicle_brands(source, vehicles):
+    models = {vehicle["model"]: vehicle["brand_slug"] for vehicle in vehicles}
+    brands = {}
+    for card in Document(source).root.find_all():
+        if "vc-card" not in card.attrs.get("class", "").split():
+            continue
+        link = card.find("a")
+        model = link.attrs.get("href", "").strip("/").split("/")[-1] if link else ""
+        if model not in models:
+            continue
+        images = card.find_all("img")
+        logo = next((image.attrs["src"] for image in images if "vc-brandmark" in image.attrs.get("class", "").split()), "")
+        flag = next((image for image in images if "flag" in image.attrs.get("class", "").split()), None)
+        brands[models[model]] = {
+            "logo": urllib.parse.urljoin(ORIGIN, logo) if logo else "",
+            "flag": urllib.parse.urljoin(ORIGIN, flag.attrs["src"]) if flag else "",
+            "country": flag.attrs.get("alt", "") if flag else "",
+        }
+    return dict(sorted(brands.items()))
+
+
 def main():
     global USE_CACHE
     parser = argparse.ArgumentParser()
@@ -422,7 +443,10 @@ def main():
                     "section": key, "image": document["image"], "chunk": chunk_name,
                 })
             dump(output / "details" / chunk_name, chunk)
-        dump(output / f"{key}.json", {"title": section["title"], "data": section["data"], "description": section["description"]})
+        payload = {"title": section["title"], "data": section["data"], "description": section["description"]}
+        if key == "vehicles":
+            payload["brands"] = vehicle_brands(sources["/vehicles/"], section["data"][0]["data"]["vehicles"])
+        dump(output / f"{key}.json", payload)
     index = {
         "source": ORIGIN,
         "importedAt": datetime.now(timezone.utc).isoformat(),
