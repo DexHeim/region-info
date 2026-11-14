@@ -341,6 +341,50 @@ def dump(path, data):
     os.replace(temporary, path)
 
 
+def search_data(documents, places):
+    texts = {}
+    variants = {}
+    facts = {}
+    for document in documents:
+        root = Document(document["html"]).root
+        if document["path"].split("/")[1] in ("articles", "updates"):
+            texts[document["path"]] = clean(text_only(root))
+            continue
+        hero = next((node for node in root.find_all("section") if set(node.attrs.get("class", "").split()) & {"imported-hero", "detail-heading"}), None)
+        if not hero:
+            continue
+        metrics = hero.find("div", **{"class": "detail-metrics"})
+        if metrics:
+            values = []
+            for cell in metrics.children:
+                if not isinstance(cell, Node):
+                    continue
+                value = cell.find("b")
+                label = next((child for child in cell.children if isinstance(child, Node) and child.tag == "span"), None)
+                if value and label:
+                    values.append([clean(text_only(label)), clean(text_only(value))])
+            facts[document["path"]] = values
+        names = list(dict.fromkeys(image.attrs.get("alt", "") for gallery in hero.find_all("ul", **{"class": "gallery"}) for image in gallery.find_all("img")))
+        if len(names) > 1:
+            variants[document["path"]] = names
+        known = set(re.findall(r"\w+", (document["title"] + " " + document["summary"]).lower()))
+        words = re.findall(r"\w+", (text_only(hero) + " " + " ".join(names)).lower())
+        texts[document["path"]] = " ".join(dict.fromkeys(word for word in words if word not in known))
+    return {
+        "texts": texts,
+        "variants": variants,
+        "facts": facts,
+        "places": [{
+            "path": f'/map/?p={urllib.parse.quote(place["id"])}',
+            "title": place["name"], "section": "map",
+            "summary": " · ".join(filter(None, [place.get("description"), place.get("note")])),
+            "image": place.get("image") or "", "icon": urllib.parse.urljoin(ORIGIN, place.get("icon") or ""),
+            "kindLabel": place.get("kindLabel") or "", "facts": place.get("facts") or [],
+            "keywords": " ".join(tag["label"] for tag in place.get("tags", [])),
+        } for place in places],
+    }
+
+
 def synchronize_legacy_cars(vehicles):
     path = ROOT / "data" / "cars.json"
     cars = json.loads(path.read_text(encoding="utf-8"))
@@ -507,6 +551,10 @@ def main():
         "pages": page_index,
         "failed": failed,
     }
+    dump(output / "search.json", search_data(
+        [document for section in sections.values() for document in section["documents"].values()],
+        catalog_data["map"][0]["data"]["places"],
+    ))
     dump(output / "index.json", index)
     synchronize_legacy_cars(catalog_data["vehicles"][0]["data"]["vehicles"])
     print(json.dumps({"pages": total, "failed": failed}, ensure_ascii=False), flush=True)

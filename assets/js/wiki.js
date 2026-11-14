@@ -42,6 +42,7 @@
   let routeVersion = 0;
   let cleanupView = () => {};
   let toastTimer;
+  let searchIndexPromise;
 
   function escapeHtml(value) {
     return String(value ?? "").replaceAll("\ue000", "RC").replace(/[&<>"']/g, (character) => ({
@@ -55,6 +56,69 @@
 
   function normalize(value) {
     return String(value ?? "").toLocaleLowerCase("ru").replaceAll("ё", "е");
+  }
+
+  function searchText(value) {
+    const lookalikes = { а: "a", в: "b", е: "e", к: "k", м: "m", н: "h", о: "o", р: "p", с: "c", т: "t", у: "y", х: "x" };
+    return normalize(String(value ?? "").normalize("NFKC"))
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .replace(/(^|\s)([a-zа-я])\s+(?=\d)/gu, "$1$2")
+      .trim().split(/\s+/).map((word) => /^[a-zавекмнорстух]{1,3}\d+[a-zавекмнорстух]{0,2}$/.test(word)
+        ? word.replace(/[авекмнорстух]/g, (letter) => lookalikes[letter]) : word).join(" ");
+  }
+
+  function searchHref(query = "", section = "", page = 1) {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (section) params.set("section", section);
+    if (page > 1) params.set("page", page);
+    return `#/search${params.size ? `?${params}` : ""}`;
+  }
+
+  function loadSearchIndex() {
+    if (!searchIndexPromise) {
+      searchIndexPromise = getJson("data/wiki/search.json?v=20261114-10").then((extra) =>
+        [...manifest.pages, ...extra.places, { path: "/tuning", title: "Калькулятор тюнинга", summary: "Приблизительный расчёт стоимости полного тюнинга, двигателя, трансмиссии, тормозов, подвески, турбо и внешних улучшений.", section: "vehicles", searchIcon: "calculator" }].map((page) => {
+          page = { ...page, previewFacts: extra.facts?.[page.path] || [] };
+          const title = searchText(page.title);
+          const summary = searchText(page.summary);
+          const code = page.section === "vehicles" ? searchText(page.path.split("/")[2]) : "";
+          const content = extra.texts[page.path] || page.keywords || "";
+          const variants = (extra.variants?.[page.path] || []).map((name) => ({ name, text: searchText(name) }));
+          return { page, title, summary, code, content, variants, compactTitle: title.replaceAll(" ", ""), text: `${title} ${summary} ${code} ${searchText(sectionTitle(page.section))} ${searchText(content)}` };
+        })
+      ).catch((error) => { searchIndexPromise = null; throw error; });
+    }
+    return searchIndexPromise;
+  }
+
+  function searchMatches(query, index) {
+    const needle = searchText(query);
+    const terms = needle.split(/\s+/).filter(Boolean);
+    const compact = needle.replaceAll(" ", "");
+    const matchers = terms.map((term) => new RegExp(/^\d+$/.test(term) ? `(?:^|\\s)${term}(?=\\s|$)` : term));
+    const containsTerms = (text) => matchers.every((matcher) => matcher.test(text));
+    const matchCompact = terms.length === 1 && /\p{L}/u.test(compact);
+    return index.filter((entry) => containsTerms(entry.text) || (matchCompact && entry.compactTitle.includes(compact))).map((entry) => {
+      let score = 0;
+      if (needle && entry.title === needle) score = 120;
+      else if (compact && (entry.code === compact || entry.compactTitle === compact)) score = 110;
+      else if (needle && entry.title.startsWith(needle)) score = 100;
+      else if (needle && entry.title.includes(needle)) score = 90;
+      else if (compact && entry.compactTitle.includes(compact)) score = 80;
+      else if (terms.length && containsTerms(entry.title)) score = 70;
+      else if (terms.length && containsTerms(entry.summary)) score = 30;
+      let page = entry.page;
+      if (score < 30 && terms.length && ["articles", "updates"].includes(page.section)) {
+        const start = Math.max(0, normalize(entry.content).indexOf(terms[0]) - 60);
+        const offset = start ? entry.content.indexOf(" ", start) + 1 : 0;
+        const snippet = entry.content.slice(offset, offset + 220).trim();
+        page = { ...page, snippet: `${offset ? "…" : ""}${snippet}${offset + 220 < entry.content.length ? "…" : ""}` };
+      }
+      const variant = terms.length && entry.variants.find((variant) => containsTerms(variant.text));
+      if (variant && variant.text !== entry.title) page = { ...page, snippet: `В расцветках · ${variant.name}` };
+      return { page, score };
+    }).sort((a, b) => b.score - a.score || collator.compare(a.page.title, b.page.title)).map((entry) => entry.page);
   }
 
   function label(value) {
@@ -404,9 +468,9 @@
     const filterPanel = main.querySelector("#vehicleFilters");
 
     function draw() {
-      const terms = normalize(state.query).split(/\s+/).filter(Boolean);
+      const terms = searchText(state.query).split(/\s+/).filter(Boolean);
       const filtered = rows.filter((row) => {
-        const haystack = normalize([row.title, row.id, row.country, row.kindLabel].join(" "));
+        const haystack = searchText([row.title, row.id, row.country, row.kindLabel].join(" "));
         return terms.every((term) => haystack.includes(term))
           && (!state.kind || state.kind.split(",").includes(row.kind))
           && (!state.level || state.level.split(",").includes(row.level))
@@ -550,9 +614,9 @@
     function draw() {
       const filterCount = [state.kind, state.level, state.city, state.min, state.max, state.weightMin, state.weightMax, state.usable, state.tradable].filter(Boolean).length;
       if (filterToggle) filterToggle.querySelector("span").textContent = filterCount ? `Фильтры (${filterCount})` : "Фильтры";
-      const terms = normalize(state.query).split(/\s+/).filter(Boolean);
+      const terms = searchText(state.query).split(/\s+/).filter(Boolean);
       const filtered = rows.filter((row) => {
-        const haystack = normalize([row.title, row.sub, row.kindLabel, row.levelLabel, row.city, row.id, ...(row.stats || [])].join(" "));
+        const haystack = searchText([row.title, row.sub, row.kindLabel, row.levelLabel, row.city, row.id, ...(row.stats || [])].join(" "));
         return terms.every((term) => haystack.includes(term))
           && matchesFacet(row.kind, state.kind)
           && matchesFacet(row.level, state.level)
@@ -1015,25 +1079,143 @@
     document.querySelector("#compareDialog").showModal();
   }
 
-  function renderSearch(params) {
-    const query = params.get("q") || "";
-    const terms = normalize(query).split(/\s+/).filter(Boolean);
-    const selectedSection = params.get("section") || "";
-    const results = manifest.pages.filter((page) => (!selectedSection || page.section === selectedSection) && terms.every((term) => normalize(`${page.title} ${page.summary}`).includes(term)));
-    results.sort((a, b) => Number(normalize(b.title).includes(normalize(query))) - Number(normalize(a.title).includes(normalize(query))) || collator.compare(a.title, b.title));
-    const page = Math.min(Math.max(1, Number(params.get("page")) || 1), Math.max(1, Math.ceil(results.length / 40)));
-    main.innerHTML = pageHeading("Поиск по справочнику", "Поиск по названиям и описаниям всех загруженных карточек и статей.") + `<form class="toolbar" id="pageSearch"><input type="search" id="pageQuery" value="${escapeHtml(query)}" placeholder="Например, питомцы или BMW M5" aria-label="Поисковый запрос"><select id="searchSection" aria-label="Раздел поиска"><option value="">Все разделы</option>${manifest.sections.map((section) => `<option value="${section.id}" ${section.id === selectedSection ? "selected" : ""}>${escapeHtml(section.title)}</option>`).join("")}</select><button class="primary-button" type="submit">Найти</button></form><p class="muted">Найдено ${numbers.format(results.length)}</p><div class="search-results">${results.slice((page - 1) * 40, page * 40).map((result) => `<a class="search-result" href="${localHref(result.path)}"><span>${escapeHtml(sectionTitle(result.section))}</span><h2>${escapeHtml(result.title)}</h2><p>${escapeHtml(result.summary)}</p></a>`).join("") || '<div class="empty">Совпадений нет. Попробуйте другое название.</div>'}</div>${paginationHtml(page, Math.ceil(results.length / 40))}`;
-    const submit = () => {
-      const next = new URLSearchParams({ q: main.querySelector("#pageQuery").value, section: main.querySelector("#searchSection").value });
-      location.hash = `/search?${next}`;
+  function searchMediaHtml(page, row = {}) {
+    const original = page.image || row.image;
+    const source = original ? imageUrl(original) : page.icon;
+    const cover = original && row.fit !== "contain" && imageOverrides[original]?.fit !== "icon" && ["estate", "business", "factions", "updates", "map"].includes(page.section);
+    return `<span class="card-media search-media ${cover ? "search-media--cover" : ""}" data-section="${escapeHtml(page.section)}" data-icon="${escapeHtml(page.icon || "")}">${source ? `<img src="${escapeHtml(source)}" alt="" loading="lazy" decoding="async" class="${!original || imageOverrides[original]?.fit === "icon" ? "media-icon" : ""}">` : icon(page.searchIcon || icons[page.section])}</span>`;
+  }
+
+  function searchResultHtml(page, metadata) {
+    const row = metadata?.row;
+    const settings = metadata?.settings;
+    let description = page.snippet || (["season", "levels"].includes(page.section) ? page.summary : row?.sub || page.summary);
+    let facts = [];
+    if (row?.vehicle) {
+      const costs = vehicleCosts(row.vehicle);
+      description = `${row.stats[0]}${row.stats[1] ? ` · 0–100 за ${row.stats[1]}` : ""} · багажник ${row.stats[3]}`;
+      facts = [[row.priceLabel, money(row.price)], ["Госстоимость", money(costs.statePrice)], ["Полный тюнинг", costs.tuningPrice == null ? "—" : `≈ ${money(costs.tuningPrice)}`]];
+    } else if (page.section === "map") {
+      facts = (page.facts || []).slice(0, 3).map((fact) => [fact.label, fact.value]);
+    } else if (page.section === "rentals" && page.previewFacts?.length) {
+      facts = page.previewFacts.slice(0, 3);
+    } else if (row && page.section !== "season") {
+      const priceLabel = row.priceLabel || settings.priceTitle || (page.section === "estate" ? { Complex: "Квартиры от", Hotel: "За сутки от" }[row.kind] : page.section === "rentals" && row.kind === "rental" ? "Аренда в час от" : "") || "Цена";
+      if (row.price != null && !settings.noPrice) facts.push([priceLabel, money(row.price, row.currency)]);
+      const columns = page.section === "items" ? ["Вес", "Размер", "В ячейке"] : page.section === "clothes" ? ["Магазины"] : settings.columns || [];
+      facts.push(...columns.slice(0, 3).flatMap((title, index) => row.stats?.[index] != null && row.stats[index] !== "" && row.stats[index] !== "—" ? [[title, catalogStat(row.stats[index], page.section)]] : []));
+    }
+    if (!row && page.section !== "map") facts = (page.previewFacts || []).slice(0, 3);
+    if (description.startsWith(page.title)) description = description.slice(page.title.length).replace(/^[\s:—·-]+/u, "");
+    const kind = page.section === "season" ? "" : row?.kindLabel || page.kindLabel;
+    const category = [sectionTitle(page.section), kind].filter(Boolean).join(" · ");
+    return `<a class="search-result" href="${localHref(page.path)}">${searchMediaHtml(page, row)}<div class="search-result-main"><p class="search-result-type">${escapeHtml(category)}</p><h2>${escapeHtml(page.title)}</h2>${description ? `<p class="search-result-summary">${escapeHtml(description)}</p>` : ""}</div>${icon("arrow-up-right")}${facts.length ? `<dl class="search-facts">${facts.map(([title, value]) => `<div><dt>${escapeHtml(title)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>` : ""}</a>`;
+  }
+
+  async function renderSearch(params, version) {
+    const state = {
+      query: params.get("q") || "",
+      section: manifest.sections.some((section) => section.id === params.get("section")) ? params.get("section") : "",
+      page: Math.max(1, Math.floor(Number(params.get("page")) || 1))
     };
-    main.querySelector("#pageSearch").addEventListener("submit", (event) => { event.preventDefault(); submit(); });
-    main.querySelector("#searchSection").addEventListener("change", submit);
-    main.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => {
-      const next = new URLSearchParams(params);
-      next.set("page", button.dataset.page);
-      location.hash = `/search?${next}`;
-    }));
+    let timer;
+    let revision = 0;
+    let draft = false;
+    main.innerHTML = `<div class="search-page">${pageHeading("Поиск по справочнику", "Вещи, транспорт, места и игровые механики.")}<form class="search-form" id="pageSearch" role="search"><div class="search-input">${icon("search")}<label class="sr-only" for="pageQuery">Поисковый запрос</label><input type="search" id="pageQuery" value="${escapeHtml(state.query)}" placeholder="Название, адрес или игровая механика" autocomplete="off"><button class="icon-button search-clear" id="searchClear" type="button" aria-label="Очистить запрос" ${!state.query ? "hidden" : ""}>${icon("x")}</button></div><button class="primary-button" type="submit">Найти</button></form><nav class="search-scopes" id="searchScopes" aria-label="Разделы результатов поиска"></nav><p class="search-count" id="searchCount" role="status"></p><section class="search-results" id="searchResults" aria-label="Результаты поиска" aria-busy="true"></section></div>`;
+    const input = main.querySelector("#pageQuery");
+    const clear = main.querySelector("#searchClear");
+    const results = main.querySelector("#searchResults");
+    const scopes = main.querySelector("#searchScopes");
+    const count = main.querySelector("#searchCount");
+
+    async function draw() {
+      const ticket = ++revision;
+      results.setAttribute("aria-busy", "true");
+      results.inert = true;
+      count.textContent = "Ищем…";
+      try {
+        const index = await loadSearchIndex();
+        if (ticket !== revision || version !== routeVersion) return;
+        const matches = searchMatches(state.query, index);
+        const counts = new Map(manifest.sections.map((section) => [section.id, 0]));
+        matches.forEach((page) => counts.set(page.section, counts.get(page.section) + 1));
+        if (!searchText(state.query) && !state.section) {
+          scopes.innerHTML = "";
+          count.textContent = "";
+          results.innerHTML = `<div class="search-start"><h2>Примеры запросов</h2><div class="search-examples">${["Ремкомплект", "Питомцы", "BMW E30", "Работы", "Сезонный пропуск"].map((query) => `<a href="${searchHref(query)}">${icon("search")}${query}</a>`).join("")}</div><h2>Поиск по разделам</h2><div class="search-directory">${manifest.sections.map((section) => `<a href="${searchHref("", section.id)}">${icon(icons[section.id])}<span>${escapeHtml(section.title)}</span><small>${numbers.format(counts.get(section.id))}</small></a>`).join("")}</div></div>`;
+          results.setAttribute("aria-busy", "false");
+          results.inert = false;
+          history.replaceState(null, "", searchHref());
+          return;
+        }
+        const filtered = matches.filter((page) => !state.section || page.section === state.section);
+        const pages = Math.max(1, Math.ceil(filtered.length / 20));
+        state.page = Math.min(state.page, pages);
+        const visible = filtered.slice((state.page - 1) * 20, state.page * 20);
+        const sections = [...new Set(visible.map((page) => page.section))].filter((section) => !["articles", "updates", "map"].includes(section));
+        const payloads = await Promise.allSettled(sections.map(loadSection));
+        if (ticket !== revision || version !== routeVersion) return;
+        const metadata = new Map();
+        payloads.forEach((result, index) => {
+          if (result.status !== "fulfilled") return;
+          const section = sections[index];
+          const settings = catalogSettings(section, result.value);
+          normalizeRows(section, result.value).forEach((row) => {
+            if (!metadata.has(row.href)) metadata.set(row.href, { row, settings });
+          });
+        });
+        scopes.innerHTML = `<a data-search-section="" href="${searchHref(state.query)}" ${!state.section ? 'aria-current="page"' : ""}>Все разделы <span>${numbers.format(matches.length)}</span></a>` + manifest.sections.filter((section) => counts.get(section.id) || section.id === state.section).map((section) => `<a data-search-section="${section.id}" href="${searchHref(state.query, section.id)}" ${state.section === section.id ? 'aria-current="page"' : ""}>${escapeHtml(section.title)} <span>${numbers.format(counts.get(section.id))}</span></a>`).join("");
+        count.textContent = `Найдено ${numbers.format(filtered.length)}${pages > 1 ? ` · страница ${state.page} из ${pages}` : ""}`;
+        results.innerHTML = visible.length ? `<div class="search-result-list">${visible.map((page) => searchResultHtml(page, metadata.get(page.path))).join("")}</div>${paginationHtml(state.page, pages)}` : `<div class="search-empty"><h2>Совпадений не найдено</h2><p>Попробуйте другое название или сократите запрос.</p>${state.section ? `<a class="quiet-button" href="${searchHref(state.query)}">Искать во всех разделах</a>` : ""}</div>`;
+        results.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => { location.hash = searchHref(state.query, state.section, Number(button.dataset.page)); }));
+        history.replaceState(null, "", searchHref(state.query, state.section, state.page));
+      } catch (error) {
+        if (ticket !== revision || version !== routeVersion) return;
+        count.textContent = "Не удалось загрузить поиск";
+        results.innerHTML = '<div class="search-empty"><button class="quiet-button" type="button" id="retrySearch">Повторить</button></div>';
+        results.querySelector("#retrySearch").addEventListener("click", draw);
+      }
+      results.setAttribute("aria-busy", "false");
+      results.inert = false;
+    }
+
+    input.addEventListener("input", () => {
+      state.query = input.value;
+      state.page = 1;
+      if (!draft) { history.pushState(null, "", searchHref(state.query, state.section)); draft = true; }
+      revision += 1;
+      clear.hidden = !state.query;
+      document.querySelector("#globalQuery").value = state.query;
+      results.setAttribute("aria-busy", "true");
+      results.inert = true;
+      count.textContent = "Ищем…";
+      scopes.querySelectorAll("[data-search-section]").forEach((link) => { link.href = searchHref(state.query, link.dataset.searchSection); });
+      clearTimeout(timer);
+      timer = setTimeout(draw, 180);
+    });
+    clear.addEventListener("click", () => {
+      input.value = "";
+      state.query = "";
+      state.page = 1;
+      if (!draft) { history.pushState(null, "", searchHref("", state.section)); draft = true; }
+      clear.hidden = true;
+      document.querySelector("#globalQuery").value = "";
+      input.focus();
+      clearTimeout(timer);
+      draw();
+    });
+    main.querySelector("#pageSearch").addEventListener("submit", (event) => {
+      event.preventDefault();
+      clearTimeout(timer);
+      state.query = input.value;
+      state.page = 1;
+      draft = false;
+      document.querySelector("#globalQuery").value = state.query;
+      draw();
+    });
+    document.querySelector("#globalQuery").value = state.query;
+    cleanupView = () => { clearTimeout(timer); revision += 1; };
+    await draw();
   }
 
   function renderMap(payload, params) {
@@ -1077,7 +1259,7 @@
       for (let x = minX; x <= maxX; x += 1) {
         for (let y = minY; y <= maxY; y += 1) tiles.push(`<img class="map-tile" src="https://cdn.region.game/map/dark/${zoom}/${x}/${y}.png" alt="" draggable="false" style="left:${x * 256}px;top:${y * 256}px">`);
       }
-      const visible = data.places.filter((place) => selectedCategories.has(place.cat) && normalize(`${place.name} ${place.kindLabel} ${place.note}`).includes(query));
+      const visible = data.places.filter((place) => selectedCategories.has(place.cat) && query.split(/\s+/).filter(Boolean).every((term) => searchText(`${place.name} ${place.kindLabel} ${place.note} ${place.description || ""}`).includes(term)));
       const markers = visible.map((place) => {
         const point = project(place.x, place.y);
         if (point.x + offsetX < -30 || point.x + offsetX > surface.clientWidth + 30 || point.y + offsetY < -30 || point.y + offsetY > surface.clientHeight + 30) return "";
@@ -1111,7 +1293,7 @@
     main.querySelector("#zoomIn").addEventListener("click", () => changeZoom(1));
     main.querySelector("#zoomOut").addEventListener("click", () => changeZoom(-1));
     main.querySelector("#mapCity").addEventListener("click", () => { center = { x: -600, y: 6000 }; zoom = 3; draw(); });
-    main.querySelector("#mapQuery").addEventListener("input", (event) => { query = normalize(event.target.value); draw(); });
+    main.querySelector("#mapQuery").addEventListener("input", (event) => { query = searchText(event.target.value); draw(); });
     main.querySelectorAll("[data-category]").forEach((input) => input.addEventListener("change", () => { if (input.checked) selectedCategories.add(input.dataset.category); else selectedCategories.delete(input.dataset.category); draw(); }));
     main.querySelectorAll("[data-zone]").forEach((input) => input.addEventListener("change", () => { if (input.checked) selectedZones.add(input.dataset.zone); else selectedZones.delete(input.dataset.zone); draw(); }));
     main.querySelector("#mapAll").addEventListener("click", (event) => {
@@ -1151,6 +1333,7 @@
   }
 
   async function route() {
+    hideGlobalSuggestions();
     document.querySelector("#imageDialog").close();
     document.querySelector("#compareDialog").close();
     if (!manifest) return;
@@ -1170,7 +1353,7 @@
     document.title = `${section === "home" ? "Справочник игрока" : section === "tuning" ? "Калькулятор тюнинга" : section === "search" ? "Поиск" : sectionTitle(section)} — Region Info`;
     try {
       if (section === "home") renderHome();
-      else if (section === "search") renderSearch(url.searchParams);
+      else if (section === "search") await renderSearch(url.searchParams, version);
       else if (section === "tuning") renderTuning(url.searchParams);
       else if (section === "articles" && parts.length === 1) renderArticles(url.searchParams);
       else {
@@ -1184,7 +1367,7 @@
       }
       if (version !== routeVersion) return;
       if (!url.searchParams.get("anchor")) window.scrollTo(0, 0);
-      main.focus({ preventScroll: true });
+      if (!main.contains(document.activeElement) && !document.activeElement.matches("input, textarea, select")) main.focus({ preventScroll: true });
     } catch (error) {
       if (version !== routeVersion) return;
       console.error(error);
@@ -1193,9 +1376,80 @@
     }
   }
 
-  document.querySelector("#globalSearch").addEventListener("submit", (event) => {
+  const globalForm = document.querySelector("#globalSearch");
+  const globalInput = document.querySelector("#globalQuery");
+  const globalSuggestions = document.querySelector("#globalSuggestions");
+  let suggestionOptions = [];
+  let suggestionIndex = -1;
+  let suggestionRevision = 0;
+
+  function hideGlobalSuggestions() {
+    suggestionRevision += 1;
+    globalSuggestions.hidden = true;
+    globalInput.setAttribute("aria-expanded", "false");
+    globalInput.removeAttribute("aria-activedescendant");
+    suggestionIndex = -1;
+  }
+
+  async function showGlobalSuggestions() {
+    const ticket = ++suggestionRevision;
+    const query = globalInput.value;
+    if (!manifest || !searchText(query)) { hideGlobalSuggestions(); return; }
+    try {
+      const index = await loadSearchIndex();
+      if (ticket !== suggestionRevision || globalInput.value !== query || document.activeElement !== globalInput) return;
+      const matches = searchMatches(query, index);
+      suggestionOptions = matches.slice(0, 5);
+      suggestionIndex = -1;
+      globalInput.removeAttribute("aria-activedescendant");
+      globalSuggestions.innerHTML = `<div id="globalSearchOptions" role="listbox" aria-label="Подсказки поиска">` + suggestionOptions.map((page, index) => `<button class="search-option" type="button" role="option" tabindex="-1" id="search-option-${index}" aria-selected="false" data-suggestion="${index}">${searchMediaHtml(page)}<span><b>${escapeHtml(page.title)}</b><small>${escapeHtml(sectionTitle(page.section))}${page.section === "clothes" && page.snippet ? ` · ${escapeHtml(page.snippet)}` : ""}</small></span></button>`).join("") + `</div>${matches.length ? "" : '<p class="search-suggestion-empty">Совпадений нет</p>'}<button class="search-all" type="button" id="showAllSearch">Все результаты · ${numbers.format(matches.length)} ${icon("arrow-right")}</button>`;
+      globalSuggestions.querySelectorAll("[data-suggestion]").forEach((button) => button.addEventListener("click", () => {
+        location.hash = localHref(suggestionOptions[Number(button.dataset.suggestion)].path);
+        hideGlobalSuggestions();
+      }));
+      globalSuggestions.querySelector("#showAllSearch").addEventListener("click", () => globalForm.requestSubmit());
+      globalSuggestions.hidden = false;
+      globalInput.setAttribute("aria-expanded", "true");
+    } catch (error) {
+      if (ticket === suggestionRevision) hideGlobalSuggestions();
+    }
+  }
+
+  globalInput.addEventListener("input", showGlobalSuggestions);
+  globalInput.addEventListener("focus", showGlobalSuggestions);
+  globalInput.addEventListener("keydown", async (event) => {
+    if (event.key === "Escape" && !globalSuggestions.hidden) { event.preventDefault(); hideGlobalSuggestions(); }
+    if (globalSuggestions.hidden && ["ArrowDown", "ArrowUp"].includes(event.key) && searchText(globalInput.value)) {
+      event.preventDefault();
+      const query = globalInput.value;
+      await showGlobalSuggestions();
+      if (globalInput.value !== query) return;
+    }
+    if (!globalSuggestions.hidden && suggestionOptions.length && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      if (suggestionIndex < 0 && direction < 0) suggestionIndex = 0;
+      suggestionIndex = (suggestionIndex + direction + suggestionOptions.length) % suggestionOptions.length;
+      globalSuggestions.querySelectorAll("[data-suggestion]").forEach((button, index) => button.setAttribute("aria-selected", String(index === suggestionIndex)));
+      globalInput.setAttribute("aria-activedescendant", `search-option-${suggestionIndex}`);
+    }
+    if (event.key === "Enter" && !globalSuggestions.hidden && suggestionIndex >= 0) {
+      event.preventDefault();
+      const selected = suggestionOptions[suggestionIndex];
+      globalInput.blur();
+      location.hash = localHref(selected.path);
+      hideGlobalSuggestions();
+    }
+  });
+  globalForm.addEventListener("focusout", (event) => { if (!globalForm.contains(event.relatedTarget)) hideGlobalSuggestions(); });
+  document.addEventListener("pointerdown", (event) => { if (!globalForm.contains(event.target)) hideGlobalSuggestions(); });
+  globalForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    location.hash = `/search?q=${encodeURIComponent(document.querySelector("#globalQuery").value)}`;
+    hideGlobalSuggestions();
+    globalInput.blur();
+    const next = searchHref(globalInput.value);
+    if (location.hash === next) route();
+    else location.hash = next;
   });
   document.querySelector(".skip").addEventListener("click", (event) => {
     event.preventDefault();
