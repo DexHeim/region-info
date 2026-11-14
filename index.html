@@ -8,7 +8,7 @@
   <title>Region Info — справочник по игре Region</title>
   <link rel="icon" href="assets/img/region-info-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-11">
+  <link rel="stylesheet" href="assets/css/wiki.css?v=20261114-12">
   <link rel="stylesheet" href="assets/css/catalog.css?v=20261114-9">
   <link rel="stylesheet" href="assets/css/details.css?v=20261114-9">
 </head>
@@ -31,13 +31,11 @@
     <header class="topbar">
       <button class="icon-button menu-button" id="menuButton" aria-label="Открыть разделы" aria-expanded="false" aria-controls="sidebar"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#menu"></use></svg></button>
       <a class="mobile-brand" href="#/">REGION INFO</a>
-      <form class="global-search" id="globalSearch" role="search">
-        <span aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#search"></use></svg></span>
-        <label class="sr-only" for="globalQuery">Поиск по всему справочнику</label>
-        <input id="globalQuery" type="search" role="combobox" aria-autocomplete="list" aria-controls="globalSearchOptions" aria-expanded="false" placeholder="Найти в справочнике" autocomplete="off">
-        <button type="submit" aria-label="Найти"><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#corner-down-left"></use></svg></button>
-        <div class="search-suggestions" id="globalSuggestions" hidden><div id="globalSearchOptions" role="listbox" aria-label="Подсказки поиска"></div></div>
-      </form>
+      <button class="global-search" id="openSearch" type="button" aria-label="Поиск по всему справочнику" aria-haspopup="dialog" aria-controls="searchDialog" aria-expanded="false" disabled>
+        <svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#search"></use></svg>
+        <span>Машина, предмет, работа или место</span>
+        <kbd>/</kbd>
+      </button>
       <a class="topbar-tuning" href="#/tuning">Калькулятор тюнинга ↗</a>
     </header>
     <main id="main" tabindex="-1"><div class="loading" role="status">Загружаем справочник…</div></main>
@@ -46,6 +44,21 @@
       <span><a href="https://github.com/DexHeim" target="_blank" rel="noreferrer">GitHub · @DexHeim</a> <a href="https://t.me/DexHeim" target="_blank" rel="noreferrer">Telegram</a></span>
     </footer>
   </div>
+  <dialog id="searchDialog" class="search-dialog" aria-label="Поиск по справочнику">
+    <form class="search-dialog-form" id="globalSearch" role="search">
+      <svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#search"></use></svg>
+      <label class="sr-only" for="globalQuery">Поиск по всему справочнику</label>
+      <input id="globalQuery" type="search" role="combobox" aria-autocomplete="list" aria-controls="globalSearchOptions" aria-expanded="false" placeholder="Машина, предмет, работа или место" autocomplete="off" autofocus>
+      <button class="search-dialog-clear icon-button" id="globalSearchClear" type="button" aria-label="Очистить поиск" hidden><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#x"></use></svg></button>
+      <button class="search-dialog-close" id="closeSearch" type="button" aria-label="Закрыть поиск"><kbd>Esc</kbd><svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#x"></use></svg></button>
+    </form>
+    <div class="search-suggestions" id="globalSuggestions"><div id="globalSearchOptions" role="listbox" aria-label="Разделы справочника"></div></div>
+    <p class="sr-only" id="globalSearchStatus" role="status"></p>
+    <div class="search-dialog-footer">
+      <span class="search-key-hints"><span><kbd>↑</kbd><kbd>↓</kbd> выбрать</span><span><kbd>↵</kbd> открыть</span><span><kbd>Esc</kbd> закрыть</span></span>
+      <button class="search-all" id="showAllSearch" type="submit" form="globalSearch">Открыть страницу поиска <svg class="icon" aria-hidden="true"><use href="assets/img/icons.svg#arrow-right"></use></svg></button>
+    </div>
+  </dialog>
   <aside id="compareTray" class="compare-tray" hidden aria-live="polite">
     <span id="compareCount"></span>
     <button id="compareClear" class="quiet-button" type="button">Очистить</button>
@@ -63,6 +76,6 @@
   <div id="toast" class="toast" role="status" hidden></div>
   <noscript><p>Для поиска, каталогов и карты включите JavaScript. <a href="https://wiki.region.game/">Открыть Region Wiki</a></p></noscript>
   <script src="assets/js/tuning.js?v=20260925-4"></script>
-  <script src="assets/js/wiki.js?v=20261114-11" defer></script>
+  <script src="assets/js/wiki.js?v=20261114-12" defer></script>
 </body>
 </html>

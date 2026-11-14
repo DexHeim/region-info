@@ -1456,7 +1456,7 @@
   }
 
   async function route() {
-    hideGlobalSuggestions();
+    closeGlobalSearch();
     document.querySelector("#imageDialog").close();
     document.querySelector("#compareDialog").close();
     if (!manifest) return;
@@ -1502,73 +1502,130 @@
   const globalForm = document.querySelector("#globalSearch");
   const globalInput = document.querySelector("#globalQuery");
   const globalSuggestions = document.querySelector("#globalSuggestions");
+  const searchDialog = document.querySelector("#searchDialog");
+  const searchTrigger = document.querySelector("#openSearch");
+  const searchClear = document.querySelector("#globalSearchClear");
+  const searchStatus = document.querySelector("#globalSearchStatus");
+  const allSearchResults = document.querySelector("#showAllSearch");
   let suggestionOptions = [];
   let suggestionIndex = -1;
   let suggestionRevision = 0;
+  let searchBackdropDown = false;
 
-  function hideGlobalSuggestions() {
+  function closeGlobalSearch() {
     suggestionRevision += 1;
-    globalSuggestions.hidden = true;
+    if (searchDialog.open) searchDialog.close();
+    searchTrigger.setAttribute("aria-expanded", "false");
     globalInput.setAttribute("aria-expanded", "false");
     globalInput.removeAttribute("aria-activedescendant");
     suggestionIndex = -1;
   }
 
+  function openGlobalSearch() {
+    if (!manifest) return;
+    document.body.classList.remove("menu-open");
+    document.querySelector("#menuButton").setAttribute("aria-expanded", "false");
+    if (!searchDialog.open) searchDialog.showModal();
+    searchTrigger.setAttribute("aria-expanded", "true");
+    globalInput.focus({ preventScroll: true });
+    globalInput.select();
+    showGlobalSuggestions();
+  }
+
+  function openSearchOption(option) {
+    closeGlobalSearch();
+    const next = localHref(option.path);
+    if (location.hash === next) main.focus({ preventScroll: true });
+    else location.hash = next;
+  }
+
   async function showGlobalSuggestions() {
+    if (!searchDialog.open) return;
     const ticket = ++suggestionRevision;
     const query = globalInput.value;
-    if (!manifest || !searchText(query)) { hideGlobalSuggestions(); return; }
+    suggestionOptions = [];
+    suggestionIndex = -1;
+    globalInput.removeAttribute("aria-activedescendant");
+    globalInput.setAttribute("aria-expanded", "false");
+    searchClear.hidden = !query;
+    globalSuggestions.inert = true;
+    globalSuggestions.setAttribute("aria-busy", "true");
+    allSearchResults.disabled = true;
+    globalSuggestions.innerHTML = '<div id="globalSearchOptions" role="listbox" aria-label="Результаты поиска"></div><p class="search-suggestion-empty">Загружаем поиск…</p>';
     try {
-      const index = await loadSearchIndex();
-      if (ticket !== suggestionRevision || globalInput.value !== query || document.activeElement !== globalInput) return;
-      const matches = searchMatches(query, index);
-      suggestionOptions = matches.slice(0, 5);
-      suggestionIndex = -1;
-      globalInput.removeAttribute("aria-activedescendant");
-      globalSuggestions.innerHTML = `<div id="globalSearchOptions" role="listbox" aria-label="Подсказки поиска">` + suggestionOptions.map((page, index) => `<button class="search-option" type="button" role="option" tabindex="-1" id="search-option-${index}" aria-selected="false" data-suggestion="${index}">${searchMediaHtml(page)}<span><b>${escapeHtml(page.title)}</b><small>${escapeHtml(sectionTitle(page.section))}${page.section === "clothes" && page.snippet ? ` · ${escapeHtml(page.snippet)}` : ""}</small></span></button>`).join("") + `</div>${matches.length ? "" : '<p class="search-suggestion-empty">Совпадений нет</p>'}<button class="search-all" type="button" id="showAllSearch">Все результаты · ${numbers.format(matches.length)} ${icon("arrow-right")}</button>`;
-      globalSuggestions.querySelectorAll("[data-suggestion]").forEach((button) => button.addEventListener("click", () => {
-        location.hash = localHref(suggestionOptions[Number(button.dataset.suggestion)].path);
-        hideGlobalSuggestions();
-      }));
-      globalSuggestions.querySelector("#showAllSearch").addEventListener("click", () => globalForm.requestSubmit());
-      globalSuggestions.hidden = false;
+      if (!manifest) return;
+      if (!searchText(query)) {
+        suggestionOptions = manifest.sections.map((section) => ({ title: section.title, path: `/${section.id}/` }));
+        globalSuggestions.innerHTML = `<p class="search-suggestion-label" id="searchOptionsTitle">Разделы</p><div class="search-section-options" id="globalSearchOptions" role="listbox" aria-labelledby="searchOptionsTitle">${suggestionOptions.map((section, index) => `<button class="search-section-option" type="button" role="option" tabindex="-1" id="search-option-${index}" aria-selected="false" data-suggestion="${index}">${escapeHtml(section.title)}</button>`).join("")}</div>`;
+        allSearchResults.innerHTML = `Открыть страницу поиска ${icon("arrow-right")}`;
+        searchStatus.textContent = `Доступно ${suggestionOptions.length} разделов`;
+      } else {
+        const index = await loadSearchIndex();
+        if (ticket !== suggestionRevision || !searchDialog.open || globalInput.value !== query) return;
+        const matches = searchMatches(query, index);
+        suggestionOptions = matches.slice(0, 8);
+        globalSuggestions.innerHTML = `<p class="search-suggestion-label" id="searchOptionsTitle">Найдено ${numbers.format(matches.length)}</p><div id="globalSearchOptions" role="listbox" aria-labelledby="searchOptionsTitle">${suggestionOptions.map((page, index) => `<button class="search-option" type="button" role="option" tabindex="-1" id="search-option-${index}" aria-selected="false" data-suggestion="${index}">${searchMediaHtml(page)}<span class="search-option-text"><b>${escapeHtml(page.title)}</b><small>${escapeHtml(sectionTitle(page.section))}${page.section === "clothes" && page.snippet ? ` · ${escapeHtml(page.snippet)}` : ""}</small></span>${icon("arrow-up-right")}</button>`).join("")}</div>${matches.length ? "" : '<p class="search-suggestion-empty">Совпадений нет. Попробуйте другое название или сократите запрос.</p>'}`;
+        allSearchResults.innerHTML = `Все результаты · ${numbers.format(matches.length)} ${icon("arrow-right")}`;
+        searchStatus.textContent = `Найдено ${numbers.format(matches.length)}. Показано ${suggestionOptions.length}`;
+      }
+      globalSuggestions.inert = false;
+      globalSuggestions.setAttribute("aria-busy", "false");
       globalInput.setAttribute("aria-expanded", "true");
+      allSearchResults.disabled = false;
     } catch (error) {
-      if (ticket === suggestionRevision) hideGlobalSuggestions();
+      if (ticket !== suggestionRevision || !searchDialog.open) return;
+      globalSuggestions.innerHTML = '<div id="globalSearchOptions" role="listbox" aria-label="Результаты поиска"></div><p class="search-suggestion-empty">Не удалось загрузить поиск.</p><button class="quiet-button" type="button" id="retryGlobalSearch">Повторить</button>';
+      globalSuggestions.querySelector("#retryGlobalSearch").addEventListener("click", showGlobalSuggestions);
+      globalSuggestions.inert = false;
+      globalSuggestions.setAttribute("aria-busy", "false");
+      searchStatus.textContent = "Не удалось загрузить поиск";
     }
   }
 
+  searchTrigger.addEventListener("click", openGlobalSearch);
+  document.querySelector("#closeSearch").addEventListener("click", closeGlobalSearch);
+  searchDialog.addEventListener("close", () => { if (!searchDialog.open) closeGlobalSearch(); });
+  searchDialog.addEventListener("pointerdown", (event) => { searchBackdropDown = event.target === searchDialog; });
+  searchDialog.addEventListener("click", (event) => {
+    if (!searchBackdropDown || event.target !== searchDialog) return;
+    const bounds = searchDialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeGlobalSearch();
+  });
+  searchClear.addEventListener("click", () => {
+    globalInput.value = "";
+    globalInput.focus();
+    showGlobalSuggestions();
+  });
+  globalSuggestions.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-suggestion]");
+    const selected = button && suggestionOptions[Number(button.dataset.suggestion)];
+    if (selected && !globalSuggestions.inert) openSearchOption(selected);
+  });
   globalInput.addEventListener("input", showGlobalSuggestions);
-  globalInput.addEventListener("focus", showGlobalSuggestions);
-  globalInput.addEventListener("keydown", async (event) => {
-    if (event.key === "Escape" && !globalSuggestions.hidden) { event.preventDefault(); hideGlobalSuggestions(); }
-    if (globalSuggestions.hidden && ["ArrowDown", "ArrowUp"].includes(event.key) && searchText(globalInput.value)) {
+  globalInput.addEventListener("keydown", (event) => {
+    if (event.isComposing) return;
+    if (event.key === "Escape") {
       event.preventDefault();
-      const query = globalInput.value;
-      await showGlobalSuggestions();
-      if (globalInput.value !== query) return;
+      closeGlobalSearch();
+      return;
     }
-    if (!globalSuggestions.hidden && suggestionOptions.length && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+    if (suggestionOptions.length && ["ArrowDown", "ArrowUp"].includes(event.key)) {
       event.preventDefault();
       const direction = event.key === "ArrowDown" ? 1 : -1;
       if (suggestionIndex < 0 && direction < 0) suggestionIndex = 0;
       suggestionIndex = (suggestionIndex + direction + suggestionOptions.length) % suggestionOptions.length;
       globalSuggestions.querySelectorAll("[data-suggestion]").forEach((button, index) => button.setAttribute("aria-selected", String(index === suggestionIndex)));
       globalInput.setAttribute("aria-activedescendant", `search-option-${suggestionIndex}`);
+      globalSuggestions.querySelector(`#search-option-${suggestionIndex}`).scrollIntoView({ block: "nearest" });
     }
-    if (event.key === "Enter" && !globalSuggestions.hidden && suggestionIndex >= 0) {
+    if (event.key === "Enter" && suggestionIndex >= 0) {
       event.preventDefault();
-      const selected = suggestionOptions[suggestionIndex];
-      globalInput.blur();
-      location.hash = localHref(selected.path);
-      hideGlobalSuggestions();
+      openSearchOption(suggestionOptions[suggestionIndex]);
     }
   });
-  globalForm.addEventListener("focusout", (event) => { if (!globalForm.contains(event.relatedTarget)) hideGlobalSuggestions(); });
-  document.addEventListener("pointerdown", (event) => { if (!globalForm.contains(event.target)) hideGlobalSuggestions(); });
   globalForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    hideGlobalSuggestions();
+    closeGlobalSearch();
     globalInput.blur();
     const next = searchHref(globalInput.value);
     if (location.hash === next) route();
@@ -1605,7 +1662,14 @@
   document.querySelector("#compareClose").addEventListener("click", () => document.querySelector("#compareDialog").close());
   document.querySelector("#compareDialog").addEventListener("click", (event) => { if (event.target === event.currentTarget) event.currentTarget.close(); });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName) && !document.querySelector("dialog[open]")) { event.preventDefault(); document.querySelector("#globalQuery").focus(); }
+    const editing = ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName) || event.target.isContentEditable;
+    const searchShortcut = event.key === "/" && !editing && !event.ctrlKey && !event.metaKey && !event.altKey;
+    const commandShortcut = event.key.toLowerCase() === "k" && (event.ctrlKey || event.metaKey);
+    const activeDialog = document.querySelector("dialog[open]");
+    if ((searchShortcut || commandShortcut) && (!activeDialog || activeDialog === searchDialog)) {
+      event.preventDefault();
+      openGlobalSearch();
+    }
     if (event.key === "Escape") { document.body.classList.remove("menu-open"); document.querySelector("#menuButton").setAttribute("aria-expanded", "false"); }
   });
   document.addEventListener("error", (event) => {
@@ -1658,6 +1722,7 @@
   Promise.all([getJson("data/wiki/index.json"), getJson("data/wiki/image-overrides.json").catch(() => ({}))]).then(([index, overrides]) => {
     manifest = index;
     imageOverrides = overrides;
+    searchTrigger.disabled = false;
     document.querySelector("#importDate").textContent = `База от ${dates.format(new Date(index.importedAt))}`;
     route();
   }).catch((error) => {
