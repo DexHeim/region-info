@@ -1512,6 +1512,26 @@
   let suggestionRevision = 0;
   let searchBackdropDown = false;
 
+  function positionGlobalSearch() {
+    if (!searchDialog.open) return;
+    const anchor = searchTrigger.getBoundingClientRect();
+    const viewport = window.visualViewport;
+    const margin = window.matchMedia("(max-width: 600px)").matches ? 10 : 16;
+    const viewportLeft = viewport?.offsetLeft || 0;
+    const viewportTop = viewport?.offsetTop || 0;
+    const viewportWidth = Math.min(viewport?.width || innerWidth, document.documentElement.clientWidth);
+    const viewportBottom = viewportTop + (viewport?.height || innerHeight);
+    const width = Math.min(880, viewportWidth - margin * 2);
+    const right = viewportLeft + viewportWidth - margin;
+    const preferredLeft = anchor.left + width <= right ? anchor.left : anchor.right - width;
+    const left = Math.max(viewportLeft + margin, Math.min(preferredLeft, right - width));
+    const top = Math.max(viewportTop + margin, anchor.bottom + 12);
+    searchDialog.style.setProperty("--search-top", `${top}px`);
+    searchDialog.style.setProperty("--search-left", `${left}px`);
+    searchDialog.style.setProperty("--search-width", `${width}px`);
+    searchDialog.style.setProperty("--search-height", `${Math.max(0, viewportBottom - top - margin)}px`);
+  }
+
   function closeGlobalSearch() {
     suggestionRevision += 1;
     if (searchDialog.open) searchDialog.close();
@@ -1526,6 +1546,7 @@
     document.body.classList.remove("menu-open");
     document.querySelector("#menuButton").setAttribute("aria-expanded", "false");
     if (!searchDialog.open) searchDialog.showModal();
+    positionGlobalSearch();
     searchTrigger.setAttribute("aria-expanded", "true");
     globalInput.focus({ preventScroll: true });
     globalInput.select();
@@ -1583,6 +1604,10 @@
   }
 
   searchTrigger.addEventListener("click", openGlobalSearch);
+  window.addEventListener("resize", positionGlobalSearch);
+  window.addEventListener("scroll", positionGlobalSearch, { passive: true });
+  window.visualViewport?.addEventListener("resize", positionGlobalSearch);
+  window.visualViewport?.addEventListener("scroll", positionGlobalSearch, { passive: true });
   document.querySelector("#closeSearch").addEventListener("click", closeGlobalSearch);
   searchDialog.addEventListener("close", () => { if (!searchDialog.open) closeGlobalSearch(); });
   searchDialog.addEventListener("pointerdown", (event) => { searchBackdropDown = event.target === searchDialog; });
